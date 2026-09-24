@@ -1,3 +1,9 @@
+# peepie
+
+peepie 是 [PentAGI](https://github.com/vxcontrol/pentagi) 的二开 fork，计划支持中英文界面，并持续同步上游更新。当前应用内的 `pentagi` 技术标识与部署配置仍沿用上游；以下为上游文档，不能将其中的镜像地址视作 peepie 的发布地址。
+
+---
+
 # PentAGI
 
 <div align="center" style="font-size: 1.5em; margin: 20px 0;">
