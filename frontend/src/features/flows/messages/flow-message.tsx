@@ -1,4 +1,4 @@
-import { Copy } from 'lucide-react';
+import { Copy, RefreshCw } from 'lucide-react';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -16,6 +16,7 @@ import FlowMessageTypeIcon from './flow-message-type-icon';
 
 interface FlowMessageProps {
     log: AssistantLogFragmentFragment | MessageLogFragmentFragment;
+    occurrenceTimestamps?: string[];
     searchValue?: string;
 }
 
@@ -27,7 +28,7 @@ const containsSearchValue = (text: null | string | undefined, searchValue: strin
     return text.toLowerCase().includes(searchValue.toLowerCase().trim());
 };
 
-function FlowMessage({ log, searchValue = '' }: FlowMessageProps) {
+function FlowMessage({ log, occurrenceTimestamps, searchValue = '' }: FlowMessageProps) {
     const { t } = useTranslation(['flowDetails', 'common']);
     const { createdAt, message, result, resultFormat = ResultFormat.Plain, thinking, type } = log;
     const isReportMessage = type === MessageLogType.Report;
@@ -200,6 +201,21 @@ function FlowMessage({ log, searchValue = '' }: FlowMessageProps) {
                 }`}
             >
                 <FlowMessageTypeIcon type={type} />
+                {occurrenceTimestamps && occurrenceTimestamps.length > 1 && (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <span className="border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400 mx-0.5 inline-flex items-center gap-0.5 rounded-full border px-1.5 py-0.5 text-[10px] font-medium leading-none">
+                                <RefreshCw className="size-2.5" />
+                                {t('messages.retryBadge', { count: occurrenceTimestamps.length })}
+                            </span>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-64 whitespace-pre-line">
+                            {t('messages.retryTooltip', {
+                                times: occurrenceTimestamps.map((ts) => formatDate(new Date(ts))).join('\n'),
+                            })}
+                        </TooltipContent>
+                    </Tooltip>
+                )}
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Copy

@@ -75,6 +75,9 @@
         "clearSearch": "Clear message search",
         "scrollToLatest": "Scroll to latest message",
         "notFound": "No messages found",
+        "retryBadge": "Retried {{count}}×",
+        "retryTooltip": "This step repeated without producing a result, possibly stuck on a failing tool call. Attempts:\n{{times}}",
+        "currentAgent": "Currently handling:",
         "automationEmpty": {
             "title": "No active tasks",
             "description": "Starting a new task may take some time as the Peepie agent downloads the required Docker image"

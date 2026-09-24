@@ -10,7 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
 import { Form, FormControl, FormField } from '@/components/ui/form';
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
-import { StatusType } from '@/graphql/types';
+import FlowAgentIcon, { useAgentTypeLabel } from '@/features/flows/agents/flow-agent-icon';
+import { MessageLogType, StatusType } from '@/graphql/types';
 import { useAutoScroll } from '@/hooks/use-auto-scroll';
 import { cn } from '@/lib/utils';
 import { useFlow } from '@/providers/flow-provider';
@@ -35,9 +36,26 @@ const searchFormSchema = z.object({
 
 function FlowAutomationMessages({ className }: FlowAutomationMessagesProps) {
     const { t } = useTranslation('flowDetails');
+    const getAgentTypeLabel = useAgentTypeLabel();
     const { flowData, flowId, flowStatus, stopAutomation, submitAutomationMessage } = useFlow();
 
     const logs = useMemo(() => flowData?.messageLogs ?? [], [flowData?.messageLogs]);
+
+    // The most recently created agent log tells us which agent role is currently
+    // handling the flow; shown next to the input so the user isn't guessing what
+    // is happening while waiting (agent logs carry no live "in progress" flag,
+    // only completed steps, so this reflects the last agent that reported back).
+    const currentAgent = useMemo(() => {
+        const agentLogs = flowData?.agentLogs;
+
+        if (!agentLogs || agentLogs.length === 0) {
+            return undefined;
+        }
+
+        return agentLogs.reduce((latest, log) =>
+            new Date(log.createdAt).getTime() > new Date(latest.createdAt).getTime() ? log : latest,
+        ).executor;
+    }, [flowData?.agentLogs]);
 
     const [debouncedSearchValue, setDebouncedSearchValue] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -129,6 +147,34 @@ function FlowAutomationMessages({ className }: FlowAutomationMessagesProps) {
 
         return filtered;
     }, [logs, debouncedSearchValue, filter]);
+
+    // Repeated tool-call failures (e.g. parsing errors) make the agent re-emit the
+    // same "thinking" title over and over with no result to show. Collapsing those
+    // consecutive duplicates into one card with a retry badge keeps the timeline
+    // readable instead of showing N near-identical, content-less cards.
+    const groupedLogs = useMemo(() => {
+        const groups: Array<{ occurrences: string[]; representative: (typeof filteredLogs)[number] }> = [];
+
+        for (const log of filteredLogs) {
+            const isRetryCandidate = log.type === MessageLogType.Thoughts && !!log.message && !log.result;
+            const previous = groups[groups.length - 1];
+
+            if (
+                isRetryCandidate &&
+                previous &&
+                previous.representative.type === log.type &&
+                previous.representative.message === log.message &&
+                !previous.representative.result
+            ) {
+                previous.representative = log;
+                previous.occurrences.push(log.createdAt);
+            } else {
+                groups.push({ occurrences: [log.createdAt], representative: log });
+            }
+        }
+
+        return groups;
+    }, [filteredLogs]);
 
     const placeholder = useMemo(() => {
         if (!flowId) {
@@ -256,10 +302,11 @@ function FlowAutomationMessages({ className }: FlowAutomationMessagesProps) {
                         className="flex h-full flex-col gap-4 overflow-y-auto"
                         ref={containerRef}
                     >
-                        {filteredLogs.map((log) => (
+                        {groupedLogs.map((group) => (
                             <FlowMessage
-                                key={log.id}
-                                log={log}
+                                key={group.representative.id}
+                                log={group.representative}
+                                occurrenceTimestamps={group.occurrences}
                                 searchValue={debouncedSearchValue}
                             />
                         ))}
@@ -314,6 +361,20 @@ function FlowAutomationMessages({ className }: FlowAutomationMessagesProps) {
             )}
 
             <div className="bg-background sticky bottom-0 p-px">
+                {flowStatus === StatusType.Running && currentAgent && (
+                    <div className="text-muted-foreground mb-2 flex w-fit items-center gap-1.5 rounded-full border px-2 py-1 text-xs">
+                        <span className="relative flex size-1.5">
+                            <span className="bg-primary absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
+                            <span className="bg-primary relative inline-flex size-1.5 rounded-full" />
+                        </span>
+                        <span>{t('messages.currentAgent')}</span>
+                        <FlowAgentIcon
+                            className="text-foreground"
+                            type={currentAgent}
+                        />
+                        <span className="text-foreground font-medium">{getAgentTypeLabel(currentAgent)}</span>
+                    </div>
+                )}
                 <FlowForm
                     defaultValues={{
                         providerName: flowData?.flow?.provider?.name ?? '',
