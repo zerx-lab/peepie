@@ -114,12 +114,12 @@
         "notSelected": "未选择",
         "modes": {
             "adaptive": "自适应",
-            "budget": "预算",
+            "budget": "固定推理额度",
             "off": "关闭（不思考）"
         },
         "modeDescriptionAdaptiveOnlyCanDisable": "该模型会自适应地思考；选择“关闭”可禁用思考。",
         "modeDescriptionAdaptiveOnly": "该模型仅支持自适应思考，且无法禁用。",
-        "modeDescription": "自适应：由模型决定思考多少；预算：使用固定的 Token 预算；关闭：禁用思考。",
+        "modeDescription": "自适应：由模型决定思考多少；固定推理额度：按预设的 Token 额度推理，实际用量可能更少；关闭：禁用思考。",
         "effortLabel": "推理强度",
         "effortPlaceholder": "选择强度等级（可选）",
         "efforts": {
