@@ -276,15 +276,15 @@ func (s *Styles) RenderMenuItem(text string, selected bool, disabled bool, highl
 	return s.ListItem.Render("  " + text)
 }
 
-// RenderASCIILogo returns the PentAGI ASCII art logo
+// RenderASCIILogo returns the Peepie ASCII art logo
 func (s *Styles) RenderASCIILogo(width int) string {
 	logo := `
- ██████╗ ███████╗███╗   ██╗████████╗ █████╗  ██████╗ ██╗
- ██╔══██╗██╔════╝████╗  ██║╚══██╔══╝██╔══██╗██╔════╝ ██║
- ██████╔╝█████╗  ██╔██╗ ██║   ██║   ███████║██║  ███╗██║
- ██╔═══╝ ██╔══╝  ██║╚██╗██║   ██║   ██╔══██║██║   ██║██║
- ██║     ███████╗██║ ╚████║   ██║   ██║  ██║╚██████╔╝██║
- ╚═╝     ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚═╝
+ ██████╗ ███████╗███████╗██████╗ ██╗███████╗
+ ██╔══██╗██╔════╝██╔════╝██╔══██╗██║██╔════╝
+ ██████╔╝█████╗  █████╗  ██████╔╝██║█████╗
+ ██╔═══╝ ██╔══╝  ██╔══╝  ██╔═══╝ ██║██╔══╝
+ ██║     ███████╗███████╗██║     ██║███████╗
+ ╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝╚══════╝
  `
 
 	// cut logo to width if it's too wide otherwise use full width and center it

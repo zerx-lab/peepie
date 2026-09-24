@@ -37,7 +37,7 @@ func (p *processor) validateOperation(stack ProductStack, operation ProcessorOpe
 
 	case ProcessorOperationResetPassword:
 		if stack != ProductStackPentagi {
-			return fmt.Errorf("operation %s only applicable for PentAGI stack", operation)
+			return fmt.Errorf("operation %s only applicable for Peepie stack", operation)
 		}
 	}
 
@@ -876,11 +876,11 @@ func (p *processor) resetPassword(ctx context.Context, stack ProductStack, state
 	}
 
 	if stack != ProductStackPentagi {
-		return fmt.Errorf("reset password operation only supported for PentAGI stack")
+		return fmt.Errorf("reset password operation only supported for Peepie stack")
 	}
 
 	if !p.checker.PentagiRunning {
-		return fmt.Errorf("PentAGI must be running to reset password")
+		return fmt.Errorf("Peepie must be running to reset password")
 	}
 
 	if state.passwordValue == "" {

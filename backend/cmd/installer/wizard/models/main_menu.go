@@ -81,9 +81,9 @@ func (h *MainMenuHandler) GetOverview() string {
 		Value bool
 	}{
 		{"Docker", checker.DockerApiAccessible},
-		{"PentAGI", checker.PentagiRunning},
+		{locale.ProcessorComponentPentagi, checker.PentagiRunning},
 		{"Langfuse", checker.LangfuseRunning},
-		{"Observability", checker.ObservabilityRunning},
+		{locale.ProcessorComponentObservability, checker.ObservabilityRunning},
 	}
 
 	for _, status := range statusItems {

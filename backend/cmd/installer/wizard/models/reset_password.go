@@ -2,7 +2,7 @@ package models
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"strings"
 
 	"pentagi/cmd/installer/loader"
@@ -150,6 +150,11 @@ func NewResetPasswordModel(
 	}
 }
 
+// IsRunning reports whether the password reset operation is in progress.
+func (m *ResetPasswordModel) IsRunning() bool {
+	return m.operationRunning
+}
+
 // GetFormTitle returns screen title
 func (m *ResetPasswordModel) GetFormTitle() string {
 	return locale.ResetPasswordFormTitle
@@ -278,15 +283,15 @@ func (m *ResetPasswordModel) executePasswordReset(newPassword string, closeOnSuc
 // validatePasswords validates that passwords match and meet requirements
 func (m *ResetPasswordModel) validatePasswords(newPassword, confirmPassword string) error {
 	if newPassword == "" {
-		return fmt.Errorf(locale.ResetPasswordErrorEmptyPassword)
+		return errors.New(locale.ResetPasswordErrorEmptyPassword)
 	}
 
 	if len(newPassword) < 5 {
-		return fmt.Errorf(locale.ResetPasswordErrorShortPassword)
+		return errors.New(locale.ResetPasswordErrorShortPassword)
 	}
 
 	if newPassword != confirmPassword {
-		return fmt.Errorf(locale.ResetPasswordErrorMismatch)
+		return errors.New(locale.ResetPasswordErrorMismatch)
 	}
 
 	return nil

@@ -89,6 +89,11 @@ func (m *ApplyChangesFormModel) BuildForm() tea.Cmd {
 	return m.terminal.Init()
 }
 
+// IsRunning reports whether applying changes or its terminal is still active.
+func (m *ApplyChangesFormModel) IsRunning() bool {
+	return m.running || (m.terminal != nil && m.terminal.IsRunning())
+}
+
 func (m *ApplyChangesFormModel) GetFormTitle() string {
 	return locale.ApplyChangesFormTitle
 }

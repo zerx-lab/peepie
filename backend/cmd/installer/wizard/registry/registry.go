@@ -15,6 +15,8 @@ import (
 type Registry interface {
 	models.Registry
 	HandleMsg(msg tea.Msg) tea.Cmd
+	// HasRunningScreen reports whether any screen runs a background operation.
+	HasRunningScreen() bool
 }
 
 type registry struct {
@@ -163,4 +165,14 @@ func (r *registry) HandleMsg(msg tea.Msg) tea.Cmd {
 	}
 
 	return nil
+}
+
+func (r *registry) HasRunningScreen() bool {
+	for _, screen := range r.screens {
+		if busy, ok := screen.(models.BusyScreen); ok && busy.IsRunning() {
+			return true
+		}
+	}
+
+	return false
 }

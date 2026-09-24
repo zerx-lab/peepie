@@ -104,6 +104,11 @@ func (m *ProcessorOperationFormModel) BuildForm() tea.Cmd {
 	return m.terminal.Init()
 }
 
+// IsRunning reports whether the operation or its terminal is still active.
+func (m *ProcessorOperationFormModel) IsRunning() bool {
+	return m.running || (m.terminal != nil && m.terminal.IsRunning())
+}
+
 func (m *ProcessorOperationFormModel) GetFormTitle() string {
 	return fmt.Sprintf(locale.ProcessorOperationFormTitle, m.operationInfo.title)
 }
@@ -354,7 +359,8 @@ func (m *ProcessorOperationFormModel) handleOperation() tea.Cmd {
 func (m *ProcessorOperationFormModel) handleCompletion(msg processor.ProcessorCompletionMsg) {
 	m.running = false
 	if msg.Error != nil {
-		m.terminal.Append(fmt.Sprintf("%s: %v\n", locale.ProcessorOperationFailed, msg.Error))
+		failed := fmt.Sprintf(locale.ProcessorOperationFailed, strings.ToLower(m.operationInfo.title))
+		m.terminal.Append(fmt.Sprintf("%s: %v\n", failed, msg.Error))
 	} else {
 		m.terminal.Append(fmt.Sprintf(locale.ProcessorOperationCompleted, strings.ToLower(m.operationInfo.title)))
 	}

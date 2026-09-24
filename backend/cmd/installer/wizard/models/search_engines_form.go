@@ -90,8 +90,8 @@ func (m *SearchEnginesFormModel) BuildForm() tea.Cmd {
 	// Perplexity Model (suggestions)
 	fields = append(fields, m.createSelectTextField(
 		"perplexity_model",
-		"Perplexity Model",
-		"Select Perplexity model",
+		locale.ToolsSearchEnginesPerplexityModel,
+		locale.ToolsSearchEnginesPerplexityModelDesc,
 		config.PerplexityModel,
 		[]string{"sonar", "sonar-pro", "sonar-reasoning", "sonar-reasoning-pro", "sonar-deep-research"},
 		false,
@@ -100,8 +100,8 @@ func (m *SearchEnginesFormModel) BuildForm() tea.Cmd {
 	// Perplexity Context Size (suggestions)
 	fields = append(fields, m.createSelectTextField(
 		"perplexity_context_size",
-		"Perplexity Context Size",
-		"Select Perplexity context size",
+		locale.ToolsSearchEnginesPerplexityContextSize,
+		locale.ToolsSearchEnginesPerplexityContextSizeDesc,
 		config.PerplexityContextSize,
 		[]string{"low", "medium", "high"},
 		false,
@@ -432,10 +432,10 @@ func (m *SearchEnginesFormModel) GetCurrentConfiguration() string {
 
 	// Google Search
 	if config.GoogleAPIKey.Value != "" && config.GoogleCXKey.Value != "" {
-		sections = append(sections, fmt.Sprintf("• Google Search: %s",
+		sections = append(sections, fmt.Sprintf("• %s: %s", locale.ToolsSearchEnginesGoogleSearch,
 			m.GetStyles().Success.Render(locale.StatusConfigured)))
 	} else {
-		sections = append(sections, fmt.Sprintf("• Google Search: %s",
+		sections = append(sections, fmt.Sprintf("• %s: %s", locale.ToolsSearchEnginesGoogleSearch,
 			m.GetStyles().Warning.Render(locale.StatusNotConfigured)))
 	}
 
@@ -454,10 +454,10 @@ func (m *SearchEnginesFormModel) GetCurrentConfiguration() string {
 		internalEnabled = config.WebSearchInternalEnabled.Default
 	}
 	if internalEnabled == "true" {
-		sections = append(sections, fmt.Sprintf("• Internal Analytics Engine: %s",
+		sections = append(sections, fmt.Sprintf("• %s: %s", locale.ToolsSearchEnginesInternalEnabled,
 			m.GetStyles().Success.Render(locale.StatusEnabled)))
 	} else {
-		sections = append(sections, fmt.Sprintf("• Internal Analytics Engine: %s",
+		sections = append(sections, fmt.Sprintf("• %s: %s", locale.ToolsSearchEnginesInternalEnabled,
 			m.GetStyles().Warning.Render(locale.StatusDisabled)))
 	}
 

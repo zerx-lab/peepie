@@ -18,6 +18,12 @@ type Registry interface {
 	GetScreen(id ScreenID) BaseScreenModel
 }
 
+// BusyScreen is implemented by screens that run background operations; while
+// IsRunning reports true the screen must not be recreated (e.g. on language switch).
+type BusyScreen interface {
+	IsRunning() bool
+}
+
 // RestoreModel restores the model to the BaseScreenModel interface
 func RestoreModel(model tea.Model) BaseScreenModel {
 	switch m := model.(type) {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/signal"
@@ -15,20 +16,31 @@ import (
 	"pentagi/cmd/installer/hardening"
 	"pentagi/cmd/installer/state"
 	"pentagi/cmd/installer/wizard"
+	"pentagi/cmd/installer/wizard/locale"
 	"pentagi/pkg/version"
 )
 
 type Config struct {
 	envPath     string
 	showVersion bool
+	language    string
 }
 
 func main() {
+	languagePreferencePath := initLanguage()
+
 	config := parseFlags(os.Args)
 
 	if config.showVersion {
 		fmt.Println(version.GetBinaryVersion())
 		os.Exit(0)
+	}
+
+	// parseFlags already switched to a supported -l language; reject anything else
+	if config.language != "" {
+		if _, ok := locale.Normalize(config.language); !ok {
+			log.Fatalf(locale.CLIError, fmt.Errorf(locale.CLIUnsupportedLanguage, config.language, locale.SupportedLanguageTags()))
+		}
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -38,64 +50,100 @@ func main() {
 
 	envPath, err := validateEnvPath(config.envPath)
 	if err != nil {
-		log.Fatalf("Error: %v", err)
+		log.Fatalf(locale.CLIError, err)
 	}
 
 	appState, err := initializeState(envPath)
 	if err != nil {
-		log.Fatalf("Failed to initialize state: %v", err)
+		log.Fatalf(locale.CLIFailedInitState, err)
 	}
 
 	if err := hardening.DoMigrateSettings(appState); err != nil {
-		log.Fatalf("Failed to migrate settings: %v", err)
+		log.Fatalf(locale.CLIFailedMigrate, err)
 	}
 
 	if err := hardening.DoSyncNetworkSettings(appState); err != nil {
-		log.Fatalf("Failed to sync network settings: %v", err)
+		log.Fatalf(locale.CLIFailedSyncNetwork, err)
 	}
 
 	checkResult, err := gatherSystemFacts(ctx, appState)
 	if err != nil {
-		log.Fatalf("Failed to gather system facts: %v", err)
+		log.Fatalf(locale.CLIFailedGatherFacts, err)
 	}
 
 	printStartupInfo(envPath, checkResult)
 
 	if err := hardening.DoHardening(appState, checkResult); err != nil {
-		log.Fatalf("Failed to do hardening: %v", err)
+		log.Fatalf(locale.CLIFailedHardening, err)
 	}
 
-	if err := runApplication(ctx, appState, checkResult); err != nil {
-		log.Fatalf("Application error: %v", err)
+	if err := runApplication(ctx, appState, checkResult, languagePreferencePath); err != nil {
+		log.Fatalf(locale.CLIApplicationError, err)
 	}
 
 	cleanup(appState)
 }
 
-func parseFlags(args []string) Config {
-	var config Config
+// initLanguage applies the language chosen earlier with Ctrl+L, else the system
+// language, before anything is printed. It returns where Ctrl+L saves the choice
+// ("" when the user config dir is unavailable, which disables saving).
+func initLanguage() string {
+	lang := locale.DetectSystemLanguage(os.Getenv)
 
+	path, err := locale.PreferencePath()
+	if err != nil {
+		path = ""
+	} else if saved, ok := locale.LoadPreference(path); ok {
+		lang = saved
+	}
+
+	// detected and loaded languages are always supported
+	_ = locale.SetLanguage(lang)
+
+	return path
+}
+
+func parseFlags(args []string) Config {
 	name := "installer"
 	if len(args) > 0 {
 		args, name = args[1:], filepath.Base(args[0])
 	}
 
-	flagSet := flag.NewFlagSet(name, flag.ContinueOnError)
-	flagSet.BoolVar(&config.showVersion, "v", false, "Show version information")
-	flagSet.StringVar(&config.envPath, "e", ".env", "Path to environment file")
+	// A silent first pass only resolves -l, so the flag descriptions and usage text
+	// of the real pass below are already in the requested language.
+	var probe Config
+	probeSet := newFlagSet(name, &probe)
+	probeSet.SetOutput(io.Discard)
+	probeSet.Usage = func() {}
+	_ = probeSet.Parse(args)
+	if lang, ok := locale.Normalize(probe.language); ok {
+		_ = locale.SetLanguage(lang) // Normalize only returns supported languages
+	}
+
+	var config Config
+	flagSet := newFlagSet(name, &config)
 	flagSet.Usage = func() {
-		fmt.Fprintf(os.Stderr, "PentAGI Installer v%s\n\n", version.GetBinaryVersion())
-		fmt.Fprintf(os.Stderr, "Usage: %s [options]\n\n", name)
-		fmt.Fprintf(os.Stderr, "Options:\n")
+		fmt.Fprintf(os.Stderr, locale.CLIUsageTitle+"\n\n", version.GetBinaryVersion())
+		fmt.Fprintf(os.Stderr, locale.CLIUsageLine+"\n\n", name)
+		fmt.Fprintln(os.Stderr, locale.CLIUsageOptions)
 		flagSet.PrintDefaults()
-		fmt.Fprintf(os.Stderr, "\nExamples:\n")
-		fmt.Fprintf(os.Stderr, "  %s                    # Use default .env file\n", name)
-		fmt.Fprintf(os.Stderr, "  %s -e config/.env     # Use custom env file\n", name)
-		fmt.Fprintf(os.Stderr, "  %s -v                 # Show version\n", name)
+		fmt.Fprintf(os.Stderr, "\n%s\n", locale.CLIUsageExamples)
+		fmt.Fprintf(os.Stderr, "  %s                    # %s\n", name, locale.CLIExampleDefault)
+		fmt.Fprintf(os.Stderr, "  %s -e config/.env     # %s\n", name, locale.CLIExampleEnvFile)
+		fmt.Fprintf(os.Stderr, "  %s -l zh-CN           # %s\n", name, locale.CLIExampleLanguage)
+		fmt.Fprintf(os.Stderr, "  %s -v                 # %s\n", name, locale.CLIExampleVersion)
 	}
 
 	flagSet.Parse(args)
 	return config
+}
+
+func newFlagSet(name string, config *Config) *flag.FlagSet {
+	flagSet := flag.NewFlagSet(name, flag.ContinueOnError)
+	flagSet.BoolVar(&config.showVersion, "v", false, locale.CLIFlagVersion)
+	flagSet.StringVar(&config.envPath, "e", ".env", locale.CLIFlagEnvFile)
+	flagSet.StringVar(&config.language, "l", "", fmt.Sprintf(locale.CLIFlagLanguage, locale.SupportedLanguageTags()))
+	return flagSet
 }
 
 func setupSignalHandler(cancel context.CancelFunc) {
@@ -183,23 +231,25 @@ func gatherSystemFacts(ctx context.Context, appState state.State) (checker.Check
 }
 
 func printStartupInfo(envPath string, checkResult checker.CheckResult) {
-	fmt.Printf("PentAGI Installer v%s\n", version.GetBinaryVersion())
-	fmt.Printf("Environment file: %s\n", envPath)
+	fmt.Printf(locale.CLIStartupTitle+"\n", version.GetBinaryVersion())
+	fmt.Printf(locale.CLIStartupEnvFile+"\n", envPath)
 
 	if !checkResult.IsReadyToContinue() {
-		fmt.Println("⚠️  System is not ready to continue. Please resolve the issues above.")
+		fmt.Println(locale.CLISystemNotReady)
 	} else {
-		fmt.Println("✅ System is ready to continue.")
+		fmt.Println(locale.CLISystemReady)
 	}
 }
 
-func runApplication(ctx context.Context, appState state.State, checkResult checker.CheckResult) error {
-	return wizard.Run(ctx, appState, checkResult, files.NewFiles())
+func runApplication(
+	ctx context.Context, appState state.State, checkResult checker.CheckResult, languagePreferencePath string,
+) error {
+	return wizard.Run(ctx, appState, checkResult, files.NewFiles(), languagePreferencePath)
 }
 
 func cleanup(appState state.State) {
 	if appState.IsDirty() {
-		fmt.Println("You have pending changes.")
-		fmt.Println("Run the installer again to continue or commit your changes.")
+		fmt.Println(locale.CLIPendingChanges)
+		fmt.Println(locale.CLIPendingChangesHint)
 	}
 }

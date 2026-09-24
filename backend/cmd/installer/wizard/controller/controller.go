@@ -211,7 +211,7 @@ func (c *controller) GetLLMProviders() map[string]*LLMProviderConfig {
 func (c *controller) GetLLMProviderConfig(providerID string) *LLMProviderConfig {
 	providersConfigsPath := GetEmbeddedLLMConfigsPath(c.files)
 	providerConfig := &LLMProviderConfig{
-		Name:                   "Unknown",
+		Name:                   locale.LLMProviderUnknownName,
 		EmbeddedLLMConfigsPath: providersConfigsPath,
 	}
 
@@ -299,7 +299,7 @@ func (c *controller) GetLLMProviderConfig(providerID string) *LLMProviderConfig 
 		providerConfig.Configured = providerConfig.APIKey.Value != ""
 
 	case "custom":
-		providerConfig.Name = "Custom"
+		providerConfig.Name = locale.LLMProviderCustomName
 		providerConfig.BaseURL, _ = c.GetVar("LLM_SERVER_URL")
 		providerConfig.APIKey, _ = c.GetVar("LLM_SERVER_KEY")
 		providerConfig.Model, _ = c.GetVar("LLM_SERVER_MODEL")

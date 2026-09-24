@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"pentagi/cmd/installer/wizard/locale"
 	"pentagi/pkg/version"
 )
 
@@ -52,6 +53,24 @@ func TestParseFlags(t *testing.T) {
 				t.Errorf("Expected showVersion %v, got %v", tt.expectedVersion, config.showVersion)
 			}
 		})
+	}
+}
+
+func TestParseFlagsLanguage(t *testing.T) {
+	t.Cleanup(func() { _ = locale.SetLanguage(locale.LanguageEnglish) })
+
+	config := parseFlags([]string{"test", "-e", "custom.env", "-l", "zh_CN.UTF-8"})
+	if config.language != "zh_CN.UTF-8" || config.envPath != "custom.env" {
+		t.Fatalf("unexpected config: %+v", config)
+	}
+	if got := locale.Current(); got != locale.LanguageChineseSimplified {
+		t.Fatalf("-l must switch the language before usage is built, got %s", got)
+	}
+
+	// unsupported values are left for main to reject; the language stays unchanged
+	config = parseFlags([]string{"test", "-l", "fr"})
+	if config.language != "fr" || locale.Current() != locale.LanguageChineseSimplified {
+		t.Fatalf("unsupported -l must not switch language: %+v, %s", config, locale.Current())
 	}
 }
 

@@ -211,10 +211,10 @@ func (m *DockerFormModel) GetCurrentConfiguration() string {
 		dockerInside = config.DockerInside.Default
 	}
 	if dockerInside == "true" {
-		sections = append(sections, fmt.Sprintf("• Docker Access: %s",
+		sections = append(sections, fmt.Sprintf("• %s: %s", locale.ToolsDockerInside,
 			m.GetStyles().Success.Render(locale.StatusEnabled)))
 	} else {
-		sections = append(sections, fmt.Sprintf("• Docker Access: %s",
+		sections = append(sections, fmt.Sprintf("• %s: %s", locale.ToolsDockerInside,
 			m.GetStyles().Warning.Render(locale.StatusDisabled)))
 	}
 
@@ -223,63 +223,63 @@ func (m *DockerFormModel) GetCurrentConfiguration() string {
 		dockerNetAdmin = config.DockerNetAdmin.Default
 	}
 	if dockerNetAdmin == "true" {
-		sections = append(sections, fmt.Sprintf("• Network Admin: %s",
+		sections = append(sections, fmt.Sprintf("• %s: %s", locale.ToolsDockerNetAdmin,
 			m.GetStyles().Success.Render(locale.StatusEnabled)))
 	} else {
-		sections = append(sections, fmt.Sprintf("• Network Admin: %s",
+		sections = append(sections, fmt.Sprintf("• %s: %s", locale.ToolsDockerNetAdmin,
 			m.GetStyles().Warning.Render(locale.StatusDisabled)))
 	}
 
 	// Connection settings
 	if config.DockerNetwork.Value != "" {
-		sections = append(sections, fmt.Sprintf("• Custom Network: %s",
+		sections = append(sections, fmt.Sprintf("• %s: %s", locale.ToolsDockerSummaryCustomNetwork,
 			m.GetStyles().Success.Render(locale.StatusConfigured)))
 	} else {
-		sections = append(sections, fmt.Sprintf("• Custom Network: %s",
+		sections = append(sections, fmt.Sprintf("• %s: %s", locale.ToolsDockerSummaryCustomNetwork,
 			m.GetStyles().Warning.Render(locale.StatusNotConfigured)))
 	}
 
 	if config.DockerPublicIP.Value != "" && config.DockerPublicIP.Value != "0.0.0.0" {
-		sections = append(sections, fmt.Sprintf("• Public IP: %s",
+		sections = append(sections, fmt.Sprintf("• %s: %s", locale.ToolsDockerSummaryPublicIP,
 			m.GetStyles().Success.Render(locale.StatusConfigured)))
 	} else {
-		sections = append(sections, fmt.Sprintf("• Public IP: %s",
+		sections = append(sections, fmt.Sprintf("• %s: %s", locale.ToolsDockerSummaryPublicIP,
 			m.GetStyles().Warning.Render(locale.StatusNotConfigured)))
 	}
 
 	// Default images
 	if config.DockerDefaultImage.Value != "" {
-		sections = append(sections, fmt.Sprintf("• Default Image: %s",
+		sections = append(sections, fmt.Sprintf("• %s: %s", locale.ToolsDockerDefaultImage,
 			m.GetStyles().Success.Render(locale.StatusConfigured)))
 	} else {
-		sections = append(sections, fmt.Sprintf("• Default Image: %s",
+		sections = append(sections, fmt.Sprintf("• %s: %s", locale.ToolsDockerDefaultImage,
 			m.GetStyles().Warning.Render(locale.StatusNotConfigured)))
 	}
 
 	if config.DockerDefaultImageForPentest.Value != "" {
-		sections = append(sections, fmt.Sprintf("• Pentest Image: %s",
+		sections = append(sections, fmt.Sprintf("• %s: %s", locale.ToolsDockerSummaryPentestImage,
 			m.GetStyles().Success.Render(locale.StatusConfigured)))
 	} else {
-		sections = append(sections, fmt.Sprintf("• Pentest Image: %s",
+		sections = append(sections, fmt.Sprintf("• %s: %s", locale.ToolsDockerSummaryPentestImage,
 			m.GetStyles().Warning.Render(locale.StatusNotConfigured)))
 	}
 
 	// TLS settings
 	if config.DockerHost.Value != "" && config.DockerTLSVerify.Value == "1" && config.HostDockerCertPath.Value != "" {
-		sections = append(sections, fmt.Sprintf("• TLS Connection: %s",
+		sections = append(sections, fmt.Sprintf("• %s: %s", locale.ToolsDockerSummaryTLSConnection,
 			m.GetStyles().Success.Render(locale.StatusConfigured)))
 	} else if config.DockerHost.Value != "" {
-		sections = append(sections, fmt.Sprintf("• Remote Connection: %s",
+		sections = append(sections, fmt.Sprintf("• %s: %s", locale.ToolsDockerSummaryRemoteConnection,
 			m.GetStyles().Success.Render(locale.StatusConfigured)))
 	}
 
 	// Worker daemon endpoint — only meaningful when Docker Access is enabled.
 	if dockerInside == "true" {
 		if config.DockerInsideHost.Value != "" {
-			sections = append(sections, fmt.Sprintf("• Worker Docker Daemon: %s",
+			sections = append(sections, fmt.Sprintf("• %s: %s", locale.ToolsDockerSummaryWorkerDaemon,
 				m.GetStyles().Success.Render(locale.StatusConfigured)))
 		} else {
-			sections = append(sections, fmt.Sprintf("• Worker Docker Daemon: %s",
+			sections = append(sections, fmt.Sprintf("• %s: %s", locale.ToolsDockerSummaryWorkerDaemon,
 				m.GetStyles().Warning.Render(locale.StatusNotConfigured)))
 		}
 	}

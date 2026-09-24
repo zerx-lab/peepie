@@ -1,7 +1,13 @@
+// Package locale holds every user-visible string of the installer TUI.
+//
+// Text is declared as package-level `var`s holding the English source; other
+// languages are catalogs in catalog_<lang>.go that SetLanguage swaps in at
+// runtime (see i18n.go). Identifiers that are not user-visible text stay
+// `const`. locale_test.go enforces that every text var is translated.
 package locale
 
 // Common status and UI strings
-const (
+var (
 	// Common status and UI strings
 	UIStatistics       = "Statistics"
 	UIStatus           = "Status: "
@@ -28,13 +34,13 @@ const (
 )
 
 // Legend constants
-const (
+var (
 	LegendConfigured    = "✓ Configured"
 	LegendNotConfigured = "✗ Not configured"
 )
 
 // Common Navigation Actions (always available)
-const (
+var (
 	NavBack       = "Esc: Back"
 	NavExit       = "Ctrl+Q: Exit"
 	NavUpDown     = "↑/↓: Scroll/Select"
@@ -48,14 +54,16 @@ const (
 	NavCtrlR      = "Ctrl+R: Reset"
 	NavCtrlH      = "Ctrl+H: Show/Hide"
 	NavTab        = "Tab: Complete"
-	NavSeparator  = " • "
+	// NavCtrlL names the language Ctrl+L switches to (native name, e.g. "简体中文")
+	NavCtrlL     = "Ctrl+L: Switch to %s"
+	NavSeparator = " • "
 )
 
 // Welcome Screen constants
-const (
+var (
 	// Form interface implementation
-	WelcomeFormTitle       = "Welcome to PentAGI"
-	WelcomeFormDescription = "PentAGI is an autonomous penetration testing platform that leverages AI technologies to perform comprehensive security assessments."
+	WelcomeFormTitle       = "Welcome to Peepie"
+	WelcomeFormDescription = "Peepie is an autonomous penetration testing platform that leverages AI technologies to perform comprehensive security assessments."
 	WelcomeFormName        = "Welcome"
 	WelcomeFormOverview    = `System checks verify:
 • Environment configuration file presence
@@ -78,17 +86,17 @@ The installer guides you through each component setup with recommendations for d
 	WelcomeWorkflowStep2 = "2. Configure LLM providers (OpenAI, Anthropic, etc.)"
 	WelcomeWorkflowStep3 = "3. Set up integrations (Langfuse, Observability)"
 	WelcomeWorkflowStep4 = "4. Configure security settings"
-	WelcomeWorkflowStep5 = "5. Deploy and start PentAGI services"
+	WelcomeWorkflowStep5 = "5. Deploy and start Peepie services"
 	WelcomeSystemReady   = "✓ System ready - Press Enter to continue"
 )
 
 // Troubleshooting on welcome screen constants
-const (
+var (
 	TroubleshootTitle = "System Requirements Not Met"
 
 	// Environment file issues
 	TroubleshootEnvFileTitle = "Environment Configuration Missing"
-	TroubleshootEnvFileDesc  = "The .env file is required for PentAGI configuration but was not found or is not readable."
+	TroubleshootEnvFileDesc  = "The .env file is required for Peepie configuration but was not found or is not readable."
 	TroubleshootEnvFileFix   = `To fix:
 1. Copy .env.example to .env in your installation directory
 2. Edit .env and configure at least one LLM provider API key
@@ -108,7 +116,7 @@ cp .env.example .env && chmod 644 .env`
 
 	// Docker not installed
 	TroubleshootDockerNotInstalledTitle = "Docker Not Installed"
-	TroubleshootDockerNotInstalledDesc  = "Docker is not installed on this system. PentAGI requires Docker to run containers."
+	TroubleshootDockerNotInstalledDesc  = "Docker is not installed on this system. Peepie requires Docker to run containers."
 	TroubleshootDockerNotInstalledFix   = `To fix:
 1. Install Docker Desktop: https://docs.docker.com/get-docker/
 2. For Linux: Follow distribution-specific instructions
@@ -145,7 +153,7 @@ cp .env.example .env && chmod 644 .env`
 
 	// Docker version issues
 	TroubleshootDockerVersionTitle = "Docker Version Too Old"
-	TroubleshootDockerVersionDesc  = "Your Docker version is incompatible. PentAGI requires Docker 20.0.0 or newer."
+	TroubleshootDockerVersionDesc  = "Your Docker version is incompatible. Peepie requires Docker 20.0.0 or newer."
 	TroubleshootDockerVersionFix   = `To fix:
 1. Update Docker to version 20.0.0 or newer
 2. Visit https://docs.docker.com/engine/install/
@@ -161,12 +169,12 @@ Required: 20.0.0+`
 2. Verify the plugin is available: docker compose version
 3. If only legacy docker-compose is installed, install the Docker Compose v2 plugin as well
 
-PentAGI executes "docker compose", so legacy "docker-compose" alone is not sufficient.
+Peepie executes "docker compose", so legacy "docker-compose" alone is not sufficient.
 Documentation: https://docs.docker.com/compose/install/`
 
 	// Docker Compose version issues
 	TroubleshootComposeVersionTitle = "Docker Compose Version Too Old"
-	TroubleshootComposeVersionDesc  = "Your `docker compose` version is incompatible. PentAGI requires Docker Compose 1.25.0 or newer."
+	TroubleshootComposeVersionDesc  = "Your `docker compose` version is incompatible. Peepie requires Docker Compose 1.25.0 or newer."
 	TroubleshootComposeVersionFix   = `Current version: %s
 Required: 1.25.0+
 
@@ -191,7 +199,7 @@ Documentation: https://docs.docker.com/compose/install/`
 
 	// CPU issues
 	TroubleshootCPUTitle = "Insufficient CPU Cores"
-	TroubleshootCPUDesc  = "PentAGI requires at least 2 CPU cores for proper operation."
+	TroubleshootCPUDesc  = "Peepie requires at least 2 CPU cores for proper operation."
 	TroubleshootCPUFix   = `Your system has %d CPU core(s), but 2+ are required.
 
 For virtual machines:
@@ -206,7 +214,7 @@ Settings → Resources → CPUs: Set to 2 or more`
 	TroubleshootMemoryDesc  = "Not enough free memory for selected components."
 	TroubleshootMemoryFix   = `Memory requirements:
 • Base system: 0.5 GB
-• PentAGI core: +0.5 GB
+• Peepie core: +0.5 GB
 • Langfuse (if enabled): +1.5 GB
 • Observability (if enabled): +1.5 GB
 
@@ -262,7 +270,7 @@ To fix:
 )
 
 // System Checks constants
-const (
+var (
 	ChecksTitle               = "System Checks"
 	ChecksWarningFailed       = "⚠ Some checks failed"
 	CheckEnvironmentFile      = "Environment file"
@@ -277,11 +285,11 @@ const (
 )
 
 // EULA Screen constants
-const (
+var (
 	// Form interface implementation
-	EULAFormDescription = "Legal terms and conditions for PentAGI usage"
+	EULAFormDescription = "Legal terms and conditions for Peepie usage"
 	EULAFormName        = "EULA"
-	EULAFormOverview    = `Review and accept the End User License Agreement to proceed with PentAGI installation.
+	EULAFormOverview    = `Review and accept the End User License Agreement to proceed with Peepie installation.
 
 The EULA contains:
 • Software license terms and usage rights
@@ -306,11 +314,11 @@ Use arrow keys, page up/down, or home/end keys to navigate through the document.
 )
 
 // Main Menu Screen constants
-const (
-	MainMenuTitle       = "PentAGI Configuration"
-	MainMenuDescription = "Configure all PentAGI components and settings"
+var (
+	MainMenuTitle       = "Peepie Configuration"
+	MainMenuDescription = "Configure all Peepie components and settings"
 	MainMenuName        = "Main Menu"
-	MainMenuOverview    = `Welcome to PentAGI Configuration Center.
+	MainMenuOverview    = `Welcome to Peepie Configuration Center.
 
 Configure essential components:
 • LLM Providers - AI language models for autonomous testing
@@ -318,17 +326,17 @@ Configure essential components:
 • Tools - Additional capabilities for enhanced testing
 • System Settings - Environment and deployment options
 
-Navigate through each section to complete your PentAGI setup.`
+Navigate through each section to complete your Peepie setup.`
 
 	MenuTitle        = "Configuration Menu"
 	MenuSystemStatus = "System Status"
 )
 
 // Main Menu Status Labels (not used)
-const (
-	MainMenuStatusPentagiRunning     = "PentAGI is already running"
-	MainMenuStatusPentagiNotRunning  = "Ready to start PentAGI services"
-	MainMenuStatusUpToDate           = "PentAGI is up to date"
+var (
+	MainMenuStatusPentagiRunning     = "Peepie is already running"
+	MainMenuStatusPentagiNotRunning  = "Ready to start Peepie services"
+	MainMenuStatusUpToDate           = "Peepie is up to date"
 	MainMenuStatusUpdatesAvailable   = "Updates are available"
 	MainMenuStatusReadyToStart       = "Ready to start"
 	MainMenuStatusAllServicesRunning = "All services are running"
@@ -336,11 +344,13 @@ const (
 )
 
 // LLM Providers Screen constants
-const (
+var (
 	LLMProvidersTitle       = "LLM Providers Configuration"
 	LLMProvidersDescription = "Configure Large Language Model providers for AI agents"
 	LLMProvidersName        = "LLM Providers"
-	LLMProvidersOverview    = `PentAGI uses specialized AI agents (researcher, developer, executor, pentester) that require different LLM capabilities for optimal penetration testing results.
+	LLMProviderUnknownName  = "Unknown"
+	LLMProviderCustomName   = "Custom"
+	LLMProvidersOverview    = `Peepie uses specialized AI agents (researcher, developer, executor, pentester) that require different LLM capabilities for optimal penetration testing results.
 
 Why multiple providers matter:
 • Agent Specialization: Different agents benefit from models optimized for reasoning, coding, or analysis
@@ -356,7 +366,7 @@ Ready-to-use configurations for OpenRouter, DeepInfra, vLLM, Ollama, and other p
 )
 
 // LLM Provider titles and descriptions
-const (
+var (
 	LLMProviderOpenAI        = "OpenAI"
 	LLMProviderAnthropic     = "Anthropic"
 	LLMProviderGemini        = "Google Gemini"
@@ -382,10 +392,10 @@ const (
 )
 
 // Provider-specific help text
-const (
+var (
 	LLMFormOpenAIHelp = `OpenAI delivers industry-leading models with cutting-edge reasoning capabilities perfect for sophisticated penetration testing.
 
-Default PentAGI Models:
+Default Peepie Models:
 • o1, o4-mini: Advanced reasoning models for complex vulnerability analysis and strategic planning
 • GPT-4.1, GPT-4.1-mini: Flagship models optimized for exploit development and code generation
 • Automatic model selection based on agent type and task complexity
@@ -403,7 +413,7 @@ Setup: Get your API key from https://platform.openai.com/api-keys`
 
 	LLMFormAnthropicHelp = `Anthropic Claude models excel in safety-conscious penetration testing with superior reasoning and analytical capabilities.
 
-Default PentAGI Models:
+Default Peepie Models:
 • Claude Sonnet-4: Premium reasoning model for complex security analysis and strategic vulnerability assessment
 • Claude 3.5 Haiku: High-speed model optimized for rapid information gathering and simple parsing tasks
 • Balanced cost-performance ratio across all security testing scenarios
@@ -421,7 +431,7 @@ Setup: Get your API key from https://console.anthropic.com/`
 
 	LLMFormGeminiHelp = `Google Gemini combines multimodal capabilities with advanced reasoning, perfect for comprehensive security assessments.
 
-Default PentAGI Models:
+Default Peepie Models:
 • Gemini 2.5 Pro: Advanced reasoning model for deep vulnerability analysis and complex exploit development
 • Gemini 2.5 Flash: High-performance model balancing speed and intelligence for most security testing tasks
 • Gemini 2.0 Flash Lite: Cost-effective model for rapid scanning and information gathering operations
@@ -440,7 +450,7 @@ Setup: Get your API key from https://aistudio.google.com/app/apikey`
 
 	LLMFormBedrockHelp = `AWS Bedrock provides enterprise-grade access to 20+ foundation models with multiple authentication methods and enhanced security.
 
-Default PentAGI Models:
+Default Peepie Models:
 • Claude Sonnet-4.5 (via Bedrock): Premium reasoning model with AWS enterprise security and extended thinking capabilities
 • OpenAI GPT OSS 120B: Strong reasoning model for scientific analysis and complex security tasks
 • Claude Haiku-4.5, DeepSeek V3.2, Qwen3-32B: Efficient models for specific agent roles and cost optimization
@@ -480,7 +490,7 @@ Scenario 2: Ollama Cloud (Managed Service)
 • API key required - generate at https://ollama.com/settings/keys
 • Setup: Register at https://ollama.com, configure OLLAMA_SERVER_URL=https://ollama.com + OLLAMA_SERVER_API_KEY=your_key
 
-Default PentAGI Models:
+Default Peepie Models:
 • Llama 3.1:8b, Qwen3:32b, and other open models
 • Customizable - switch between 100+ available models
 • Model auto-download and loading options for convenience
@@ -496,7 +506,7 @@ Setup options: Local installation from https://10.10.10.10:11434 or cloud regist
 
 	LLMFormDeepSeekHelp = `DeepSeek provides advanced AI models with strong reasoning capabilities and multilingual support.
 
-Default PentAGI Models:
+Default Peepie Models:
 • deepseek-v4-flash: Cost-efficient general-purpose model for dialogue, code generation, and tool calling
 • deepseek-v4-pro: Higher-tier reasoning model for complex logic, mathematical reasoning, and security analysis
 • Cost-effective pricing with competitive performance compared to leading models
@@ -519,7 +529,7 @@ Setup: Get your API key from https://platform.deepseek.com/`
 
 	LLMFormGLMHelp = `GLM from Zhipu AI provides advanced language models with strong NLP and reasoning capabilities developed by Tsinghua University.
 
-Default PentAGI Models:
+Default Peepie Models:
 • GLM-4-Air: High performance general dialogue model optimized for regular tasks and tool calling
 • GLM-4-Plus: Flagship model with strong reasoning and code generation capabilities
 • GLM-Z1-Plus: Advanced reasoning model with deep analysis capabilities for security research
@@ -547,7 +557,7 @@ Setup: Get your API key from https://open.bigmodel.cn/`
 
 	LLMFormKimiHelp = `Kimi from Moonshot AI provides ultra-long context models perfect for analyzing extensive codebases and documentation.
 
-Default PentAGI Models:
+Default Peepie Models:
 • Moonshot-v1-8k: Long-context model supporting up to 8K tokens for general dialogue
 • Kimi-k2.5: Advanced model with strong reasoning and document understanding
 • Optimized for processing large volumes of text and code
@@ -574,7 +584,7 @@ Setup: Get your API key from https://platform.moonshot.ai/`
 
 	LLMFormQwenHelp = `Qwen from Alibaba Cloud Model Studio (DashScope) provides powerful multilingual models with multimodal capabilities.
 
-Default PentAGI Models:
+Default Peepie Models:
 • Qwen-Turbo: Fastest lightweight model for high-frequency tasks and real-time response scenarios
 • Qwen-Plus: Balanced performance model for general dialogue, code generation, and tool calling
 • Qwen-Max: Flagship reasoning model with strong instruction following and complex task handling
@@ -604,7 +614,7 @@ Setup: Get your API key from https://dashscope.console.aliyun.com/`
 
 	LLMFormMiniMaxHelp = `MiniMax provides the M-series of agentic models with very large context windows, accessible through an OpenAI-compatible API.
 
-Default PentAGI Models:
+Default Peepie Models:
 • MiniMax-M3: Latest flagship model (~1M token context) for agentic reasoning, tool use, coding, and long-context tasks
 • MiniMax-M2.7: Previous-generation model with strong reasoning and coding capabilities
 • MiniMax-M2.7-highspeed: Low-latency variant of M2.7 for fast response scenarios
@@ -655,7 +665,7 @@ Examples available: Pre-configured setups for major providers in /opt/pentagi/co
 )
 
 // LLM Provider Form field labels and descriptions
-const (
+var (
 	LLMFormFieldBaseURL           = "Base URL"
 	LLMFormFieldAPIKey            = "API Key"
 	LLMFormFieldDefaultAuth       = "Use Default AWS Auth"
@@ -689,10 +699,11 @@ const (
 	LLMFormPullEnabledDesc        = "Automatically download required models on startup"
 	LLMFormLoadModelsEnabledDesc  = "Load available models list from Ollama server"
 	LLMFormOllamaAPIKeyDesc       = "Ollama Cloud API key (optional, leave empty for local Ollama server)"
+	LLMFormDefaultAuthEnabled     = "enabled"
 )
 
 // LLM Provider Form status messages
-const (
+var (
 	LLMProviderFormTitle       = "LLM Provider %s Configuration"
 	LLMProviderFormDescription = "Configure your Large Language Model provider settings"
 	LLMProviderFormName        = "LLM Provider %s"
@@ -712,7 +723,7 @@ Your configuration will determine which models each agent uses for different pen
 )
 
 // Monitoring Screen
-const (
+var (
 	MonitoringTitle       = "Monitoring Configuration"
 	MonitoringDescription = "Configure monitoring and observability platforms for comprehensive system insights"
 	MonitoringName        = "Monitoring"
@@ -735,7 +746,7 @@ Quick Setup:
 )
 
 // Langfuse Integration constants
-const (
+var (
 	MonitoringLangfuseFormTitle       = "Langfuse Configuration"
 	MonitoringLangfuseFormDescription = "Configuration of Langfuse integration for LLM monitoring"
 	MonitoringLangfuseFormName        = "Langfuse"
@@ -828,7 +839,7 @@ optimize costs effectively.`
 )
 
 // Graphiti Integration constants
-const (
+var (
 	MonitoringGraphitiFormTitle       = "Graphiti Configuration (beta)"
 	MonitoringGraphitiFormDescription = "Configuration of Graphiti knowledge graph integration"
 	MonitoringGraphitiFormName        = "Graphiti (beta)"
@@ -946,11 +957,11 @@ Best for: Teams using existing Graphiti deployments or cloud services.`
 • Flow-scoped graph recall
 • Advanced contextual search
 
-PentAGI continues using its primary vector memory when Graphiti is disabled.`
+Peepie continues using its primary vector memory when Graphiti is disabled.`
 )
 
 // Observability Integration constants
-const (
+var (
 	MonitoringObservabilityFormTitle       = "Observability Configuration"
 	MonitoringObservabilityFormDescription = "Configuration of monitoring and observability stack"
 	MonitoringObservabilityFormName        = "Observability"
@@ -961,7 +972,7 @@ const (
 • Loki for log aggregation
 • OpenTelemetry for data collection
 
-Monitor PentAGI performance and system health.`
+Monitor Peepie performance and system health.`
 
 	// Deployment types
 	MonitoringObservabilityEmbedded = "Embedded Stack"
@@ -1045,7 +1056,7 @@ and optimize performance effectively.`
 )
 
 // Summarizer Screen
-const (
+var (
 	SummarizerTitle       = "Summarizer Configuration"
 	SummarizerDescription = "Enable conversation summarization to reduce LLM costs and improve context management"
 	SummarizerName        = "Summarizer"
@@ -1112,7 +1123,7 @@ Best practices:
 )
 
 // Summarizer Form Screen
-const (
+var (
 	SummarizerFormGeneralTitle   = "General Summarizer Configuration"
 	SummarizerFormAssistantTitle = "Assistant Summarizer Configuration"
 	SummarizerFormDescription    = "Configure %s Settings"
@@ -1208,7 +1219,7 @@ Monitor actual token usage and adjust Recent Sections first, then limits.`
 )
 
 // Tools screen strings
-const (
+var (
 	ToolsTitle       = "Tools Configuration"
 	ToolsDescription = "Enhance agent capabilities with additional tools and options"
 	ToolsName        = "Tools"
@@ -1225,11 +1236,11 @@ Available settings:
 )
 
 // Server Settings screen strings
-const (
+var (
 	ServerSettingsFormTitle       = "Server Settings"
-	ServerSettingsFormDescription = "Configure PentAGI server network access and public routing"
+	ServerSettingsFormDescription = "Configure Peepie server network access and public routing"
 	ServerSettingsFormName        = "Server Settings"
-	ServerSettingsFormOverview    = `• Network binding - control which interface and port PentAGI listens on
+	ServerSettingsFormOverview    = `• Network binding - control which interface and port Peepie listens on
 • Public URL - external address and optional base path used in redirects
 • CORS - allowed origins for browser access
 • Proxy - HTTP/HTTPS proxy for outbound traffic to LLM/search providers
@@ -1238,7 +1249,7 @@ const (
 
 	// Field labels and descriptions
 	ServerSettingsLicenseKey     = "License Key"
-	ServerSettingsLicenseKeyDesc = "PentAGI License Key in format of XXXX-XXXX-XXXX-XXXX"
+	ServerSettingsLicenseKeyDesc = "Peepie License Key in format of XXXX-XXXX-XXXX-XXXX"
 
 	ToolsDockerInsideHost     = "Worker Docker Daemon Host"
 	ToolsDockerInsideHostDesc = "Daemon endpoint given to worker containers (e.g., tcp://dind:2376); empty keeps socket mounting"
@@ -1253,7 +1264,7 @@ const (
 
 It is injected into each sandbox as DOCKER_HOST, so the Docker CLI inside the container talks to this daemon.
 
-Setting it also STOPS the host socket from being auto-detected and bind-mounted into sandboxes: an agent then reaches only the daemon you designated, not the one running PentAGI itself. An explicitly configured Docker Socket still takes precedence and is mounted as before.
+Setting it also STOPS the host socket from being auto-detected and bind-mounted into sandboxes: an agent then reaches only the daemon you designated, not the one running Peepie itself. An explicitly configured Docker Socket still takes precedence and is mounted as before.
 
 Leave empty to keep the historical behaviour (auto-detected socket mount).
 
@@ -1288,7 +1299,7 @@ Examples:
 	ServerSettingsHostDesc = "Bind address used by Docker port mapping (e.g., 0.0.0.0 to expose on all interfaces)"
 
 	ServerSettingsPort     = "Server Port (Listen Port)"
-	ServerSettingsPortDesc = "External TCP port exposed by Docker for PentAGI web UI"
+	ServerSettingsPortDesc = "External TCP port exposed by Docker for Peepie web UI"
 
 	ServerSettingsPublicURL     = "Public URL"
 	ServerSettingsPublicURLDesc = "Base public URL for redirects and links (supports base path, e.g., https://example.com/pentagi/)"
@@ -1349,17 +1360,18 @@ Examples:
 	ServerSettingsDataDirHint                      = "Data Directory"
 	ServerSettingsDatabaseExtensionsSchemaHint     = "Extensions Schema"
 	ServerSettingsDatabaseSearchPathViaOptionsHint = "Search Path via Options"
+	ServerSettingsExternalSSLInsecureEnabled       = "Enabled (⚠ Insecure)"
 
 	// Help texts per-field
-	ServerSettingsGeneralHelp = `PentAGI exposes its web UI via Docker with configurable host and port.
+	ServerSettingsGeneralHelp = `Peepie exposes its web UI via Docker with configurable host and port.
 
 Public URL must reflect how users reach the server. If using a subpath (e.g., /pentagi/), include it here. CORS controls browser access from specified origins. Proxy affects outbound traffic to LLM/search providers and other external services used by Tools.
 
 SSL directory allows providing custom certificates. When set, server will use server.crt and server.key from that directory. Data directory stores artifacts and working files for flows.`
 
-	ServerSettingsLicenseKeyHelp = `PentAGI License Key in format of XXXX-XXXX-XXXX-XXXX. It's used to communicate with PentAGI Cloud API.`
+	ServerSettingsLicenseKeyHelp = `Peepie License Key in format of XXXX-XXXX-XXXX-XXXX. It's used to communicate with PentAGI Cloud API.`
 
-	ServerSettingsTenantIDHelp = `Optional identifier that namespaces PostgreSQL schema, data directory, Docker objects, Graphiti group ids, auth cookies and telemetry when several PentAGI instances share one host and the same backing services.
+	ServerSettingsTenantIDHelp = `Optional identifier that namespaces PostgreSQL schema, data directory, Docker objects, Graphiti group ids, auth cookies and telemetry when several Peepie instances share one host and the same backing services.
 
 Leave empty for a single-instance deployment (default). When set, the value must match ^[a-z][a-z0-9_]{0,31}$ — lowercase letter first, then lowercase letters, digits or underscores, max 32 characters. Hyphens are not allowed.
 
@@ -1385,7 +1397,7 @@ Examples:
 • 127.0.0.1 — local-only access
 • 0.0.0.0 — expose on all interfaces`
 
-	ServerSettingsPortHelp = `External port for PentAGI UI. Must be available on the host. Example: 8443.`
+	ServerSettingsPortHelp = `External port for Peepie UI. Must be available on the host. Example: 8443.`
 
 	ServerSettingsPublicURLHelp = `Set the public base URL used in redirects and links.
 
@@ -1435,7 +1447,7 @@ When enabled, all certificate validation is bypassed, making connections vulnera
 
 	ServerSettingsSSLDirHelp = `Path to directory with server.crt and server.key in PEM format. server.crt may include fullchain. Overrides default generated certificate behavior.`
 
-	ServerSettingsDataDirHelp = `Host directory for persistent data. PentAGI stores agent artifacts under flow-N subdirectories, which map to /work inside worker containers.`
+	ServerSettingsDataDirHelp = `Host directory for persistent data. Peepie stores agent artifacts under flow-N subdirectories, which map to /work inside worker containers.`
 
 	ServerSettingsCookieSigningSaltHelp = `Secret salt used to sign cookies. Keep it private.`
 
@@ -1455,12 +1467,12 @@ Values: true, false`
 )
 
 // Human-in-the-loop screen strings
-const (
+var (
 	// AI Agents Settings screen strings
 	ToolsAIAgentsSettingsFormTitle       = "AI Agents Settings"
 	ToolsAIAgentsSettingsFormDescription = "Configure global behavior for AI agents"
 	ToolsAIAgentsSettingsFormName        = "AI Agents Settings"
-	ToolsAIAgentsSettingsFormOverview    = `This section configures global behavior of AI agents across PentAGI.
+	ToolsAIAgentsSettingsFormOverview    = `This section configures global behavior of AI agents across Peepie.
 
 Basic Settings:
 • Enable User Interaction: allow agents to request user input when needed
@@ -1497,6 +1509,7 @@ Task Planning (⚠️  BETA):
 	ToolsAIAgentsSettingMaxLimitedToolCallsDesc = "Maximum tool calls for Searcher, Enricher, Memorist, etc."
 	ToolsAIAgentsSettingTaskPlanning            = "Enable Task Planning (beta)"
 	ToolsAIAgentsSettingTaskPlanningDesc        = "Generate structured execution plans for specialist agents"
+	ToolsAIAgentsSettingNotSet                  = "not set"
 
 	// help content
 	ToolsAIAgentsSettingsHelp = `AI Agents Settings define how agents collaborate, interact with users, and handle execution control.
@@ -1528,7 +1541,7 @@ Note: Changes require service restart.`
 )
 
 // Search Engines screen strings
-const (
+var (
 	ToolsSearchEnginesFormTitle       = "Search Engines Configuration"
 	ToolsSearchEnginesFormDescription = "Configure search engines for AI agents to gather intelligence during testing"
 	ToolsSearchEnginesFormName        = "Search Engines"
@@ -1550,54 +1563,59 @@ Get API keys from:
 • Traversaal: https://traversaal.ai/
 • Google: https://developers.google.com/custom-search/v1/introduction`
 
-	ToolsSearchEnginesDuckDuckGo               = "DuckDuckGo Search"
-	ToolsSearchEnginesDuckDuckGoDesc           = "Enable DuckDuckGo search (no API key required)"
-	ToolsSearchEnginesDuckDuckGoRegion         = "DuckDuckGo Region"
-	ToolsSearchEnginesDuckDuckGoRegionDesc     = "DuckDuckGo region code (e.g., us-en, uk-en, cn-zh)"
-	ToolsSearchEnginesDuckDuckGoSafeSearch     = "DuckDuckGo Safe Search"
-	ToolsSearchEnginesDuckDuckGoSafeSearchDesc = "DuckDuckGo safe search (strict, moderate, off)"
-	ToolsSearchEnginesDuckDuckGoTimeRange      = "DuckDuckGo Time Range"
-	ToolsSearchEnginesDuckDuckGoTimeRangeDesc  = "DuckDuckGo time range (d: day, w: week, m: month, y: year)"
-	ToolsSearchEnginesSploitus                 = "Sploitus Search"
-	ToolsSearchEnginesSploitusDesc             = "Enable Sploitus search for exploits and vulnerabilities (no API key required)"
-	ToolsSearchEnginesPerplexityKey            = "Perplexity API Key"
-	ToolsSearchEnginesPerplexityKeyDesc        = "API key for Perplexity AI search"
-	ToolsSearchEnginesTavilyKey                = "Tavily API Key"
-	ToolsSearchEnginesTavilyKeyDesc            = "API key for Tavily search service"
-	ToolsSearchEnginesFirecrawlKey             = "Firecrawl API Key"
-	ToolsSearchEnginesFirecrawlKeyDesc         = "API key for Firecrawl search service"
-	ToolsSearchEnginesFirecrawlURL             = "Firecrawl API URL"
-	ToolsSearchEnginesFirecrawlURLDesc         = "Firecrawl API base URL (leave empty for cloud; set for self-hosted)"
-	ToolsSearchEnginesTraversaalKey            = "Traversaal API Key"
-	ToolsSearchEnginesTraversaalKeyDesc        = "API key for Traversaal web scraping"
-	ToolsSearchEnginesGoogleKey                = "Google Search API Key"
-	ToolsSearchEnginesGoogleKeyDesc            = "Google Custom Search API key"
-	ToolsSearchEnginesGoogleCX                 = "Google Search Engine ID"
-	ToolsSearchEnginesGoogleCXDesc             = "Google Custom Search Engine ID"
-	ToolsSearchEnginesGoogleLR                 = "Google Language Restriction"
-	ToolsSearchEnginesGoogleLRDesc             = "Google Search Engine language restriction (e.g., lang_en, lang_cn, etc.)"
-	ToolsSearchEnginesSearxngURL               = "Searxng Search URL"
-	ToolsSearchEnginesSearxngURLDesc           = "Searxng search engine URL"
-	ToolsSearchEnginesSearxngCategories        = "Searxng Search Categories"
-	ToolsSearchEnginesSearxngCategoriesDesc    = "Searxng search engine categories (e.g., general, it, web, news, technology, science, health, other)"
-	ToolsSearchEnginesSearxngLanguage          = "Searxng Search Language"
-	ToolsSearchEnginesSearxngLanguageDesc      = "Searxng search engine language (en, ch, fr, de, it, es, pt, ru, zh, empty for all languages)"
-	ToolsSearchEnginesSearxngSafeSearch        = "Searxng Safe Search"
-	ToolsSearchEnginesSearxngSafeSearchDesc    = "Searxng search engine safe search (0: off, 1: moderate, 2: strict)"
-	ToolsSearchEnginesSearxngTimeRange         = "Searxng Time Range"
-	ToolsSearchEnginesSearxngTimeRangeDesc     = "Searxng search engine time range (day, month, year)"
-	ToolsSearchEnginesSearxngTimeout           = "Searxng Timeout"
-	ToolsSearchEnginesSearxngTimeoutDesc       = "Searxng request timeout in seconds"
-	ToolsSearchEnginesInternalEnabled          = "Internal Analytics Engine"
-	ToolsSearchEnginesInternalEnabledDesc      = "Enable the built-in browser-analytics fallback for answer/research queries (no API key required; scrapes and summarizes pages, so it requires a configured scraper and at least one available link engine, e.g. DuckDuckGo or Google)"
-	ToolsSearchEnginesInternalMaxSites         = "Internal Engine Max Sites"
-	ToolsSearchEnginesInternalMaxSitesDesc     = "Maximum number of pages to fetch and summarize per query"
-	ToolsSearchEnginesInternalMaxSiteBytes     = "Internal Engine Max Site Bytes"
-	ToolsSearchEnginesInternalMaxSiteBytesDesc = "Maximum markdown bytes read from each page before truncation"
+	ToolsSearchEnginesDuckDuckGo                = "DuckDuckGo Search"
+	ToolsSearchEnginesDuckDuckGoDesc            = "Enable DuckDuckGo search (no API key required)"
+	ToolsSearchEnginesDuckDuckGoRegion          = "DuckDuckGo Region"
+	ToolsSearchEnginesDuckDuckGoRegionDesc      = "DuckDuckGo region code (e.g., us-en, uk-en, cn-zh)"
+	ToolsSearchEnginesDuckDuckGoSafeSearch      = "DuckDuckGo Safe Search"
+	ToolsSearchEnginesDuckDuckGoSafeSearchDesc  = "DuckDuckGo safe search (strict, moderate, off)"
+	ToolsSearchEnginesDuckDuckGoTimeRange       = "DuckDuckGo Time Range"
+	ToolsSearchEnginesDuckDuckGoTimeRangeDesc   = "DuckDuckGo time range (d: day, w: week, m: month, y: year)"
+	ToolsSearchEnginesSploitus                  = "Sploitus Search"
+	ToolsSearchEnginesSploitusDesc              = "Enable Sploitus search for exploits and vulnerabilities (no API key required)"
+	ToolsSearchEnginesPerplexityKey             = "Perplexity API Key"
+	ToolsSearchEnginesPerplexityKeyDesc         = "API key for Perplexity AI search"
+	ToolsSearchEnginesPerplexityModel           = "Perplexity Model"
+	ToolsSearchEnginesPerplexityModelDesc       = "Select Perplexity model"
+	ToolsSearchEnginesPerplexityContextSize     = "Perplexity Context Size"
+	ToolsSearchEnginesPerplexityContextSizeDesc = "Select Perplexity context size"
+	ToolsSearchEnginesGoogleSearch              = "Google Search"
+	ToolsSearchEnginesTavilyKey                 = "Tavily API Key"
+	ToolsSearchEnginesTavilyKeyDesc             = "API key for Tavily search service"
+	ToolsSearchEnginesFirecrawlKey              = "Firecrawl API Key"
+	ToolsSearchEnginesFirecrawlKeyDesc          = "API key for Firecrawl search service"
+	ToolsSearchEnginesFirecrawlURL              = "Firecrawl API URL"
+	ToolsSearchEnginesFirecrawlURLDesc          = "Firecrawl API base URL (leave empty for cloud; set for self-hosted)"
+	ToolsSearchEnginesTraversaalKey             = "Traversaal API Key"
+	ToolsSearchEnginesTraversaalKeyDesc         = "API key for Traversaal web scraping"
+	ToolsSearchEnginesGoogleKey                 = "Google Search API Key"
+	ToolsSearchEnginesGoogleKeyDesc             = "Google Custom Search API key"
+	ToolsSearchEnginesGoogleCX                  = "Google Search Engine ID"
+	ToolsSearchEnginesGoogleCXDesc              = "Google Custom Search Engine ID"
+	ToolsSearchEnginesGoogleLR                  = "Google Language Restriction"
+	ToolsSearchEnginesGoogleLRDesc              = "Google Search Engine language restriction (e.g., lang_en, lang_zh-CN, etc.)"
+	ToolsSearchEnginesSearxngURL                = "Searxng Search URL"
+	ToolsSearchEnginesSearxngURLDesc            = "Searxng search engine URL"
+	ToolsSearchEnginesSearxngCategories         = "Searxng Search Categories"
+	ToolsSearchEnginesSearxngCategoriesDesc     = "Searxng search engine categories (e.g., general, it, web, news, technology, science, health, other)"
+	ToolsSearchEnginesSearxngLanguage           = "Searxng Search Language"
+	ToolsSearchEnginesSearxngLanguageDesc       = "Searxng search engine language (en, fr, de, it, es, pt, ru, zh, empty for all languages)"
+	ToolsSearchEnginesSearxngSafeSearch         = "Searxng Safe Search"
+	ToolsSearchEnginesSearxngSafeSearchDesc     = "Searxng search engine safe search (0: off, 1: moderate, 2: strict)"
+	ToolsSearchEnginesSearxngTimeRange          = "Searxng Time Range"
+	ToolsSearchEnginesSearxngTimeRangeDesc      = "Searxng search engine time range (day, month, year)"
+	ToolsSearchEnginesSearxngTimeout            = "Searxng Timeout"
+	ToolsSearchEnginesSearxngTimeoutDesc        = "Searxng request timeout in seconds"
+	ToolsSearchEnginesInternalEnabled           = "Internal Analytics Engine"
+	ToolsSearchEnginesInternalEnabledDesc       = "Enable the built-in browser-analytics fallback for answer/research queries (no API key required; scrapes and summarizes pages, so it requires a configured scraper and at least one available link engine, e.g. DuckDuckGo or Google)"
+	ToolsSearchEnginesInternalMaxSites          = "Internal Engine Max Sites"
+	ToolsSearchEnginesInternalMaxSitesDesc      = "Maximum number of pages to fetch and summarize per query"
+	ToolsSearchEnginesInternalMaxSiteBytes      = "Internal Engine Max Site Bytes"
+	ToolsSearchEnginesInternalMaxSiteBytesDesc  = "Maximum markdown bytes read from each page before truncation"
 )
 
 // Scraper screen strings
-const (
+var (
 	ToolsScraperFormTitle       = "Scraper Configuration"
 	ToolsScraperFormDescription = "Configure web scraping service"
 	ToolsScraperFormName        = "Scraper"
@@ -1646,7 +1664,7 @@ The scraper supports:
 )
 
 // Docker Environment screen strings
-const (
+var (
 	ToolsDockerFormTitle       = "Docker Environment Configuration"
 	ToolsDockerFormDescription = "Configure Docker environment for worker containers"
 	ToolsDockerFormName        = "Docker Environment"
@@ -1692,6 +1710,14 @@ Configuration combines based on scenario: enable both capabilities for full pent
 	ToolsDockerDefaultImageDesc           = "Default Docker image for general tasks"
 	ToolsDockerDefaultImageForPentest     = "Pentesting Image"
 	ToolsDockerDefaultImageForPentestDesc = "Default Docker image for security testing tasks"
+
+	// Configuration summary labels
+	ToolsDockerSummaryCustomNetwork    = "Custom Network"
+	ToolsDockerSummaryPublicIP         = "Public IP"
+	ToolsDockerSummaryPentestImage     = "Pentest Image"
+	ToolsDockerSummaryTLSConnection    = "TLS Connection"
+	ToolsDockerSummaryRemoteConnection = "Remote Connection"
+	ToolsDockerSummaryWorkerDaemon     = "Worker Docker Daemon"
 
 	// TLS connection settings (optional)
 	ToolsDockerHost          = "Docker Host"
@@ -1793,8 +1819,21 @@ Required for secure remote Docker connections when using TLS to manage worker co
 Example: /path/to/certs`
 )
 
-// Embedder form strings
+// Embedder provider IDs: internal identifiers, not user-visible text (kept const).
 const (
+	EmbedderProviderIDDefault     = "default"
+	EmbedderProviderIDOpenAI      = "openai"
+	EmbedderProviderIDOllama      = "ollama"
+	EmbedderProviderIDMistral     = "mistral"
+	EmbedderProviderIDJina        = "jina"
+	EmbedderProviderIDHuggingFace = "huggingface"
+	EmbedderProviderIDGoogleAI    = "googleai"
+	EmbedderProviderIDVoyageAI    = "voyageai"
+	EmbedderProviderIDDisabled    = "none"
+)
+
+// Embedder form strings
+var (
 	EmbedderFormTitle       = "Embedder Configuration"
 	EmbedderFormDescription = "Configure text vectorization for semantic search and knowledge storage"
 	EmbedderFormName        = "Embedder"
@@ -1882,18 +1921,7 @@ Change providers carefully - different embedders produce incompatible vectors re
 	EmbedderModelPlaceholderVoyageAI    = "voyage-2"
 	EmbedderModelPlaceholderDefault     = "Model name"
 
-	// Provider IDs for internal use
-	EmbedderProviderIDDefault     = "default"
-	EmbedderProviderIDOpenAI      = "openai"
-	EmbedderProviderIDOllama      = "ollama"
-	EmbedderProviderIDMistral     = "mistral"
-	EmbedderProviderIDJina        = "jina"
-	EmbedderProviderIDHuggingFace = "huggingface"
-	EmbedderProviderIDGoogleAI    = "googleai"
-	EmbedderProviderIDVoyageAI    = "voyageai"
-	EmbedderProviderIDDisabled    = "none"
-
-	EmbedderHelpGeneral = `Embeddings convert text into vectors for semantic search and knowledge storage. This enables PentAGI to understand meaning rather than just keywords, making search results more relevant and intelligent.
+	EmbedderHelpGeneral = `Embeddings convert text into vectors for semantic search and knowledge storage. This enables Peepie to understand meaning rather than just keywords, making search results more relevant and intelligent.
 
 Key benefits:
 • Find documents by meaning, not exact words
@@ -2002,19 +2030,31 @@ Only recommended if embeddings are not needed for your use case.`
 )
 
 // Development and Mock Screen constants
-const (
+var (
 	MockScreenTitle       = "Development Screen"
 	MockScreenDescription = "This screen is under development"
+
+	MockScreenUnderDevelopment  = "🚧 This screen is under development"
+	MockScreenAvailableLater    = "This configuration screen will be available in a future update."
+	MockScreenGoBack            = "Press Enter or Esc to go back to the main menu."
+	MockScreenPendingMigration  = "⏳ Configuration pending migration"
+	MockScreenNoticeTitle       = "Development Notice"
+	MockScreenNoticeMigrating   = "This configuration screen is currently being migrated to the new interface."
+	MockScreenExpectedFeatures  = "Expected features:"
+	MockScreenFeatureForms      = "• Modern form interface"
+	MockScreenFeatureValidation = "• Improved validation"
+	MockScreenFeatureUX         = "• Enhanced user experience"
+	MockScreenCheckBack         = "Please check back in a future update."
 )
 
 // Apply Changes screen constants
-const (
+var (
 	ApplyChangesFormTitle       = "Apply Configuration Changes"
 	ApplyChangesFormName        = "Apply Changes"
 	ApplyChangesFormDescription = "Review and apply your configuration changes"
 
 	// Apply Changes overview and help
-	ApplyChangesFormOverview = `This screen allows you to review all pending configuration changes and apply them to your PentAGI installation.
+	ApplyChangesFormOverview = `This screen allows you to review all pending configuration changes and apply them to your Peepie installation.
 
 When you apply changes, the system will:
 • Save all modified environment variables to the .env file
@@ -2036,17 +2076,17 @@ When you apply changes, the system will:
 	ApplyChangesNoChanges = "No configuration changes are pending"
 
 	// Apply Changes installation status
-	ApplyChangesInstallNotFound = `PentAGI is not currently installed on this system.
+	ApplyChangesInstallNotFound = `Peepie is not currently installed on this system.
 
 The following actions will be performed:
 • Docker environment setup and validation
 • Creation of docker-compose.yml file
-• Installation and startup of PentAGI core services`
+• Installation and startup of Peepie core services`
 
 	ApplyChangesInstallFoundLangfuse      = `• Installation of Langfuse observability stack (docker-compose-langfuse.yml)`
 	ApplyChangesInstallFoundObservability = `• Installation of comprehensive observability stack with Grafana, VictoriaMetrics, and Jaeger (docker-compose-observability.yml)`
 
-	ApplyChangesUpdateFound = `PentAGI is currently installed on this system.
+	ApplyChangesUpdateFound = `Peepie is currently installed on this system.
 
 The following actions will be performed:
 • Update environment variables in .env file
@@ -2080,7 +2120,7 @@ The following actions will be performed:
 )
 
 // apply changes integrity prompt
-const (
+var (
 	ApplyChangesIntegrityPromptTitle   = "File integrity check"
 	ApplyChangesIntegrityPromptMessage = "Out-of-date files were detected.\nDo you want to update them to the latest version?"
 	ApplyChangesIntegrityOutdatedList  = "Out-of-date files:\n%s\nConfirm update? (y/n)"
@@ -2089,11 +2129,11 @@ const (
 )
 
 // Maintenance Screen constants
-const (
+var (
 	MaintenanceTitle       = "System Maintenance"
-	MaintenanceDescription = "Manage PentAGI services and perform maintenance operations"
+	MaintenanceDescription = "Manage Peepie services and perform maintenance operations"
 	MaintenanceName        = "Maintenance"
-	MaintenanceOverview    = `Perform system maintenance operations for PentAGI.
+	MaintenanceOverview    = `Perform system maintenance operations for Peepie.
 
 Available operations depend on the current system state and will only be shown when applicable.
 
@@ -2106,38 +2146,38 @@ Operations include:
 Each operation will provide real-time status updates and confirmation when required.`
 
 	// Maintenance menu items
-	MaintenanceStartPentagi            = "Start PentAGI"
-	MaintenanceStartPentagiDesc        = "Start all configured PentAGI services"
-	MaintenanceStopPentagi             = "Stop PentAGI"
-	MaintenanceStopPentagiDesc         = "Stop all running PentAGI services"
-	MaintenanceRestartPentagi          = "Restart PentAGI"
-	MaintenanceRestartPentagiDesc      = "Restart all PentAGI services"
+	MaintenanceStartPentagi            = "Start Peepie"
+	MaintenanceStartPentagiDesc        = "Start all configured Peepie services"
+	MaintenanceStopPentagi             = "Stop Peepie"
+	MaintenanceStopPentagiDesc         = "Stop all running Peepie services"
+	MaintenanceRestartPentagi          = "Restart Peepie"
+	MaintenanceRestartPentagiDesc      = "Restart all Peepie services"
 	MaintenanceDownloadWorkerImage     = "Download Worker Image"
 	MaintenanceDownloadWorkerImageDesc = "Download pentesting container image for worker tasks"
 	MaintenanceUpdateWorkerImage       = "Update Worker Image"
 	MaintenanceUpdateWorkerImageDesc   = "Update pentesting container image to latest version"
-	MaintenanceUpdatePentagi           = "Update PentAGI"
-	MaintenanceUpdatePentagiDesc       = "Update PentAGI to the latest version"
+	MaintenanceUpdatePentagi           = "Update Peepie"
+	MaintenanceUpdatePentagiDesc       = "Update Peepie to the latest version"
 	MaintenanceUpdateInstaller         = "Update Installer"
 	MaintenanceUpdateInstallerDesc     = "Update this installer to the latest version"
 	MaintenanceFactoryReset            = "Factory Reset"
-	MaintenanceFactoryResetDesc        = "Reset PentAGI to factory defaults"
-	MaintenanceRemovePentagi           = "Remove PentAGI"
-	MaintenanceRemovePentagiDesc       = "Remove PentAGI containers but keep data"
-	MaintenancePurgePentagi            = "Purge PentAGI"
-	MaintenancePurgePentagiDesc        = "Completely remove PentAGI including all data"
+	MaintenanceFactoryResetDesc        = "Reset Peepie to factory defaults"
+	MaintenanceRemovePentagi           = "Remove Peepie"
+	MaintenanceRemovePentagiDesc       = "Remove Peepie containers but keep data"
+	MaintenancePurgePentagi            = "Purge Peepie"
+	MaintenancePurgePentagiDesc        = "Completely remove Peepie including all data"
 	MaintenanceResetPassword           = "Reset Admin Password"
-	MaintenanceResetPasswordDesc       = "Reset the administrator password for PentAGI"
+	MaintenanceResetPasswordDesc       = "Reset the administrator password for Peepie"
 )
 
 // Reset Password Screen constants
-const (
+var (
 	ResetPasswordFormTitle       = "Reset Admin Password"
-	ResetPasswordFormDescription = "Reset the administrator password for PentAGI"
+	ResetPasswordFormDescription = "Reset the administrator password for Peepie"
 	ResetPasswordFormName        = "Reset Password"
 	ResetPasswordFormOverview    = `Reset the password for the default administrator account (admin@pentagi.com).
 
-This operation requires PentAGI to be running and will update the password in the PostgreSQL database.
+This operation requires Peepie to be running and will update the password in the PostgreSQL database.
 
 Enter your new password twice to confirm and press Enter to apply the change.
 
@@ -2152,7 +2192,7 @@ Password requirements:
 	ResetPasswordConfirmPasswordDesc = "Re-enter the new password to confirm"
 
 	// Status messages
-	ResetPasswordNotAvailable = "PentAGI must be running to reset password"
+	ResetPasswordNotAvailable = "Peepie must be running to reset password"
 	ResetPasswordAvailable    = "Password reset is available"
 	ResetPasswordInProgress   = "Resetting password..."
 	ResetPasswordSuccess      = "Password has been successfully reset"
@@ -2164,12 +2204,12 @@ Password requirements:
 	ResetPasswordErrorMismatch      = "Passwords do not match"
 
 	// Help content
-	ResetPasswordHelpContent = `Reset the administrator password for accessing PentAGI.
+	ResetPasswordHelpContent = `Reset the administrator password for accessing Peepie.
 
 This operation:
 • Updates the password for admin@pentagi.com account
 • Sets the user status to 'active'
-• Requires PentAGI database to be accessible
+• Requires Peepie database to be accessible
 • Does not affect other user accounts
 
 The password change takes effect immediately after successful completion.
@@ -2178,7 +2218,7 @@ Enter the same password in both fields and press Enter to confirm the change.`
 )
 
 // Processor Operation Form constants
-const (
+var (
 	// Dynamic title templates
 	ProcessorOperationFormTitle       = "%s"
 	ProcessorOperationFormDescription = "Execute %s operation"
@@ -2209,7 +2249,7 @@ const (
 	ProcessorOperationResetting   = "Resetting to factory defaults..."
 	ProcessorOperationRemoving    = "Removing containers..."
 	ProcessorOperationPurging     = "Purging all data..."
-	ProcessorOperationInstalling  = "Installing PentAGI services..."
+	ProcessorOperationInstalling  = "Installing Peepie services..."
 
 	// Help text templates
 	ProcessorOperationHelpTitle           = "%s Operation"
@@ -2217,8 +2257,8 @@ const (
 	ProcessorOperationHelpContentDownload = "This operation will download %s components."
 	ProcessorOperationHelpContentUpdate   = "This operation will update %s components."
 	// Generic title/description/builders for dynamic operations
-	OperationTitleInstallPentagi    = "Install PentAGI"
-	OperationDescInstallPentagi     = "Install and configure PentAGI services"
+	OperationTitleInstallPentagi    = "Install Peepie"
+	OperationDescInstallPentagi     = "Install and configure Peepie services"
 	OperationTitleDownload          = "Download %s"
 	OperationDescDownloadComponents = "Download %s components"
 	OperationTitleUpdate            = "Update %s"
@@ -2232,7 +2272,7 @@ const (
 )
 
 // Operation-specific help texts
-const (
+var (
 	ProcessorHelpInstallPentagi = `This will:
 • Deploy Docker containers for selected services
 • Configure networking and volumes
@@ -2242,7 +2282,7 @@ const (
 Installation will use your current configuration settings.`
 
 	ProcessorHelpStartPentagi = `This will:
-• Core PentAGI API and web interface
+• Core Peepie API and web interface
 • Configured Langfuse analytics (if enabled)
 • Observability stack (if enabled)
 
@@ -2316,7 +2356,7 @@ This action cannot be undone!`
 )
 
 // environment variable descriptions (centralized)
-const (
+var (
 	EnvDesc_OPEN_AI_KEY                       = "OpenAI API Key"
 	EnvDesc_OPEN_AI_SERVER_URL                = "OpenAI Server URL"
 	EnvDesc_ANTHROPIC_API_KEY                 = "Anthropic API Key"
@@ -2455,14 +2495,14 @@ const (
 	EnvDesc_DOCKER_INSIDE_TLS_VERIFY         = "Worker Docker TLS Verify"
 	EnvDesc_DOCKER_INSIDE_CERT_PATH          = "Worker Docker Certificate Path"
 
-	EnvDesc_TENANT_ID                         = "PentAGI Tenant ID"
-	EnvDesc_LICENSE_KEY                       = "PentAGI License Key"
-	EnvDesc_PPROF_ADDR                        = "PentAGI pprof Listen Address"
-	EnvDesc_PENTAGI_LISTEN_IP                 = "PentAGI Server Host"
-	EnvDesc_PENTAGI_LISTEN_PORT               = "PentAGI Server Port"
-	EnvDesc_PUBLIC_URL                        = "PentAGI Public URL"
-	EnvDesc_CORS_ORIGINS                      = "PentAGI CORS Origins"
-	EnvDesc_COOKIE_SIGNING_SALT               = "PentAGI Cookie Signing Salt"
+	EnvDesc_TENANT_ID                         = "Peepie Tenant ID"
+	EnvDesc_LICENSE_KEY                       = "Peepie License Key"
+	EnvDesc_PPROF_ADDR                        = "Peepie pprof Listen Address"
+	EnvDesc_PENTAGI_LISTEN_IP                 = "Peepie Server Host"
+	EnvDesc_PENTAGI_LISTEN_PORT               = "Peepie Server Port"
+	EnvDesc_PUBLIC_URL                        = "Peepie Public URL"
+	EnvDesc_CORS_ORIGINS                      = "Peepie CORS Origins"
+	EnvDesc_COOKIE_SIGNING_SALT               = "Peepie Cookie Signing Salt"
 	EnvDesc_DATABASE_EXTENSIONS_SCHEMA        = "PostgreSQL Extensions Schema"
 	EnvDesc_DATABASE_SEARCH_PATH_VIA_OPTIONS  = "PostgreSQL Search Path via Options"
 	EnvDesc_PROXY_URL                         = "HTTP/HTTPS Proxy URL"
@@ -2470,8 +2510,8 @@ const (
 	EnvDesc_TERMINAL_TOOL_TIMEOUT             = "Terminal Tool Timeout (seconds)"
 	EnvDesc_EXTERNAL_SSL_CA_PATH              = "Custom CA Certificate Path"
 	EnvDesc_EXTERNAL_SSL_INSECURE             = "Skip SSL Verification"
-	EnvDesc_PENTAGI_SSL_DIR                   = "PentAGI SSL Directory"
-	EnvDesc_PENTAGI_DATA_DIR                  = "PentAGI Data Directory"
+	EnvDesc_PENTAGI_SSL_DIR                   = "Peepie SSL Directory"
+	EnvDesc_PENTAGI_DATA_DIR                  = "Peepie Data Directory"
 	EnvDesc_PENTAGI_DOCKER_SOCKET             = "Mount Docker Socket Path"
 	EnvDesc_PENTAGI_DOCKER_CERT_PATH          = "Mount Docker Certificate Path"
 	EnvDesc_PENTAGI_LLM_SERVER_CONFIG_PATH    = "Custom LLM Host Config Path"
@@ -2501,7 +2541,7 @@ const (
 	EnvDesc_OAUTH_GITHUB_CLIENT_SECRET = "OAuth GitHub Client Secret"
 
 	EnvDesc_LANGFUSE_EE_LICENSE_KEY   = "Langfuse Enterprise License Key"
-	EnvDesc_PENTAGI_POSTGRES_PASSWORD = "PentAGI PostgreSQL Password"
+	EnvDesc_PENTAGI_POSTGRES_PASSWORD = "Peepie PostgreSQL Password"
 
 	EnvDesc_GRAPHITI_ENABLED                      = "Enable Graphiti Integration"
 	EnvDesc_GRAPHITI_URL                          = "Graphiti Server URL"
@@ -2528,14 +2568,14 @@ const (
 )
 
 // dynamic, contextual sections used in processor operation forms
-const (
+var (
 	// section headers
 	ProcessorSectionCurrentState = "Current state"
 	ProcessorSectionPlanned      = "Planned actions"
 	ProcessorSectionEffects      = "Effects"
 
 	// component labels
-	ProcessorComponentPentagi       = "PentAGI"
+	ProcessorComponentPentagi       = "Peepie"
 	ProcessorComponentLangfuse      = "Langfuse"
 	ProcessorComponentObservability = "Observability"
 
@@ -2568,8 +2608,8 @@ const (
 	PlannedWillRestore  = "will restore:"
 
 	// effect notes per operation (concise and practical)
-	EffectsStart           = "PentAGI web UI becomes available. Background services are brought online in the required order."
-	EffectsStop            = "Web UI becomes unavailable. In-progress flows pause safely. When you start PentAGI again, flows resume automatically. A small portion of the current agent step may be lost."
+	EffectsStart           = "Peepie web UI becomes available. Background services are brought online in the required order."
+	EffectsStop            = "Web UI becomes unavailable. In-progress flows pause safely. When you start Peepie again, flows resume automatically. A small portion of the current agent step may be lost."
 	EffectsRestart         = "Services stop and start again with a clean state. Brief downtime is expected. Flows resume automatically afterwards."
 	EffectsUpdateAll       = "Images are pulled and services are recreated where needed. External or disabled components are skipped. Temporary downtime is expected."
 	EffectsDownloadWorker  = "Running worker containers are not touched. New flows will use the downloaded image. To switch an existing flow to the new image, finish the flow and start a new task or create a new assistant."
@@ -2579,4 +2619,33 @@ const (
 	EffectsRemove          = "Stops and removes containers but keeps volumes and images. Data is preserved. Web UI becomes unavailable until you start again."
 	EffectsPurge           = "Complete cleanup: containers, images, volumes and configuration files are deleted. Irreversible."
 	EffectsInstall         = "Required files are created and services are started. External components are detected and skipped."
+)
+
+// Installer command line and console output (main.go)
+var (
+	CLIFlagVersion         = "Show version information"
+	CLIFlagEnvFile         = "Path to environment file"
+	CLIFlagLanguage        = "Interface language (%s); default: language chosen with Ctrl+L, then system language"
+	CLIUsageTitle          = "Peepie Installer v%s"
+	CLIUsageLine           = "Usage: %s [options]"
+	CLIUsageOptions        = "Options:"
+	CLIUsageExamples       = "Examples:"
+	CLIExampleDefault      = "Use default .env file"
+	CLIExampleEnvFile      = "Use custom env file"
+	CLIExampleLanguage     = "Use Simplified Chinese interface"
+	CLIExampleVersion      = "Show version"
+	CLIUnsupportedLanguage = "unsupported language %q (supported: %s)"
+	CLIError               = "Error: %v"
+	CLIFailedInitState     = "Failed to initialize state: %v"
+	CLIFailedMigrate       = "Failed to migrate settings: %v"
+	CLIFailedSyncNetwork   = "Failed to sync network settings: %v"
+	CLIFailedGatherFacts   = "Failed to gather system facts: %v"
+	CLIFailedHardening     = "Failed to do hardening: %v"
+	CLIApplicationError    = "Application error: %v"
+	CLIStartupTitle        = "Peepie Installer v%s"
+	CLIStartupEnvFile      = "Environment file: %s"
+	CLISystemNotReady      = "⚠️  System is not ready to continue. Please resolve the issues above."
+	CLISystemReady         = "✅ System is ready to continue."
+	CLIPendingChanges      = "You have pending changes."
+	CLIPendingChangesHint  = "Run the installer again to continue or commit your changes."
 )

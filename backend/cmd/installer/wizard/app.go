@@ -38,9 +38,13 @@ type App struct {
 	controller   controller.Controller
 	currentModel models.BaseScreenModel
 	hotkeys      map[string]string
+	// languagePreferencePath stores the language chosen with Ctrl+L; empty disables saving
+	languagePreferencePath string
 }
 
-func NewApp(appState state.State, checkResult checker.CheckResult, files files.Files) *App {
+func NewApp(
+	appState state.State, checkResult checker.CheckResult, files files.Files, languagePreferencePath string,
+) *App {
 	styles := styles.New()
 	window := window.New()
 	navigator := navigator.NewNavigator(appState, checkResult)
@@ -53,13 +57,14 @@ func NewApp(appState state.State, checkResult checker.CheckResult, files files.F
 	}
 
 	app := &App{
-		files:      files,
-		styles:     styles,
-		window:     window,
-		registry:   registry,
-		navigator:  navigator,
-		processor:  processor,
-		controller: controller,
+		files:                  files,
+		styles:                 styles,
+		window:                 window,
+		registry:               registry,
+		navigator:              navigator,
+		processor:              processor,
+		controller:             controller,
+		languagePreferencePath: languagePreferencePath,
 	}
 
 	app.initHotkeysLocale()
@@ -118,6 +123,10 @@ func (app *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+q":
 			logger.Log("[App] QUIT")
 			return app, tea.Quit
+		case "ctrl+l":
+			if app.canSwitchLanguage() {
+				return app, app.switchLanguage(locale.NextLanguage())
+			}
 		case "esc":
 			logger.Log("[App] ESC: %s", app.navigator.Current())
 			if app.navigator.Current() != models.WelcomeScreen && app.navigator.CanGoBack() {
@@ -221,6 +230,9 @@ func (app *App) renderFooter() string {
 		actions = append(actions, locale.NavBack)
 	}
 	actions = append(actions, locale.NavExit)
+	if app.canSwitchLanguage() {
+		actions = append(actions, fmt.Sprintf(locale.NavCtrlL, locale.NextLanguage().NativeName()))
+	}
 
 	// get hotkeys from current screen model
 	if app.currentModel != nil {
@@ -242,8 +254,46 @@ func (app *App) getScreenTitle() string {
 	return locale.WelcomeFormTitle
 }
 
-func Run(ctx context.Context, appState state.State, checkResult checker.CheckResult, files files.Files) error {
-	app := NewApp(appState, checkResult, files)
+// canSwitchLanguage limits switching to the welcome screen and main menu, where no
+// form holds unsaved input, and blocks it while any operation runs: switching
+// recreates every screen, which would drop an operation's live terminal.
+func (app *App) canSwitchLanguage() bool {
+	switch models.ScreenID(app.navigator.Current().GetScreen()) {
+	case models.WelcomeScreen, models.MainMenuScreen:
+		return !app.registry.HasRunningScreen()
+	default:
+		return false
+	}
+}
+
+// switchLanguage swaps all locale texts, remembers the choice and recreates the
+// screens so text cached at construction (lists, form fields) is rebuilt too.
+func (app *App) switchLanguage(lang locale.Language) tea.Cmd {
+	if err := locale.SetLanguage(lang); err != nil {
+		logger.Errorf("[App] switch language: %v", err)
+		return nil
+	}
+	if app.languagePreferencePath != "" {
+		if err := locale.SavePreference(app.languagePreferencePath, lang); err != nil {
+			logger.Errorf("[App] save language preference: %v", err)
+		}
+	}
+	logger.Log("[App] language switched to %s", lang)
+
+	app.registry = registry.NewRegistry(app.controller, app.styles, app.window, app.files, app.processor)
+	app.initHotkeysLocale()
+	app.currentModel = app.registry.GetScreen(app.navigator.Current())
+	app.updateScreenMargins()
+
+	// new screens need the current window size before they render
+	return tea.Batch(app.currentModel.Init(), tea.WindowSize())
+}
+
+func Run(
+	ctx context.Context, appState state.State, checkResult checker.CheckResult, files files.Files,
+	languagePreferencePath string,
+) error {
+	app := NewApp(appState, checkResult, files, languagePreferencePath)
 
 	p := tea.NewProgram(
 		app,
