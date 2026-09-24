@@ -1,0 +1,136 @@
+{
+    "entity": "flow",
+    "entityPlural": "flows",
+    "entityTitle": "Flow",
+    "pageTitle": "Flows",
+    "untitled": "Flow #{{id}}",
+    "titlePlaceholder": "Flow title",
+    "status": {
+        "created": "Created",
+        "failed": "Failed",
+        "finished": "Finished",
+        "running": "Running",
+        "waiting": "Waiting"
+    },
+    "types": {
+        "automation": "Automation",
+        "assistant": "Assistant"
+    },
+    "actions": {
+        "toggleFavorite": "Toggle favorite",
+        "addToFavorites": "Add to favorites",
+        "removeFromFavorites": "Remove from favorites",
+        "finish": "Finish",
+        "finishing": "Finishing...",
+        "deleting": "Deleting...",
+        "openMenu": "Open menu"
+    },
+    "detail": {
+        "loadError": "Error loading flow",
+        "selectFlow": "Select a flow",
+        "doubleClickToRename": "Double-click to rename",
+        "flowActions": "Flow actions"
+    },
+    "list": {
+        "columns": {
+            "title": "Title",
+            "terminals": "Terminals"
+        },
+        "noTerminals": "No terminals",
+        "terminalConnected": "(connected)",
+        "terminalDisconnected": "(disconnected)",
+        "newFlow": "New Flow",
+        "loadingTitle": "Loading flows...",
+        "loadingDescription": "Please wait while we fetch your conversation flows",
+        "loadError": "Error loading flows",
+        "emptyTitle": "No flows found",
+        "emptyDescription": "Get started by creating your first conversation flow",
+        "filterPlaceholder": "Filter flows..."
+    },
+    "new": {
+        "pageTitle": "New flow",
+        "heading": "Create a new flow",
+        "description": "Describe what you would like Peepie to test",
+        "assistantPlaceholder": "What would you like me to help you with?",
+        "creatingPlaceholder": "Creating a new flow..."
+    },
+    "form": {
+        "validation": {
+            "messageRequired": "Message cannot be empty",
+            "providerRequired": "Provider must be selected"
+        },
+        "searchPlaceholder": "Search...",
+        "clearTemplateSearch": "Clear template search",
+        "clearResourceSearch": "Clear resource search",
+        "clearProviderSearch": "Clear provider search",
+        "noResults": "No results found",
+        "noTemplates": "No available templates",
+        "noResources": "No available resources",
+        "noProviders": "No available providers",
+        "uploading": "Uploading…",
+        "uploadFiles": "Upload files",
+        "removeResource": "Remove {{name}}",
+        "messagePlaceholder": "Describe what you would like Peepie to test...",
+        "selectProvider": "Select Provider",
+        "useAgents": "Use Agents",
+        "useAgentsDescription": "Enable multi-agent collaboration for complex tasks",
+        "templatesAndResources": "Templates and resources",
+        "templatesTab": "Templates",
+        "resourcesTab": "Resources",
+        "submitting": "Submitting…",
+        "replaceDialog": {
+            "title": "Replace content?",
+            "description": "Current message has content. Replace with the selected template?",
+            "confirm": "Replace"
+        },
+        "stop": "Stop",
+        "stopping": "Stopping…"
+    },
+    "report": {
+        "label": "Report",
+        "openWebView": "Open web view",
+        "copyToClipboard": "Copy to clipboard",
+        "downloadMarkdown": "Download MD",
+        "downloadPdf": "Download PDF",
+        "copied": "Report copied to clipboard",
+        "copyFailed": "Failed to copy report to clipboard",
+        "loadingTitle": "Loading Report...",
+        "generatingTitle": "Generating PDF...",
+        "loadingDescription": "Please wait while we prepare your penetration testing report.",
+        "generatingDescription": "Creating your PDF document. This may take a few moments.",
+        "errorTitle": "Error Loading Report",
+        "unexpectedError": "An unexpected error occurred while loading the report.",
+        "loadFlowFailed": "Failed to load flow data",
+        "pdfFailed": "Failed to generate PDF"
+    },
+    "toasts": {
+        "renamed": "Flow renamed successfully",
+        "renameFailed": "Failed to rename flow",
+        "flowNotFound": "Flow not found",
+        "submitMessageFailed": "Failed to submit message",
+        "submitMessageError": "An error occurred while submitting message",
+        "stopFlowFailed": "Failed to stop flow",
+        "stopFlowError": "An error occurred while stopping flow",
+        "createAssistantFailed": "Failed to create assistant",
+        "createAssistantError": "An error occurred while creating assistant",
+        "callAssistantFailed": "Failed to call assistant",
+        "callAssistantError": "An error occurred while calling assistant",
+        "stopAssistantFailed": "Failed to stop assistant",
+        "stopAssistantError": "An error occurred while stopping assistant",
+        "deleteAssistantFailed": "Failed to delete assistant",
+        "deleteAssistantError": "An error occurred while deleting assistant",
+        "createFlowFailed": "Failed to create flow",
+        "createFlowError": "An error occurred while creating flow",
+        "deleting": "Deleting flow...",
+        "deleted": "Flow deleted successfully",
+        "deleteError": "An error occurred while deleting flow",
+        "finishing": "Finishing flow...",
+        "finished": "Flow finished successfully",
+        "finishError": "An error occurred while finishing flow",
+        "flowDescription": "{{title}} (ID: {{id}})",
+        "addFavoriteFailed": "Failed to add to favorites",
+        "addFavoriteError": "Failed to add favorite",
+        "removeFavoriteFailed": "Failed to remove from favorites",
+        "removeFavoriteError": "Failed to remove favorite"
+    }
+}

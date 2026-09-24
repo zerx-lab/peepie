@@ -1,5 +1,6 @@
 import { FolderInput, Search, X } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { FileManager, type FileNode } from '@/components/shared/file-manager';
 import { OverwriteButtons, OverwriteDialog, useOverwrite } from '@/components/shared/overwrite';
@@ -18,6 +19,7 @@ import { toFileNode } from '@/features/resources/resources-utils';
 import { useResources } from '@/providers/resources-provider';
 
 import { findAttachConflicts } from './flow-files-conflicts';
+import { RESOURCES_PATH_PREFIX, RESOURCES_TARGET_DIRECTORY } from './flow-files-constants';
 import { useFlowFilesAttachResources } from './use-flow-files-attach-resources';
 
 interface AttachPlan {
@@ -82,6 +84,7 @@ function FlowFilesAttachResourcesDialogBody({
     onClose,
     onSuccess,
 }: Omit<FlowFilesAttachResourcesDialogProps, 'isOpen'>) {
+    const { t } = useTranslation(['fileManager', 'common']);
     const { error: resourcesError, isInitialLoading: isResourcesLoading, resources } = useResources();
     const { attach, isAttaching } = useFlowFilesAttachResources({ flowId });
 
@@ -175,8 +178,12 @@ function FlowFilesAttachResourcesDialogBody({
     const selectedCount = selectedPaths.size;
     const hasResources = resources.length > 0;
     const isAttachDisabled = selectedCount === 0;
-    const primaryLabel = selectedCount > 0 ? `Attach ${selectedCount}` : 'Attach';
-    const overwriteLabel = selectedCount > 0 ? `Attach ${selectedCount} with overwrite` : 'Attach with overwrite';
+    const primaryLabel =
+        selectedCount > 0 ? t('attachDialog.attachSelected', { count: selectedCount }) : t('attachDialog.attach');
+    const overwriteLabel =
+        selectedCount > 0
+            ? t('attachDialog.attachSelectedWithOverwrite', { count: selectedCount })
+            : t('attachDialog.attachWithOverwrite');
 
     const emptyState = (
         <Empty className="border-0">
@@ -184,8 +191,8 @@ function FlowFilesAttachResourcesDialogBody({
                 <EmptyMedia variant="icon">
                     <FolderInput />
                 </EmptyMedia>
-                <EmptyTitle>Resource library is empty</EmptyTitle>
-                <EmptyDescription>Upload resources first to attach them to a flow.</EmptyDescription>
+                <EmptyTitle>{t('attachDialog.empty.title')}</EmptyTitle>
+                <EmptyDescription>{t('attachDialog.empty.description')}</EmptyDescription>
             </EmptyHeader>
         </Empty>
     );
@@ -196,9 +203,14 @@ function FlowFilesAttachResourcesDialogBody({
                 <EmptyMedia variant="icon">
                     <Search />
                 </EmptyMedia>
-                <EmptyTitle>No matches</EmptyTitle>
+                <EmptyTitle>{t('attachDialog.noMatches.title')}</EmptyTitle>
                 <EmptyDescription>
-                    No resources match <code>{searchQuery.trim()}</code>.
+                    <Trans
+                        components={{ code: <code /> }}
+                        i18nKey="attachDialog.noMatches.description"
+                        ns="fileManager"
+                        values={{ query: searchQuery.trim() }}
+                    />
                 </EmptyDescription>
             </EmptyHeader>
         </Empty>
@@ -210,12 +222,18 @@ function FlowFilesAttachResourcesDialogBody({
                 <DialogHeader className="text-left">
                     <DialogTitle className="flex items-center gap-2">
                         <FolderInput className="size-4" />
-                        Attach resources
+                        {t('attachDialog.title')}
                     </DialogTitle>
                     <DialogDescription>
-                        Pick files and/or folders from your global library — they will be copied into{' '}
-                        <code>resources/</code> of this flow and made available at <code>/work/resources</code> inside
-                        the container.
+                        <Trans
+                            components={{ code: <code /> }}
+                            i18nKey="attachDialog.description"
+                            ns="fileManager"
+                            values={{
+                                cachePath: `${RESOURCES_PATH_PREFIX}/`,
+                                containerPath: RESOURCES_TARGET_DIRECTORY,
+                            }}
+                        />
                     </DialogDescription>
                 </DialogHeader>
 
@@ -228,14 +246,14 @@ function FlowFilesAttachResourcesDialogBody({
                             autoComplete="off"
                             disabled={isAttaching || isResourcesLoading}
                             onChange={(event) => setSearchQuery(event.target.value)}
-                            placeholder="Search resources..."
+                            placeholder={t('attachDialog.searchPlaceholder')}
                             type="text"
                             value={searchQuery}
                         />
                         {searchQuery && (
                             <InputGroupAddon align="inline-end">
                                 <InputGroupButton
-                                    aria-label="Clear resource search"
+                                    aria-label={t('attachDialog.clearSearch')}
                                     onClick={() => setSearchQuery('')}
                                     type="button"
                                 >
@@ -265,9 +283,9 @@ function FlowFilesAttachResourcesDialogBody({
                 <DialogFooter className="flex-wrap gap-4 sm:items-center">
                     <span className="text-muted-foreground order-last mr-auto text-xs sm:order-first">
                         {selectedCount > 0
-                            ? `${selectedCount} selected`
+                            ? t('bulk.selected', { count: selectedCount })
                             : hasResources
-                              ? 'Select one or more items'
+                              ? t('attachDialog.selectHint')
                               : ''}
                     </span>
                     <div className="flex flex-col-reverse gap-2 sm:ml-auto sm:flex-row sm:justify-end">
@@ -277,7 +295,7 @@ function FlowFilesAttachResourcesDialogBody({
                             type="button"
                             variant="outline"
                         >
-                            Cancel
+                            {t('common:actions.cancel')}
                         </Button>
                         <OverwriteButtons
                             isDisabled={isAttachDisabled}

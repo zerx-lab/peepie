@@ -1,5 +1,7 @@
 import type { Control } from 'react-hook-form';
 
+import { useTranslation } from 'react-i18next';
+
 import type { KnowledgeDocumentFragmentFragment } from '@/graphql/types';
 
 import { DetailSplitLayout } from '@/components/shared/detail-split-layout';
@@ -81,31 +83,33 @@ export function KnowledgeFormLayoutMobile({ control, isNew, isSaving, knowledge,
 }
 
 function KnowledgeIntroBlock({ isNew, knowledge }: KnowledgeIntroBlockProps) {
+    const { t } = useTranslation('knowledges');
+
     return (
         <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2 text-center">
-                <h2 className="text-2xl font-semibold">
-                    {isNew ? 'Create a new knowledge document' : 'Edit knowledge document'}
-                </h2>
+                <h2 className="text-2xl font-semibold">{isNew ? t('form.createTitle') : t('form.editTitle')}</h2>
                 <p className="text-muted-foreground">
-                    {isNew
-                        ? 'Add an entry to the vector knowledge base'
-                        : 'Edits to content or metadata will trigger re-embedding'}
+                    {isNew ? t('form.createDescription') : t('form.editDescription')}
                 </p>
             </div>
 
             {!isNew && knowledge ? (
                 <div className="text-muted-foreground flex flex-wrap items-center gap-2 text-xs">
                     <Badge variant={knowledge.manual ? 'secondary' : 'outline'}>
-                        {knowledge.manual ? 'manual' : 'agent'}
+                        {knowledge.manual ? t('form.manual') : t('form.agent')}
                     </Badge>
-                    {knowledge.flowId ? <Badge variant="outline">flow #{knowledge.flowId}</Badge> : null}
-                    {knowledge.taskId ? <Badge variant="outline">task #{knowledge.taskId}</Badge> : null}
-                    {knowledge.subtaskId ? <Badge variant="outline">subtask #{knowledge.subtaskId}</Badge> : null}
+                    {knowledge.flowId ? (
+                        <Badge variant="outline">{t('form.flowNumber', { id: knowledge.flowId })}</Badge>
+                    ) : null}
+                    {knowledge.taskId ? (
+                        <Badge variant="outline">{t('form.taskNumber', { id: knowledge.taskId })}</Badge>
+                    ) : null}
+                    {knowledge.subtaskId ? (
+                        <Badge variant="outline">{t('form.subtaskNumber', { id: knowledge.subtaskId })}</Badge>
+                    ) : null}
                     <span>·</span>
-                    <span>
-                        chunk {knowledge.partSize} of {knowledge.totalSize}
-                    </span>
+                    <span>{t('form.chunk', { part: knowledge.partSize, total: knowledge.totalSize })}</span>
                 </div>
             ) : null}
         </div>

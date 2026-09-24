@@ -23,6 +23,8 @@ import { findWrapping, liftTarget } from '@tiptap/pm/transform';
 import StarterKit from '@tiptap/starter-kit';
 import { common, createLowlight } from 'lowlight';
 
+import i18n from '@/i18n';
+
 import { HeadingAutoformat } from './markdown-editor-heading-autoformat';
 import { createMarkdownLayer, TunedTable } from './markdown-editor-marked';
 import { MarkdownPaste } from './markdown-editor-paste';
@@ -549,7 +551,10 @@ export const createMarkdownExtensions = (placeholder?: string) => [
     withWholeDocumentToggle(guardBlockTokenizer(TaskList), 'toggleTaskList', listFamily),
     TaskItem.configure({
         a11y: {
-            checkboxLabel: (node) => `Task item checkbox for ${node.firstChild?.textContent || 'empty task item'}`,
+            checkboxLabel: (node) =>
+                i18n.t('editor:taskItem.checkboxLabel', {
+                    item: node.firstChild?.textContent || i18n.t('editor:taskItem.emptyItem'),
+                }),
         },
         nested: true,
     }),
@@ -563,7 +568,11 @@ export const createMarkdownExtensions = (placeholder?: string) => [
     }),
     VariableHighlight,
     TagHighlight,
-    Placeholder.configure({ emptyEditorClass: 'is-editor-empty', placeholder }),
+    Placeholder.configure({
+        emptyEditorClass: 'is-editor-empty',
+        // Resolved per render (not at construction) so the default follows the active UI language.
+        placeholder: placeholder ?? (() => i18n.t('editor:placeholder')),
+    }),
     ...createMarkdownLayer(),
     MarkdownPaste,
 ];

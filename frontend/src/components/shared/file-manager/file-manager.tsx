@@ -1,3 +1,5 @@
+import type { TFunction } from 'i18next';
+
 import { ArrowDown, ArrowUp, ChevronRight } from 'lucide-react';
 import {
     type MouseEvent as ReactMouseEvent,
@@ -8,6 +10,7 @@ import {
     useRef,
     useState,
 } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -55,28 +58,27 @@ const EMPTY_ACTIONS: readonly FileManagerAction[] = Object.freeze([]);
 const EMPTY_BULK_ACTIONS: readonly FileManagerBulkAction[] = Object.freeze([]);
 const EMPTY_AREA_ACTIONS: readonly FileManagerEmptyAreaAction[] = Object.freeze([]);
 
-const COLUMN_LABEL_FOR_ARIA: Record<FileManagerSortColumn, string> = {
-    modified: 'modified date',
-    name: 'name',
-    size: 'size',
-};
+const COLUMN_LABEL_KEYS_FOR_ARIA = {
+    modified: 'sort.columns.modified',
+    name: 'sort.columns.name',
+    size: 'sort.columns.size',
+} as const satisfies Record<FileManagerSortColumn, string>;
 
-const defaultSortHeaderAriaLabel = (
-    column: FileManagerSortColumn,
-    direction: FileManagerSortDirection | null,
-): string => {
-    const label = COLUMN_LABEL_FOR_ARIA[column];
+const createDefaultSortHeaderAriaLabel =
+    (t: TFunction<'fileManager'>) =>
+    (column: FileManagerSortColumn, direction: FileManagerSortDirection | null): string => {
+        const label = t(COLUMN_LABEL_KEYS_FOR_ARIA[column]);
 
-    if (direction === 'asc') {
-        return `Sort by ${label} (descending)`;
-    }
+        if (direction === 'asc') {
+            return t('sort.descending', { column: label });
+        }
 
-    if (direction === 'desc') {
-        return `Clear sorting on ${label}`;
-    }
+        if (direction === 'desc') {
+            return t('sort.clear', { column: label });
+        }
 
-    return `Sort by ${label} (ascending)`;
-};
+        return t('sort.ascending', { column: label });
+    };
 
 const renderEmptyAreaItems = (items: readonly FileManagerEmptyAreaAction[]): ReactNode[] => {
     const nodes: ReactNode[] = [];
@@ -131,6 +133,7 @@ export function FileManager({
     sorting: controlledSorting,
     sortStorageKey,
 }: FileManagerProps) {
+    const { t } = useTranslation('fileManager');
     const effectiveBulkActions = bulkActions ?? EMPTY_BULK_ACTIONS;
     const hasBulkActions = effectiveBulkActions.length > 0;
     const isCheckboxVisible = enableSelection ?? hasBulkActions;
@@ -353,7 +356,7 @@ export function FileManager({
     const formatModified = effectiveLabels.formatModified;
     const effectiveActions = actions ?? EMPTY_ACTIONS;
     const searchQuery = trimmedSearch || undefined;
-    const sortHeaderAriaLabel = effectiveLabels.sortHeaderAriaLabel ?? defaultSortHeaderAriaLabel;
+    const sortHeaderAriaLabel = effectiveLabels.sortHeaderAriaLabel ?? createDefaultSortHeaderAriaLabel(t);
 
     const renderSortableHeader = (column: FileManagerSortColumn, label: string, isSortable: boolean) => {
         if (!isSortable) {
@@ -430,7 +433,7 @@ export function FileManager({
     // clicks outside any row, which is the entire point.
     const treeBody = (
         <div
-            aria-label="File tree"
+            aria-label={t('tree.ariaLabel')}
             aria-multiselectable={isCheckboxVisible || undefined}
             className={cn(
                 'flex flex-1 flex-col overflow-y-auto py-1 transition-colors',
@@ -477,6 +480,14 @@ export function FileManager({
         treeBody
     );
 
+    const nameHeader = renderSortableHeader('name', effectiveLabels.columnName ?? t('columns.name'), isNameSortable);
+    const sizeHeader = renderSortableHeader('size', effectiveLabels.columnSize ?? t('columns.size'), isSizeSortable);
+    const modifiedHeader = renderSortableHeader(
+        'modified',
+        effectiveLabels.columnModified ?? t('columns.modified'),
+        isModifiedSortable,
+    );
+
     return (
         <div
             className={cn('flex flex-col overflow-hidden rounded-lg border', className)}
@@ -490,7 +501,7 @@ export function FileManager({
             >
                 {isCheckboxVisible ? (
                     <Checkbox
-                        aria-label={effectiveLabels.selectAllAriaLabel ?? 'Select all'}
+                        aria-label={effectiveLabels.selectAllAriaLabel ?? t('header.selectAll')}
                         checked={getCheckboxState(isAllSelected, isSomeSelected)}
                         onCheckedChange={toggleSelectAll}
                     />
@@ -506,8 +517,8 @@ export function FileManager({
                             aria-expanded={isAllExpanded}
                             aria-label={
                                 isAllExpanded
-                                    ? (effectiveLabels.collapseAllAriaLabel ?? 'Collapse all')
-                                    : (effectiveLabels.expandAllAriaLabel ?? 'Expand all')
+                                    ? (effectiveLabels.collapseAllAriaLabel ?? t('header.collapseAll'))
+                                    : (effectiveLabels.expandAllAriaLabel ?? t('header.expandAll'))
                             }
                             className="text-muted-foreground hover:bg-muted -mx-0.5 size-4 shrink-0 rounded hover:text-blue-400"
                             onClick={toggleExpandAll}
@@ -522,11 +533,10 @@ export function FileManager({
                             className="-mx-0.5 size-4 shrink-0"
                         />
                     )}
-                    {renderSortableHeader('name', effectiveLabels.columnName ?? 'Name', isNameSortable)}
+                    {nameHeader}
                 </div>
-                {isSizeVisible && renderSortableHeader('size', effectiveLabels.columnSize ?? 'Size', isSizeSortable)}
-                {isModifiedVisible &&
-                    renderSortableHeader('modified', effectiveLabels.columnModified ?? 'Modified', isModifiedSortable)}
+                {isSizeVisible && sizeHeader}
+                {isModifiedVisible && modifiedHeader}
                 {hasActions && (
                     <span
                         aria-hidden="true"

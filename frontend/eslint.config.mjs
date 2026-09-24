@@ -1,6 +1,7 @@
 // @ts-check
 import { FlatCompat } from '@eslint/eslintrc';
 import js from '@eslint/js';
+import i18next from 'eslint-plugin-i18next';
 import perfectionist from 'eslint-plugin-perfectionist';
 import playwright from 'eslint-plugin-playwright';
 
@@ -93,6 +94,52 @@ const eslintConfig = [
         rules: { 'no-restricted-syntax': 'off' },
     },
     perfectionist.configs['recommended-natural'],
+    {
+        // Every user-visible string goes through i18next (see docs/i18n.md): JSX text and
+        // human-facing props must come from `t()`. Technical literals (variants, routes,
+        // ids) are not in the attribute list, so they stay allowed.
+        files: ['src/**/*.tsx'],
+        ignores: ['src/**/*.test.tsx', 'src/components/icons/**', 'src/lib/report/**'],
+        plugins: { i18next },
+        rules: {
+            'i18next/no-literal-string': [
+                'error',
+                {
+                    'jsx-attributes': {
+                        include: [
+                            'alt',
+                            'aria-description',
+                            'aria-label',
+                            'aria-placeholder',
+                            'aria-roledescription',
+                            'aria-valuetext',
+                            'cancelText',
+                            'confirmText',
+                            'description',
+                            'emptyMessage',
+                            'emptyText',
+                            'heading',
+                            'label',
+                            'message',
+                            'placeholder',
+                            'subtitle',
+                            'title',
+                            'tooltip',
+                        ],
+                    },
+                    mode: 'jsx-only',
+                    words: {
+                        // Symbols, numbers, all-caps tokens, and brand/product names are not translatable.
+                        exclude: [
+                            '[0-9!-/:-@[-`{-~\\s·•—–…→←↑↓×✓✗]+',
+                            '[A-Z_-]+',
+                            'Peepie',
+                        ],
+                    },
+                },
+            ],
+        },
+    },
     {
         ...playwright.configs['flat/recommended'],
         // *.unit.test.ts are vitest, not Playwright — the plugin's rules

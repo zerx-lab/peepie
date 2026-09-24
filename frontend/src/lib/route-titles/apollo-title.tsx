@@ -2,6 +2,7 @@ import type { TypedDocumentNode } from '@apollo/client';
 import type { ComponentType } from 'react';
 
 import { skipToken, useQuery } from '@apollo/client/react';
+import { useTranslation } from 'react-i18next';
 
 import { renderTitle, type RouteParams } from './render-title';
 
@@ -56,6 +57,8 @@ export function apolloTitle<TData, TVars extends Record<string, unknown>>(
     opts: ApolloTitleOpts<TData, TVars>,
 ): ApolloTitleComponent {
     function ApolloTitle({ params }: { params: RouteParams }) {
+        // Subscribes to language changes so translated fallbacks in `select` re-render.
+        useTranslation();
         const vars = opts.variables(params);
         const { data } = useQuery(
             opts.document,

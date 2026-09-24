@@ -1,4 +1,7 @@
+import type { TFunction } from 'i18next';
+
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
@@ -7,18 +10,18 @@ import type { OverwriteOutcome } from '@/components/shared/overwrite';
 import { api, getApiErrorMessage, getApiErrorStatusCode } from '@/lib/axios';
 
 import { RESOURCES_MOVE_API_PATH } from './resources-constants';
-import { pluralizeItems } from './resources-utils';
 
-export const resourcesMoveFormSchema = z.object({
-    destination: z
-        .string()
-        .trim()
-        .min(1, { message: 'Destination cannot be empty' })
-        .refine((value) => !value.startsWith('/'), { message: 'Destination must be a relative path' })
-        .refine((value) => !value.split('/').includes('..'), { message: 'Destination must not contain ".."' }),
-});
+export const createResourcesMoveFormSchema = (t: TFunction<'resources'>) =>
+    z.object({
+        destination: z
+            .string()
+            .trim()
+            .min(1, { message: t('validation.destinationRequired') })
+            .refine((value) => !value.startsWith('/'), { message: t('validation.destinationRelative') })
+            .refine((value) => !value.split('/').includes('..'), { message: t('validation.destinationNoParent') }),
+    });
 
-export type ResourcesMoveFormValues = z.infer<typeof resourcesMoveFormSchema>;
+export type ResourcesMoveFormValues = z.infer<ReturnType<typeof createResourcesMoveFormSchema>>;
 
 interface MoveRequestBody {
     destination: string;
@@ -46,6 +49,7 @@ interface UseResourcesMoveResult {
 /** Wraps `PUT /resources/move` for rename / move / batch-move operations. */
 export function useResourcesMove(): UseResourcesMoveResult {
     const [isMoving, setIsMoving] = useState(false);
+    const { t } = useTranslation('resources');
 
     const move = useCallback(
         async (sources: readonly string[], destination: string, force: boolean): Promise<OverwriteOutcome> => {
@@ -64,10 +68,10 @@ export function useResourcesMove(): UseResourcesMoveResult {
 
                 const description =
                     sources.length === 1
-                        ? `Moved to /${destination}`
-                        : `Moved ${sources.length} ${pluralizeItems(sources.length)} into /${destination}`;
+                        ? t('move.toasts.movedTo', { destination })
+                        : t('move.toasts.movedItems', { count: sources.length, destination });
 
-                toast.success('Resource moved', { description });
+                toast.success(t('move.toasts.moved'), { description });
 
                 return { kind: 'ok' };
             } catch (error) {
@@ -79,16 +83,16 @@ export function useResourcesMove(): UseResourcesMoveResult {
                     return { kind: 'conflict' };
                 }
 
-                const description = getApiErrorMessage(error, 'Failed to move resource');
+                const description = getApiErrorMessage(error, t('move.toasts.failedFallback'));
 
-                toast.error('Move failed', { description });
+                toast.error(t('move.toasts.failed'), { description });
 
                 return { kind: 'error' };
             } finally {
                 setIsMoving(false);
             }
         },
-        [],
+        [t],
     );
 
     return {

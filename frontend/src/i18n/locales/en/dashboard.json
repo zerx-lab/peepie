@@ -1,0 +1,119 @@
+{
+    "title": "Dashboard",
+    "tabs": {
+        "analytics": "Analytics",
+        "overview": "Overview"
+    },
+    "periods": {
+        "week": "Week",
+        "month": "Month",
+        "quarter": "Quarter"
+    },
+    "periodsShort": {
+        "week": "W",
+        "month": "M",
+        "quarter": "Q"
+    },
+    "states": {
+        "loadFailed": "Couldn't load",
+        "noDataForPeriod": "No data for this period"
+    },
+    "analytics": {
+        "flowsActivity": {
+            "title": "Flows Activity Over Time",
+            "description": "Flows, tasks, and subtasks created per day"
+        },
+        "toolCalls": {
+            "title": "Tool Calls Over Time",
+            "description": "Number of tool executions per day"
+        },
+        "tokenUsage": {
+            "title": "Token Usage Over Time",
+            "description": "Input and output tokens processed daily"
+        },
+        "cost": {
+            "title": "Cost Over Time",
+            "description": "LLM spending per day. May stay near zero when using local engines — this is expected."
+        },
+        "series": {
+            "flows": "Flows",
+            "tasks": "Tasks",
+            "subtasks": "Subtasks",
+            "toolCalls": "Tool Calls",
+            "tokensIn": "Tokens In",
+            "tokensOut": "Tokens Out",
+            "costIn": "Cost In",
+            "costOut": "Cost Out"
+        },
+        "execution": {
+            "title": "Flow Execution Details",
+            "description": "Execution time and tool calls breakdown per flow",
+            "empty": "No flow executions in this period",
+            "flowFallback": "Flow #{{id}}",
+            "taskFallback": "Task #{{id}}",
+            "subtaskFallback": "Subtask #{{id}}",
+            "taskCount_one": "{{count}} task",
+            "taskCount_other": "{{count}} tasks",
+            "subtaskCount_one": "{{count}} subtask",
+            "subtaskCount_other": "{{count}} subtasks",
+            "assistantCount_one": "{{count}} assistant",
+            "assistantCount_other": "{{count}} assistants"
+        }
+    },
+    "overview": {
+        "metrics": {
+            "totalFlows": {
+                "title": "Total Flows",
+                "description": "Tasks: {{tasks}} · Subtasks: {{subtasks}} · Assistants: {{assistants}}"
+            },
+            "toolCalls": {
+                "title": "Tool Calls",
+                "description": "Total duration: {{duration}}"
+            },
+            "totalTokens": {
+                "title": "Total Tokens",
+                "description": "Input + Output tokens processed"
+            },
+            "totalCost": {
+                "title": "Total Cost",
+                "description": "Total LLM spending across all providers"
+            }
+        },
+        "byProvider": {
+            "title": "Usage by Provider",
+            "description": "LLM token usage and costs grouped by provider"
+        },
+        "byModel": {
+            "title": "Usage by Model",
+            "description": "LLM token usage and costs grouped by model"
+        },
+        "byAgentType": {
+            "title": "Usage by Agent Type",
+            "description": "LLM token usage and costs grouped by agent type"
+        },
+        "byFunction": {
+            "title": "Tool Calls by Function",
+            "description": "Execution statistics for each tool function"
+        },
+        "modelLabel": "{{model}} ({{provider}})",
+        "functionTypes": {
+            "agent": "Agent",
+            "tool": "Tool"
+        },
+        "columns": {
+            "function": "Function",
+            "type": "Type",
+            "count": "Count",
+            "totalDuration": "Total Duration",
+            "avgDuration": "Avg Duration",
+            "name": "Name",
+            "tokensIn": "Tokens In",
+            "tokensOut": "Tokens Out",
+            "cacheIn": "Cache In",
+            "cacheOut": "Cache Out",
+            "costIn": "Cost In",
+            "costOut": "Cost Out",
+            "totalCost": "Total Cost"
+        }
+    }
+}

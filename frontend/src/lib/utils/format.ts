@@ -1,5 +1,6 @@
-import { format, isThisYear, isToday } from 'date-fns';
-import { enUS } from 'date-fns/locale';
+import { isThisYear, isToday } from 'date-fns';
+
+import { formatLocalizedDate, getIntlLocale } from '@/i18n/format';
 
 export const formatName = (name?: string): string =>
     (name || '')
@@ -9,17 +10,17 @@ export const formatName = (name?: string): string =>
 
 export const formatDate = (date: Date) => {
     if (isToday(date)) {
-        return format(date, 'HH:mm:ss');
+        return formatLocalizedDate(date, 'time');
     }
 
     if (isThisYear(date)) {
-        return format(date, 'HH:mm, d MMM', { locale: enUS });
+        return formatLocalizedDate(date, 'dateTimeThisYear');
     }
 
-    return format(date, 'HH:mm, d MMM yyyy', { locale: enUS });
+    return formatLocalizedDate(date, 'dateTime');
 };
 
-export const formatNumber = (value: number): string => new Intl.NumberFormat('en-US').format(value);
+export const formatNumber = (value: number): string => new Intl.NumberFormat(getIntlLocale()).format(value);
 
 export const formatTokenCount = (count: number): string => {
     if (count >= 1_000_000_000) {

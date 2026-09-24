@@ -22,6 +22,14 @@ const statusIcons: Record<StatusType, { className: string; icon: LucideIcon }> =
 };
 const defaultIcon = { className: 'text-muted-foreground', icon: CircleDashed };
 
+export const statusLabelKeys = {
+    [StatusType.Created]: 'status.created',
+    [StatusType.Failed]: 'status.failed',
+    [StatusType.Finished]: 'status.finished',
+    [StatusType.Running]: 'status.running',
+    [StatusType.Waiting]: 'status.waiting',
+} as const satisfies Record<StatusType, string>;
+
 function FlowTaskStatusIcon({ className, status, tooltip }: FlowTaskStatusIconProps) {
     const { className: defaultClassName, icon: Icon } = status ? statusIcons[status] || defaultIcon : defaultIcon;
     const iconElement = (

@@ -1,6 +1,7 @@
 import { Search, X } from 'lucide-react';
 import { motion } from 'motion/react';
 import { type ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDebouncedCallback } from 'use-debounce';
 
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
@@ -33,14 +34,17 @@ interface InputSearchProps {
  * through `handleClear`. A second `Escape` on an empty field collapses + blurs.
  */
 export function InputSearch({
-    ariaLabel = 'Search',
+    ariaLabel: ariaLabelProp,
     className,
     hotkey = 'f',
     maxWidth = 140,
     onSearchChange,
-    placeholder = 'Search...',
+    placeholder: placeholderProp,
     searchQuery,
 }: InputSearchProps) {
+    const { t } = useTranslation(['ui', 'common']);
+    const ariaLabel = ariaLabelProp ?? t('common:actions.search');
+    const placeholder = placeholderProp ?? t('inputSearch.placeholder');
     const [isExpanded, setIsExpanded] = useState(() => searchQuery.trim().length > 0);
     const inputRef = useRef<HTMLInputElement>(null);
     const [localValue, setLocalValue] = useState(searchQuery);
@@ -247,7 +251,7 @@ export function InputSearch({
             {isExpanded && localValue ? (
                 <InputGroupAddon align="inline-end">
                     <InputGroupButton
-                        aria-label={`Clear ${ariaLabel.toLowerCase()}`}
+                        aria-label={t('inputSearch.clear', { label: ariaLabel.toLowerCase() })}
                         onClick={handleClear}
                         type="button"
                     >

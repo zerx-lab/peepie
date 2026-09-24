@@ -13,7 +13,9 @@ import {
     isToday,
     isValid,
 } from 'date-fns';
-import { enUS } from 'date-fns/locale';
+
+import i18n from '@/i18n';
+import { formatLocalizedDate } from '@/i18n/format';
 
 import type {
     FileManagerInternalNode,
@@ -64,30 +66,30 @@ export const formatModifiedRelative = (modifiedAt?: Date | string): string => {
     const years = differenceInYears(now, date);
 
     if (seconds < 60 || !minutes) {
-        return 'just now';
+        return i18n.t('fileManager:relative.justNow');
     }
 
     if (minutes < 60 || !hours) {
-        return `${minutes}m ago`;
+        return i18n.t('fileManager:relative.minutes', { count: minutes });
     }
 
     if (hours < 24 || !days) {
-        return `${hours}h ago`;
+        return i18n.t('fileManager:relative.hours', { count: hours });
     }
 
     if (days < 7 || !weeks) {
-        return `${days}d ago`;
+        return i18n.t('fileManager:relative.days', { count: days });
     }
 
     if (weeks < 4 || !months) {
-        return `${weeks}w ago`;
+        return i18n.t('fileManager:relative.weeks', { count: weeks });
     }
 
     if (months < 12 || !years) {
-        return `${months}mo ago`;
+        return i18n.t('fileManager:relative.months', { count: months });
     }
 
-    return `${years}y ago`;
+    return i18n.t('fileManager:relative.years', { count: years });
 };
 
 /**
@@ -97,12 +99,10 @@ export const formatModifiedRelative = (modifiedAt?: Date | string): string => {
  *
  * The output is contextual, mirroring `lib/utils/format.ts#formatDate`:
  *   - same day            → `HH:mm` (e.g. `14:32`)
- *   - same calendar year  → `d MMM, HH:mm` (e.g. `15 Apr, 14:32`)
- *   - any other year      → `d MMM yyyy, HH:mm` (e.g. `15 Apr 2024, 14:32`)
+ *   - same calendar year  → `common:formats.dateTimeShortThisYear` (en: `15 Apr, 14:32`)
+ *   - any other year      → `common:formats.dateTimeShort` (en: `15 Apr 2024, 14:32`)
  *
- * Locale is forced to `en-US` so day/month tokens stay stable regardless of
- * the user's browser locale (matches the rest of the FileManager UI strings,
- * which are English-only by default).
+ * Day/month tokens follow the active UI language (not the browser locale).
  */
 export const formatModifiedAbsolute = (modifiedAt?: Date | string): string => {
     if (!modifiedAt) {
@@ -120,10 +120,10 @@ export const formatModifiedAbsolute = (modifiedAt?: Date | string): string => {
     }
 
     if (isThisYear(date)) {
-        return format(date, 'd MMM, HH:mm', { locale: enUS });
+        return formatLocalizedDate(date, 'dateTimeShortThisYear');
     }
 
-    return format(date, 'd MMM yyyy, HH:mm', { locale: enUS });
+    return formatLocalizedDate(date, 'dateTimeShort');
 };
 
 /** Strip trailing slashes from a `pathPrefix`. Empty / `'/'` collapse to `''`. */
@@ -598,8 +598,8 @@ export const collectSubtreePaths = (node: FileManagerInternalNode): string[] => 
     return result;
 };
 
-/** Default English pluralization for "N item" / "N items". Override via `labels.pluralizeItems`. */
-export const pluralizeItemsEnglish = (count: number): string => `${count} ${count === 1 ? 'item' : 'items'}`;
+/** Localized "N item(s)" count label. Override via `labels.pluralizeItems`. */
+export const formatItemCount = (count: number): string => i18n.t('fileManager:itemCount', { count });
 
 /**
  * Recursively sum every file's `size` inside a node's subtree. Synthetic group

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type Control, Controller } from 'react-hook-form';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { KnowledgeDocumentFragmentFragment } from '@/graphql/types';
 
 import { KnowledgeAnswerType, KnowledgeDocType } from '@/graphql/types';
+import i18n from '@/i18n';
 
 import type { FormValues, SubmitResult } from './knowledge-form';
 
@@ -136,6 +137,29 @@ describe('KnowledgeForm — create', () => {
         expect(dirty).toMatchObject({ content: true, question: true });
 
         await waitFor(() => expect(navigate).toHaveBeenCalledWith('/knowledges/123'));
+    });
+
+    it('updates the save action when the language changes', async () => {
+        render(
+            <KnowledgeForm
+                initialValues={newValues}
+                isNew
+                onSubmit={vi.fn()}
+            />,
+        );
+
+        expect(screen.getByRole('button', { name: 'Create' })).toBeInTheDocument();
+
+        try {
+            await act(async () => {
+                await i18n.changeLanguage('zh-CN');
+            });
+            expect(screen.getByRole('button', { name: '创建' })).toBeInTheDocument();
+        } finally {
+            await act(async () => {
+                await i18n.changeLanguage('en');
+            });
+        }
     });
 });
 

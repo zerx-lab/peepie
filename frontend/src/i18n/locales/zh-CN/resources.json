@@ -1,0 +1,136 @@
+{
+    "page": {
+        "title": "资源",
+        "newFolder": "新建文件夹",
+        "uploadFiles": "上传文件",
+        "uploading": "正在上传...",
+        "dropToUpload": "拖放文件以上传",
+        "searchPlaceholder": "搜索资源...",
+        "searchAriaLabel": "搜索资源",
+        "clearSearchAriaLabel": "清除资源搜索",
+        "columnSettingsAriaLabel": "列设置",
+        "loadErrorTitle": "加载资源出错"
+    },
+    "viewOptions": {
+        "size": "大小",
+        "modified": "修改时间",
+        "foldersFirst": "文件夹优先",
+        "relativeDates": "相对日期"
+    },
+    "rowActions": {
+        "newFolder": "新建文件夹",
+        "uploadFiles": "上传文件",
+        "renameOrMove": "重命名或移动",
+        "copyTo": "复制到…"
+    },
+    "emptyState": {
+        "title": "暂无资源",
+        "description": "上传文档，供 Peepie 智能体在流程中引用。你也可以将文件拖放到此面板的任意位置。",
+        "hint": "单个文件最大 {{maxFileSizeMb}} MB · 单次上传最大 {{maxTotalSizeGb}} GB"
+    },
+    "noMatches": {
+        "title": "无匹配结果",
+        "description": "没有与 <code>{{query}}</code> 匹配的资源。请尝试其他关键词。"
+    },
+    "deleteDialog": {
+        "titleResource": "删除资源",
+        "titleDirectory": "删除目录",
+        "itemTypeResource": "资源",
+        "itemTypeDirectory": "目录"
+    },
+    "clipboard": {
+        "pathCopied": "路径已复制到剪贴板",
+        "pathCopyFailed": "复制路径失败",
+        "pathsCopied_other": "已将 {{count}} 项复制到剪贴板",
+        "pathsCopyFailed": "复制路径失败"
+    },
+    "validation": {
+        "destinationRequired": "目标不能为空",
+        "destinationRelative": "目标必须是相对路径",
+        "destinationNoParent": "目标不能包含“..”",
+        "pathRequired": "路径不能为空",
+        "pathRelative": "路径必须是相对路径（不能以“/”开头）",
+        "pathNoParent": "路径不能包含“..”"
+    },
+    "destination": {
+        "directoryLabel": "目标目录",
+        "multiHint": "资源库内的相对目录，留空表示根目录。每一项都保留当前文件名。"
+    },
+    "mkdir": {
+        "title": "创建目录",
+        "description": "在资源库中创建虚拟目录。已存在的父目录会被自动复用。",
+        "pathLabel": "路径",
+        "pathPlaceholder": "reports/2025",
+        "pathHint": "相对路径。使用 <code>/</code> 创建嵌套子目录。",
+        "toasts": {
+            "created": "目录已创建",
+            "createdDescription": "创建于 /{{path}}",
+            "failed": "创建目录失败",
+            "failedFallback": "无法创建目录"
+        }
+    },
+    "move": {
+        "titleMulti_other": "移动 {{count}} 项",
+        "titleDirectory": "移动目录",
+        "titleResource": "重命名或移动资源",
+        "descriptionMulti": "将所有选中项移动到目标目录。",
+        "descriptionSingle": "更新 <code>{{path}}</code> 的路径。",
+        "newPathLabel": "新路径",
+        "multiPlaceholder": "留空则移动到资源库根目录",
+        "singleHint": "资源库内的相对路径。以 <code>/</code> 结尾可将该项放入对应目录。",
+        "submit": "移动",
+        "overwrite": "移动并覆盖",
+        "overwriteMulti_other": "移动 {{count}} 项并覆盖",
+        "toasts": {
+            "moved": "资源已移动",
+            "movedTo": "已移动到 /{{destination}}",
+            "movedItems_other": "已将 {{count}} 项移动到 /{{destination}}",
+            "failed": "移动失败",
+            "failedFallback": "无法移动资源"
+        }
+    },
+    "copy": {
+        "titleMulti_other": "复制 {{count}} 项",
+        "titleDirectory": "复制目录",
+        "titleResource": "复制资源",
+        "descriptionMulti": "将所有选中项复制到目标目录。",
+        "descriptionSingle": "将 <code>{{path}}</code> 复制到新路径。",
+        "pathLabel": "目标路径",
+        "multiPlaceholder": "留空则复制到资源库根目录",
+        "singleHint": "资源库内的相对路径。",
+        "overwrite": "复制并覆盖",
+        "overwriteMulti_other": "复制 {{count}} 项并覆盖",
+        "toasts": {
+            "copied": "资源已复制",
+            "copiedTo": "已复制到 /{{destination}}",
+            "copiedItems_other": "已将 {{count}} 项复制到 /{{destination}}",
+            "failed": "复制失败",
+            "failedFallback": "无法复制资源"
+        }
+    },
+    "delete": {
+        "toasts": {
+            "directoryDeleted": "目录已删除",
+            "resourceDeleted": "资源已删除",
+            "itemsDeleted_other": "已删除 {{count}} 项",
+            "failed": "删除失败",
+            "failedFallback": "无法删除资源"
+        }
+    },
+    "upload": {
+        "toasts": {
+            "fileUploaded": "文件已上传",
+            "itemsUploaded_other": "已上传 {{count}} 项",
+            "uploadedToDir": "已上传到 /{{dir}}",
+            "uploadedToLibrary": "已上传到你的资源库",
+            "filesUploadedToDir_other": "已将 {{count}} 个文件上传到 /{{dir}}",
+            "filesUploadedToLibrary_other": "已将 {{count}} 个文件上传到你的资源库",
+            "failed": "上传失败",
+            "failedFallback": "无法上传文件",
+            "alreadyExists": "资源已存在，请重命名或删除现有条目"
+        }
+    },
+    "provider": {
+        "loadFailed": "无法加载资源"
+    }
+}

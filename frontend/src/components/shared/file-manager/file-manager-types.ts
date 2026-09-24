@@ -129,8 +129,8 @@ export interface FileManagerInternalNode extends FileNode {
 }
 
 /**
- * All user-facing strings. Pass to `FileManager` via the `labels` prop to localize.
- * Every field is optional; defaults are English.
+ * Overrides for user-facing strings. Every field is optional; defaults come from the
+ * `fileManager` i18n namespace and follow the active UI language.
  */
 export interface FileManagerLabels {
     /** Cancel button in the bulk-actions bar. */
@@ -147,7 +147,7 @@ export interface FileManagerLabels {
     /**
      * Custom formatter for the "Modified" column. Receives the raw `modifiedAt`
      * and must return a display string (or empty string for no value). When omitted,
-     * the default English relative formatter is used.
+     * the default localized relative formatter is used.
      */
     formatModified?: (modifiedAt: Date | string | undefined) => string;
     /**
@@ -167,8 +167,8 @@ export interface FileManagerLabels {
     /**
      * aria-label for a sortable column header button. Receives the column id and the
      * current sort direction (`null` when the column is not currently sorted), and
-     * should describe the action the next click will perform. Defaults to a plain
-     * English description like `"Sort by name (ascending)"`.
+     * should describe the action the next click will perform. Defaults to a localized
+     * description like `"Sort by name (ascending)"`.
      */
     sortHeaderAriaLabel?: (column: FileManagerSortColumn, direction: FileManagerSortDirection | null) => string;
 }

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { FileNode } from '@/components/shared/file-manager';
 
 import { buildPathsQuery } from '@/features/resources/resources-utils';
+import i18n from '@/i18n';
 import { api, getApiErrorMessage, unwrapApiResponse } from '@/lib/axios';
 
 import { FLOW_FILES_CONTAINER_API_PATH } from './flow-files-constants';
@@ -126,7 +127,7 @@ export function useFlowContainerFiles({ flowId, paths }: UseFlowContainerFilesPa
                 return;
             }
 
-            setError(new Error(getApiErrorMessage(caught, 'Failed to load container files')));
+            setError(new Error(getApiErrorMessage(caught, i18n.t('fileManager:pullDialog.listErrorFallback'))));
             setFiles([]);
             setFailures([]);
             setTruncated(false);

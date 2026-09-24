@@ -1,0 +1,82 @@
+{
+    "actions": {
+        "add": "Add",
+        "apply": "Apply",
+        "back": "Back",
+        "cancel": "Cancel",
+        "clear": "Clear",
+        "close": "Close",
+        "confirm": "Confirm",
+        "continue": "Continue",
+        "copy": "Copy",
+        "create": "Create",
+        "delete": "Delete",
+        "discard": "Discard",
+        "download": "Download",
+        "duplicate": "Duplicate",
+        "edit": "Edit",
+        "export": "Export",
+        "import": "Import",
+        "open": "Open",
+        "refresh": "Refresh",
+        "remove": "Remove",
+        "rename": "Rename",
+        "reset": "Reset",
+        "retry": "Retry",
+        "save": "Save",
+        "search": "Search",
+        "select": "Select",
+        "submit": "Submit",
+        "update": "Update",
+        "upload": "Upload",
+        "view": "View"
+    },
+    "status": {
+        "loading": "Loading...",
+        "saving": "Saving...",
+        "copied": "Copied",
+        "copiedToClipboard": "Copied to clipboard",
+        "copyFailed": "Failed to copy",
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "error": "Error",
+        "success": "Success",
+        "warning": "Warning",
+        "unknown": "Unknown",
+        "none": "None",
+        "all": "All",
+        "yes": "Yes",
+        "no": "No",
+        "notAvailable": "N/A"
+    },
+    "fields": {
+        "name": "Name",
+        "description": "Description",
+        "status": "Status",
+        "type": "Type",
+        "actions": "Actions",
+        "createdAt": "Created",
+        "updatedAt": "Updated",
+        "provider": "Provider",
+        "model": "Model",
+        "id": "ID"
+    },
+    "language": {
+        "label": "Language",
+        "system": "System",
+        "systemWithValue": "System ({{language}})",
+        "names": {
+            "en": "English",
+            "zh-CN": "简体中文"
+        }
+    },
+    "formats": {
+        "time": "HH:mm:ss",
+        "dateTimeThisYear": "HH:mm, d MMM",
+        "dateTime": "HH:mm, d MMM yyyy",
+        "dateTimeShortThisYear": "d MMM, HH:mm",
+        "dateTimeShort": "d MMM yyyy, HH:mm",
+        "date": "d MMM yyyy",
+        "monthYear": "MMMM yyyy"
+    }
+}

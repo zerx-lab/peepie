@@ -1,11 +1,11 @@
 import type { LucideIcon } from 'lucide-react';
 
 import { HardDrive, HardDriveDownload, HardDriveUpload } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { VectorStoreAction } from '@/graphql/types';
 import { cn } from '@/lib/utils';
-import { formatName } from '@/lib/utils/format';
 
 interface FlowVectorStoreActionIconProps {
     action?: VectorStoreAction;
@@ -19,18 +19,26 @@ const icons: Record<VectorStoreAction, LucideIcon> = {
 };
 const defaultIcon = HardDrive;
 
-function FlowVectorStoreActionIcon({ action, className, tooltip = action }: FlowVectorStoreActionIconProps) {
-    const Icon = action ? icons[action] || defaultIcon : defaultIcon;
-    const iconElement = <Icon className={cn('size-3 shrink-0', tooltip && 'cursor-pointer', className)} />;
+const actionLabelKeys = {
+    [VectorStoreAction.Retrieve]: 'vectorStores.actions.retrieve',
+    [VectorStoreAction.Store]: 'vectorStores.actions.store',
+} as const satisfies Record<VectorStoreAction, string>;
 
-    if (!tooltip) {
+function FlowVectorStoreActionIcon({ action, className, tooltip }: FlowVectorStoreActionIconProps) {
+    const { t } = useTranslation('flowDetails');
+    const Icon = action ? icons[action] || defaultIcon : defaultIcon;
+    const labelKey = action ? actionLabelKeys[action] : undefined;
+    const tooltipText = tooltip ?? (labelKey ? t(labelKey) : action);
+    const iconElement = <Icon className={cn('size-3 shrink-0', tooltipText && 'cursor-pointer', className)} />;
+
+    if (!tooltipText) {
         return iconElement;
     }
 
     return (
         <Tooltip>
             <TooltipTrigger asChild>{iconElement}</TooltipTrigger>
-            <TooltipContent>{formatName(tooltip)}</TooltipContent>
+            <TooltipContent>{tooltipText}</TooltipContent>
         </Tooltip>
     );
 }

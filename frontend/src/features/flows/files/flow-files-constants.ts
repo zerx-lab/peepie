@@ -8,11 +8,14 @@ export const UPLOADS_PATH_PREFIX = 'uploads';
 export const RESOURCES_PATH_PREFIX = 'resources';
 export const CONTAINER_PATH_PREFIX = 'container';
 
-export const ROOT_GROUPS: FileManagerRootGroup[] = [
-    { defaultOpen: true, icon: FolderUp, id: 'uploads', label: 'Uploads', pathPrefix: UPLOADS_PATH_PREFIX },
-    { defaultOpen: true, icon: Folder, id: 'resources', label: 'Resources', pathPrefix: RESOURCES_PATH_PREFIX },
-    { defaultOpen: true, icon: HardDrive, id: 'container', label: 'Container', pathPrefix: CONTAINER_PATH_PREFIX },
-];
+/** Root groups with i18n keys (`fileManager:flowFiles.groups.*`); labels are resolved at render time. */
+export const ROOT_GROUPS = [
+    { defaultOpen: true, icon: FolderUp, id: 'uploads', labelKey: 'uploads', pathPrefix: UPLOADS_PATH_PREFIX },
+    { defaultOpen: true, icon: Folder, id: 'resources', labelKey: 'resources', pathPrefix: RESOURCES_PATH_PREFIX },
+    { defaultOpen: true, icon: HardDrive, id: 'container', labelKey: 'container', pathPrefix: CONTAINER_PATH_PREFIX },
+] as const satisfies readonly (Omit<FileManagerRootGroup, 'label'> & {
+    labelKey: 'container' | 'resources' | 'uploads';
+})[];
 
 export const FLOW_FILES_API_PATH = (flowId: string) => `/flows/${flowId}/files/`;
 export const FLOW_FILES_PULL_API_PATH = (flowId: string) => `/flows/${flowId}/files/pull`;

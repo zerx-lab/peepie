@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 
 import {
     DropdownMenu,
@@ -59,6 +60,7 @@ interface TableHandlesController {
 // a menu item runs — so it stays out of the byte round-trip. Merged cells / colour / header-column are omitted
 // (not GFM-representable); the toolbar Table dropdown carries the same ops for keyboard/no-hover users.
 export function TableHandles({ editor }: { editor: Editor }) {
+    const { t } = useTranslation('editor');
     const { onMenuChange, open, target } = useTableHandles(editor);
 
     if (!target) {
@@ -75,7 +77,7 @@ export function TableHandles({ editor }: { editor: Editor }) {
             >
                 <DropdownMenuTrigger asChild>
                     <button
-                        aria-label="Column actions"
+                        aria-label={t('table.columnActions')}
                         className={GRIP_CLASS}
                         data-table-grip=""
                         style={{
@@ -98,16 +100,16 @@ export function TableHandles({ editor }: { editor: Editor }) {
                 >
                     <DropdownMenuItem onSelect={() => focusTarget().addColumnBefore().run()}>
                         <ArrowLeft className="text-muted-foreground size-4 shrink-0" />
-                        Insert left
+                        {t('table.insertLeft')}
                     </DropdownMenuItem>
                     <DropdownMenuItem onSelect={() => focusTarget().addColumnAfter().run()}>
                         <ArrowRight className="text-muted-foreground size-4 shrink-0" />
-                        Insert right
+                        {t('table.insertRight')}
                     </DropdownMenuItem>
                     <DropdownMenuSub>
                         <DropdownMenuSubTrigger>
                             <AlignLeft className="text-muted-foreground size-4 shrink-0" />
-                            Align column
+                            {t('table.alignColumn')}
                         </DropdownMenuSubTrigger>
                         <DropdownMenuSubContent>
                             {ALIGN_OPTIONS.map((option) => (
@@ -119,7 +121,7 @@ export function TableHandles({ editor }: { editor: Editor }) {
                                     }}
                                 >
                                     <option.icon className="text-muted-foreground size-4 shrink-0" />
-                                    {option.label}
+                                    {t(option.labelKey)}
                                 </DropdownMenuItem>
                             ))}
                         </DropdownMenuSubContent>
@@ -131,12 +133,12 @@ export function TableHandles({ editor }: { editor: Editor }) {
                         }}
                     >
                         <Eraser className="text-muted-foreground size-4 shrink-0" />
-                        Clear contents
+                        {t('table.clearContents')}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onSelect={() => focusTarget().deleteColumn().run()}>
                         <Delete className="text-muted-foreground size-4 shrink-0" />
-                        Delete column
+                        {t('table.deleteColumn')}
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
@@ -147,7 +149,7 @@ export function TableHandles({ editor }: { editor: Editor }) {
             >
                 <DropdownMenuTrigger asChild>
                     <button
-                        aria-label="Row actions"
+                        aria-label={t('table.rowActions')}
                         className={GRIP_CLASS}
                         data-table-grip=""
                         style={{
@@ -175,11 +177,11 @@ export function TableHandles({ editor }: { editor: Editor }) {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onSelect={() => focusTarget().addRowBefore().run()}>
                         <ArrowUp className="text-muted-foreground size-4 shrink-0" />
-                        Insert above
+                        {t('table.insertAbove')}
                     </DropdownMenuItem>
                     <DropdownMenuItem onSelect={() => focusTarget().addRowAfter().run()}>
                         <ArrowDown className="text-muted-foreground size-4 shrink-0" />
-                        Insert below
+                        {t('table.insertBelow')}
                     </DropdownMenuItem>
                     <DropdownMenuItem
                         onSelect={() => {
@@ -188,12 +190,12 @@ export function TableHandles({ editor }: { editor: Editor }) {
                         }}
                     >
                         <Eraser className="text-muted-foreground size-4 shrink-0" />
-                        Clear contents
+                        {t('table.clearContents')}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onSelect={() => focusTarget().deleteRow().run()}>
                         <Delete className="text-muted-foreground size-4 shrink-0 -rotate-90" />
-                        Delete row
+                        {t('table.deleteRow')}
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
@@ -206,6 +208,7 @@ export function TableHandles({ editor }: { editor: Editor }) {
 // on close, so the deliberately non-reactive useTableHandles hover path pays no per-transaction cost while idle.
 // Reads header state by the hovered cell's position, not the caret — the grip opens without moving the selection.
 function RowHeaderToggleItem({ cellPos, editor }: { cellPos: number; editor: Editor }) {
+    const { t } = useTranslation('editor');
     const isHeaderRow = useEditorState({
         editor,
         selector: ({ editor }) => hasHeaderRow(editor, cellPos),
@@ -223,7 +226,7 @@ function RowHeaderToggleItem({ cellPos, editor }: { cellPos: number; editor: Edi
             role="menuitemcheckbox"
         >
             <PanelTop className="text-muted-foreground size-4 shrink-0" />
-            <span>Header row</span>
+            <span>{t('table.headerRow')}</span>
             <Switch
                 checked={isHeaderRow}
                 className="pointer-events-none ml-auto"

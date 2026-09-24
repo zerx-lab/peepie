@@ -1,0 +1,12 @@
+{
+    "unexpectedResponse": "服务器返回了意外的响应",
+    "confirmInput": "请检查你的输入。",
+    "clipboard": {
+        "copyFailed": "复制到剪贴板失败"
+    },
+    "upload": {
+        "tooManyFiles": "文件过多：每次最多上传 {{max}} 个文件",
+        "fileTooLarge": "文件“{{name}}”超过 {{maxSizeMb}} MB",
+        "totalTooLarge": "上传总大小超过 {{maxSizeMb}} MB 的限制"
+    }
+}

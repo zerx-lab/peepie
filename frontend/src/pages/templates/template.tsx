@@ -1,8 +1,10 @@
+import type { TFunction } from 'i18next';
 import type { ReactNode } from 'react';
 
 import { skipToken, useQuery } from '@apollo/client/react';
 import { ChevronDown, Ellipsis, FileSymlink, FileText, LayoutTemplate, Pencil, Save, Trash } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -45,14 +47,33 @@ import { routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import { type Template, useTemplates } from '@/providers/templates-provider';
 
-const formSchema = z.object({
-    text: z.string().trim().min(1, { message: 'Text is required' }),
-    title: z.string().trim().min(1, { message: 'Title is required' }),
-});
+const createFormSchema = (t: TFunction<'templates'>) =>
+    z.object({
+        text: z
+            .string()
+            .trim()
+            .min(1, { message: t('form.textRequired') }),
+        title: z
+            .string()
+            .trim()
+            .min(1, { message: t('form.titleRequired') }),
+    });
 
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = { text: string; title: string };
 
-const PRESETS_TITLE = 'Preset templates';
+const PRESET_TITLE_KEYS = [
+    'presets.titles.web',
+    'presets.titles.network',
+    'presets.titles.directory',
+    'presets.titles.api',
+    'presets.titles.cloud',
+    'presets.titles.wordpress',
+    'presets.titles.surface',
+    'presets.titles.internal',
+    'presets.titles.mobile',
+    'presets.titles.devops',
+    'presets.titles.database',
+] as const;
 
 const PRESET_TEMPLATES: { text: string; title: string }[] = [
     {
@@ -235,22 +256,9 @@ const renderTemplateItem = (item: Template, isCurrent: boolean): ReactNode => (
     <span className={cn('min-w-0 flex-1 truncate', isCurrent && 'font-medium')}>{item.title}</span>
 );
 
-// One React element serves every `/templates/:templateId`, so without a key the form instance — which sets
-// `keepDirtyValues` so a subscription resync cannot wipe an unsaved body — carried one template's edited text
-// onto the next template and Save wrote it to the wrong row. Keying by id gives each entity its own form, the
-// way knowledge.tsx already keys <KnowledgeForm>. It also stops `/templates/new` inheriting an abandoned draft.
-function Template() {
-    const { templateId } = useParams<{ templateId?: string }>();
-
-    return (
-        <TemplateForm
-            key={templateId ?? 'new'}
-            templateId={templateId}
-        />
-    );
-}
-
 function TemplateForm({ templateId }: { templateId?: string }) {
+    const { t } = useTranslation(['templates', 'common']);
+    const formSchema = useMemo(() => createFormSchema(t), [t]);
     const navigate = useNavigate();
     const { createTemplate, deleteTemplate, updateTemplate } = useTemplates();
 
@@ -333,14 +341,14 @@ function TemplateForm({ templateId }: { templateId?: string }) {
             // Send the server's current `text`, not the form's, so renaming the title never persists the
             // user's unsaved body edits — those stay dirty in the form (kept by `keepDirtyValues`) until they save.
             await updateTemplate(templateId, { text: template.text, title: newTitle });
-            toast.success('Template renamed successfully');
+            toast.success(t('renamed'));
             handleTemplateRenameCancel();
         } catch {
             // Error already handled in provider with toast
         } finally {
             setIsRenaming(false);
         }
-    }, [editingInputRef, handleTemplateRenameCancel, templateId, templateData?.flowTemplate, updateTemplate]);
+    }, [editingInputRef, handleTemplateRenameCancel, templateId, templateData?.flowTemplate, updateTemplate, t]);
 
     const handleTemplateDelete = useCallback(async () => {
         if (!templateId) {
@@ -392,7 +400,7 @@ function TemplateForm({ templateId }: { templateId?: string }) {
         const parsed = formSchema.safeParse(getValues());
 
         return parsed.success ? performSave(parsed.data) : false;
-    }, [getValues, isSaving, isValid, performSave]);
+    }, [formSchema, getValues, isSaving, isValid, performSave]);
 
     const guard = useUnsavedChangesGuard({
         isDirty,
@@ -456,7 +464,7 @@ function TemplateForm({ templateId }: { templateId?: string }) {
                                         inputRef={editingInputRef}
                                         onCancel={handleTemplateRenameCancel}
                                         onSave={handleTemplateRenameSave}
-                                        placeholder="Template title"
+                                        placeholder={t('titlePlaceholder')}
                                     />
                                 ) : hasTemplate ? (
                                     <Tooltip>
@@ -465,14 +473,14 @@ function TemplateForm({ templateId }: { templateId?: string }) {
                                                 className="max-w-64 min-w-0 cursor-text truncate select-none"
                                                 onDoubleClick={handleTemplateRenameStart}
                                             >
-                                                {templateName ?? 'Template'}
+                                                {templateName ?? t('name')}
                                             </BreadcrumbPage>
                                         </TooltipTrigger>
-                                        <TooltipContent>Double-click to rename</TooltipContent>
+                                        <TooltipContent>{t('renameHint')}</TooltipContent>
                                     </Tooltip>
                                 ) : (
                                     <BreadcrumbPage className="min-w-0 truncate">
-                                        {isNew ? 'New template' : (templateName ?? 'Template')}
+                                        {isNew ? t('new') : (templateName ?? t('name'))}
                                     </BreadcrumbPage>
                                 )}
                             </BreadcrumbItem>
@@ -486,21 +494,21 @@ function TemplateForm({ templateId }: { templateId?: string }) {
                                 controller={templateNav}
                                 renderItem={renderTemplateItem}
                                 sheetIcon={<FileText className="size-4" />}
-                                sheetTitle="Templates"
+                                sheetTitle={t('plural')}
                             />
                         )}
                         <AppHeaderAction
                             disabled={isTemplatePending || (!isNew && !hasUnsavedChanges)}
                             form="template-form"
                             icon={<Save />}
-                            label={isNew ? 'Create' : 'Save'}
+                            label={isNew ? t('common:actions.create') : t('common:actions.save')}
                             loading={isSaving}
                             type="submit"
                         />
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button
-                                    aria-label="Template actions"
+                                    aria-label={t('actions.menu')}
                                     className="size-8 p-0"
                                     variant="ghost"
                                 >
@@ -521,11 +529,11 @@ function TemplateForm({ templateId }: { templateId?: string }) {
                                                     onSelect={(event) => event.preventDefault()}
                                                 >
                                                     <FileText />
-                                                    Templates
+                                                    {t('plural')}
                                                     <div className="-my-1.5 -mr-2 ml-auto flex items-center">
                                                         <DetailNavigationButtons<Template>
                                                             controller={templateNav}
-                                                            sheetTitle="Templates"
+                                                            sheetTitle={t('plural')}
                                                             size="sm"
                                                         />
                                                     </div>
@@ -538,7 +546,7 @@ function TemplateForm({ templateId }: { templateId?: string }) {
                                             onClick={handleTemplateRenameStart}
                                         >
                                             <Pencil />
-                                            Rename
+                                            {t('common:actions.rename')}
                                         </DropdownMenuItem>
                                         <DropdownMenuSeparator />
                                     </>
@@ -547,12 +555,12 @@ function TemplateForm({ templateId }: { templateId?: string }) {
                                     className="cursor-default gap-4 hover:bg-transparent focus:bg-transparent"
                                     onSelect={(event) => event.preventDefault()}
                                 >
-                                    View
+                                    {t('actions.view')}
                                     <EditorViewModeToggle
                                         className="-my-1.5 -mr-2 ml-auto"
                                         mode={viewMode}
                                         onModeChange={setViewMode}
-                                        rawTooltip="Edit the raw template"
+                                        rawTooltip={t('actions.rawTooltip')}
                                     />
                                 </DropdownMenuItem>
                                 {!isNew && (
@@ -565,12 +573,12 @@ function TemplateForm({ templateId }: { templateId?: string }) {
                                             {isDeleting ? (
                                                 <>
                                                     <Spinner variant="circle" />
-                                                    Deleting...
+                                                    {t('actions.deleting')}
                                                 </>
                                             ) : (
                                                 <>
                                                     <Trash />
-                                                    Delete
+                                                    {t('common:actions.delete')}
                                                 </>
                                             )}
                                         </DropdownMenuItem>
@@ -586,7 +594,7 @@ function TemplateForm({ templateId }: { templateId?: string }) {
                     controller={templateNav}
                     renderItem={renderTemplateItem}
                     sheetIcon={<FileText className="size-4" />}
-                    sheetTitle="Templates"
+                    sheetTitle={t('plural')}
                 />
             )}
         </>
@@ -615,11 +623,12 @@ function TemplateForm({ templateId }: { templateId?: string }) {
                                 variant="ghost"
                             >
                                 <span className={cn('min-w-0', expandedPresetIndex !== index && 'truncate')}>
-                                    {preset.title}
+                                    {t(PRESET_TITLE_KEYS[index]!)}
                                 </span>
                             </Button>
                             <CollapsibleTrigger asChild>
                                 <Button
+                                    aria-label={t('presets.expand', { title: t(PRESET_TITLE_KEYS[index]!) })}
                                     className={cn(
                                         'h-auto shrink-0 rounded-none rounded-tr-[0.6875rem] border-l px-2 py-2',
                                         expandedPresetIndex !== index && 'rounded-br-[0.6875rem]',
@@ -652,7 +661,7 @@ function TemplateForm({ templateId }: { templateId?: string }) {
         <div className="bg-card overflow-hidden rounded-lg border">
             <div className="border-b px-4 py-3">
                 <h4 className="flex items-center gap-2 text-sm font-medium">
-                    {PRESETS_TITLE}
+                    {t('presets.title')}
                     <Badge
                         className="ml-auto font-normal tabular-nums"
                         variant="secondary"
@@ -660,9 +669,7 @@ function TemplateForm({ templateId }: { templateId?: string }) {
                         {PRESET_TEMPLATES.length}
                     </Badge>
                 </h4>
-                <p className="text-muted-foreground mt-1 text-xs">
-                    Click a preset to fill the form, or expand it to preview the content.
-                </p>
+                <p className="text-muted-foreground mt-1 text-xs">{t('presets.description')}</p>
             </div>
             {presetsList()}
         </div>
@@ -678,7 +685,7 @@ function TemplateForm({ templateId }: { templateId?: string }) {
                     variant="secondary"
                 >
                     <LayoutTemplate />
-                    {PRESETS_TITLE}
+                    {t('presets.title')}
                     <Badge
                         className="ml-auto h-5 font-normal tabular-nums"
                         variant="outline"
@@ -698,8 +705,8 @@ function TemplateForm({ templateId }: { templateId?: string }) {
 
     const introBlock = (
         <div className="flex flex-col gap-2 text-center">
-            <h2 className="text-2xl font-semibold">{isNew ? 'Create a new template' : 'Edit template'}</h2>
-            <p className="text-muted-foreground">Add a title and content, or start from a preset.</p>
+            <h2 className="text-2xl font-semibold">{isNew ? t('form.createTitle') : t('form.editTitle')}</h2>
+            <p className="text-muted-foreground">{t('form.description')}</p>
         </div>
     );
 
@@ -709,12 +716,12 @@ function TemplateForm({ templateId }: { templateId?: string }) {
             name="title"
             render={({ field }) => (
                 <FormItem>
-                    <FormLabel>Title</FormLabel>
+                    <FormLabel>{t('form.title')}</FormLabel>
                     <FormControl>
                         <Input
                             autoFocus={isNew}
                             disabled={isSaving}
-                            placeholder="A short name for this template"
+                            placeholder={t('form.titleHint')}
                             {...field}
                         />
                     </FormControl>
@@ -732,12 +739,12 @@ function TemplateForm({ templateId }: { templateId?: string }) {
                 <FormItem className="flex min-h-0 flex-1 flex-col">
                     <FormControl>
                         <MarkdownEditorField
-                            aria-label="Template content"
+                            aria-label={t('form.content')}
                             disabled={isSaving}
                             mode={viewMode}
                             onBlur={field.onBlur}
                             onChange={field.onChange}
-                            placeholder="Describe the task, or start from a preset"
+                            placeholder={t('form.contentHint')}
                             ref={field.ref}
                             value={field.value}
                         />
@@ -769,7 +776,7 @@ function TemplateForm({ templateId }: { templateId?: string }) {
                     <ErrorState
                         message={templateLoadError.message}
                         onRetry={() => refetchTemplate()}
-                        title="Error loading template"
+                        title={t('errors.loadOne')}
                     />
                 </div>
             </div>
@@ -783,9 +790,9 @@ function TemplateForm({ templateId }: { templateId?: string }) {
                 <div className="flex flex-1 items-center justify-center p-4">
                     <Card className="w-full max-w-2xl">
                         <CardContent className="flex flex-col items-center gap-4 pt-6 text-center">
-                            <h2 className="text-xl font-semibold">Template not found</h2>
-                            <p className="text-muted-foreground">The template you are looking for does not exist.</p>
-                            <Button onClick={() => navigate(routes.templates)}>Back to Templates</Button>
+                            <h2 className="text-xl font-semibold">{t('errors.notFound')}</h2>
+                            <p className="text-muted-foreground">{t('errors.notFoundDescription')}</p>
+                            <Button onClick={() => navigate(routes.templates)}>{t('form.backToList')}</Button>
                         </CardContent>
                     </Card>
                 </div>
@@ -826,9 +833,9 @@ function TemplateForm({ templateId }: { templateId?: string }) {
             </Form>
             <ConfirmationDialog
                 confirmIcon={<FileSymlink />}
-                confirmText="Replace"
+                confirmText={t('dialog.replace')}
                 confirmVariant="default"
-                description="Current form has content. Replace with the selected preset?"
+                description={t('dialog.replaceDescription')}
                 handleConfirm={handleConfirmReplacePreset}
                 handleOpenChange={(open) => {
                     if (!open) {
@@ -838,16 +845,16 @@ function TemplateForm({ templateId }: { templateId?: string }) {
                     setIsReplaceConfirmOpen(open);
                 }}
                 isOpen={isReplaceConfirmOpen}
-                title="Replace content?"
+                title={t('dialog.replaceTitle')}
             />
             <ConfirmationDialog
-                cancelText="Cancel"
-                confirmText="Delete"
+                cancelText={t('common:actions.cancel')}
+                confirmText={t('common:actions.delete')}
                 handleConfirm={handleTemplateDelete}
                 handleOpenChange={setIsDeleteDialogOpen}
                 isOpen={isDeleteDialogOpen}
                 itemName={templateName ?? undefined}
-                itemType="template"
+                itemType={t('dialog.itemType')}
             />
             <UnsavedChangesDialog
                 canSave={isValid}
@@ -862,4 +869,19 @@ function TemplateForm({ templateId }: { templateId?: string }) {
     );
 }
 
-export default Template;
+// One React element serves every `/templates/:templateId`, so without a key the form instance — which sets
+// `keepDirtyValues` so a subscription resync cannot wipe an unsaved body — carried one template's edited text
+// onto the next template and Save wrote it to the wrong row. Keying by id gives each entity its own form, the
+// way knowledge.tsx already keys <KnowledgeForm>. It also stops `/templates/new` inheriting an abandoned draft.
+function TemplatePage() {
+    const { templateId } = useParams<{ templateId?: string }>();
+
+    return (
+        <TemplateForm
+            key={templateId ?? 'new'}
+            templateId={templateId}
+        />
+    );
+}
+
+export default TemplatePage;

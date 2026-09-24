@@ -1,0 +1,106 @@
+{
+    "name": "Knowledge",
+    "plural": "Knowledges",
+    "new": "New knowledge",
+    "newButton": "New Knowledge",
+    "questionPlaceholder": "Knowledge question",
+    "renamed": "Knowledge renamed successfully",
+    "renameHint": "Double-click to rename",
+    "actions": {
+        "menu": "Knowledge actions",
+        "anonymize": "Anonymize",
+        "anonymizing": "Anonymizing...",
+        "deleting": "Deleting...",
+        "view": "View",
+        "rawTooltip": "Edit the raw markdown"
+    },
+    "anonymize": {
+        "noResult": "Anonymizer returned no result",
+        "noSensitiveData": "No sensitive data detected",
+        "success": "Content anonymized",
+        "failed": "Failed to anonymize content"
+    },
+    "errors": {
+        "create": "Failed to create knowledge document",
+        "update": "Failed to update knowledge document",
+        "rename": "Failed to rename knowledge document",
+        "delete": "Failed to delete knowledge document",
+        "notFound": "Knowledge document not found",
+        "loadOne": "Error loading knowledge document",
+        "loadList": "Error loading knowledge documents",
+        "providerMissing": "useKnowledges must be used within KnowledgesProvider"
+    },
+    "dialog": {
+        "itemType": "knowledge document"
+    },
+    "form": {
+        "createTitle": "Create a new knowledge document",
+        "editTitle": "Edit knowledge document",
+        "createDescription": "Add an entry to the vector knowledge base",
+        "editDescription": "Edits to content or metadata will trigger re-embedding",
+        "content": "Content",
+        "contentPlaceholder": "Knowledge content (will be embedded into the vector store)",
+        "documentType": "Document type",
+        "selectType": "Select type",
+        "guideType": "Guide type",
+        "selectGuideType": "Select guide type",
+        "answerType": "Answer type",
+        "selectAnswerType": "Select answer type",
+        "codeLanguage": "Code language",
+        "codeLanguagePlaceholder": "e.g. python, go, typescript",
+        "noLanguageMatch": "No matching language",
+        "question": "Question",
+        "questionHint": "Short title or question this document answers",
+        "description": "Description (optional)",
+        "descriptionLabel": "Description",
+        "descriptionHint": "Optional short description",
+        "manual": "manual",
+        "agent": "agent",
+        "flowNumber": "flow #{{id}}",
+        "taskNumber": "task #{{id}}",
+        "subtaskNumber": "subtask #{{id}}",
+        "chunk": "chunk {{part}} of {{total}}"
+    },
+    "validation": {
+        "maxLength": "{{label}} must be {{max}} characters or fewer",
+        "contentRequired": "Content is required",
+        "questionRequired": "Question is required",
+        "answerTypeRequired": "Answer type is required",
+        "codeLanguageRequired": "Code language is required",
+        "guideTypeRequired": "Guide type is required"
+    },
+    "types": {
+        "answer": "answer",
+        "code": "code",
+        "guide": "guide"
+    },
+    "answerTypes": {
+        "code": "code",
+        "guide": "guide",
+        "other": "other",
+        "tool": "tool",
+        "vulnerability": "vulnerability"
+    },
+    "guideTypes": {
+        "configure": "configure",
+        "development": "development",
+        "install": "install",
+        "other": "other",
+        "pentest": "pentest",
+        "use": "use"
+    },
+    "list": {
+        "type": "Type",
+        "question": "Question",
+        "flags": "Flags",
+        "openMenu": "Open menu",
+        "searchLabel": "Search knowledge documents",
+        "searchPlaceholder": "Semantic search...",
+        "loadingTitle": "Loading knowledges...",
+        "loadingDescription": "Please wait while we fetch your knowledge documents",
+        "emptyTitle": "No knowledge documents yet",
+        "emptyDescription": "Create your first knowledge document to enrich the vector store",
+        "entityName": "knowledge documents",
+        "filterPlaceholder": "Filter knowledge documents..."
+    }
+}

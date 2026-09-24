@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ChevronDown, Inbox, ListFilter, Search, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { useDebouncedCallback } from 'use-debounce';
 import { z } from 'zod';
 
@@ -33,6 +34,7 @@ const searchFormSchema = z.object({
 });
 
 function FlowAutomationMessages({ className }: FlowAutomationMessagesProps) {
+    const { t } = useTranslation('flowDetails');
     const { flowData, flowId, flowStatus, stopAutomation, submitAutomationMessage } = useFlow();
 
     const logs = useMemo(() => flowData?.messageLogs ?? [], [flowData?.messageLogs]);
@@ -130,32 +132,32 @@ function FlowAutomationMessages({ className }: FlowAutomationMessagesProps) {
 
     const placeholder = useMemo(() => {
         if (!flowId) {
-            return 'Select a flow...';
+            return t('messages.placeholders.selectFlow');
         }
 
         switch (flowStatus) {
             case StatusType.Created: {
-                return 'The flow is starting...';
+                return t('messages.placeholders.automationStarting');
             }
 
             case StatusType.Failed:
             case StatusType.Finished: {
-                return 'This flow has ended. Create a new one to continue.';
+                return t('messages.placeholders.automationEnded');
             }
 
             case StatusType.Running: {
-                return 'PentAGI is working... Click Stop to interrupt';
+                return t('messages.placeholders.automationRunning');
             }
 
             case StatusType.Waiting: {
-                return 'Provide additional context or instructions...';
+                return t('messages.placeholders.automationWaiting');
             }
 
             default: {
-                return 'Type your message...';
+                return t('messages.placeholders.default');
             }
         }
-    }, [flowId, flowStatus]);
+    }, [flowId, flowStatus, t]);
 
     const handleSubmitMessage = async (values: FlowFormValues) => {
         setIsSubmitting(true);
@@ -210,13 +212,13 @@ function FlowAutomationMessages({ className }: FlowAutomationMessagesProps) {
                                         <InputGroupInput
                                             {...field}
                                             autoComplete="off"
-                                            placeholder="Search messages..."
+                                            placeholder={t('messages.searchPlaceholder')}
                                             type="text"
                                         />
                                         {field.value && (
                                             <InputGroupAddon align="inline-end">
                                                 <InputGroupButton
-                                                    aria-label="Clear message search"
+                                                    aria-label={t('messages.clearSearch')}
                                                     onClick={() => {
                                                         form.reset({ search: '' });
                                                         setDebouncedSearchValue('');
@@ -266,7 +268,7 @@ function FlowAutomationMessages({ className }: FlowAutomationMessagesProps) {
 
                     {!isScrolledToBottom && (
                         <Button
-                            aria-label="Scroll to latest message"
+                            aria-label={t('messages.scrollToLatest')}
                             className="absolute right-4 bottom-4 z-10 shadow-md hover:shadow-lg"
                             onClick={() => scrollToEnd()}
                             size="icon-sm"
@@ -286,8 +288,8 @@ function FlowAutomationMessages({ className }: FlowAutomationMessagesProps) {
                         <EmptyMedia variant="icon">
                             <ListFilter />
                         </EmptyMedia>
-                        <EmptyTitle>No messages found</EmptyTitle>
-                        <EmptyDescription>Try adjusting your search or filter parameters</EmptyDescription>
+                        <EmptyTitle>{t('messages.notFound')}</EmptyTitle>
+                        <EmptyDescription>{t('filters.adjustHint')}</EmptyDescription>
                     </EmptyHeader>
                     <EmptyContent>
                         <Button
@@ -295,7 +297,7 @@ function FlowAutomationMessages({ className }: FlowAutomationMessagesProps) {
                             variant="outline"
                         >
                             <X />
-                            Reset filters
+                            {t('filters.reset')}
                         </Button>
                     </EmptyContent>
                 </Empty>
@@ -305,11 +307,8 @@ function FlowAutomationMessages({ className }: FlowAutomationMessagesProps) {
                         <EmptyMedia variant="icon">
                             <Inbox />
                         </EmptyMedia>
-                        <EmptyTitle>No active tasks</EmptyTitle>
-                        <EmptyDescription>
-                            Starting a new task may take some time as the PentAGI agent downloads the required Docker
-                            image
-                        </EmptyDescription>
+                        <EmptyTitle>{t('messages.automationEmpty.title')}</EmptyTitle>
+                        <EmptyDescription>{t('messages.automationEmpty.description')}</EmptyDescription>
                     </EmptyHeader>
                 </Empty>
             )}

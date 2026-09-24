@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { Save } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -32,8 +33,8 @@ export interface UnsavedChangesDialogProps {
 
 function UnsavedChangesDialog({
     canSave,
-    description = 'You have unsaved changes on this page. Would you like to save them before leaving?',
-    discardText = 'Discard',
+    description,
+    discardText,
     handleCancel,
     handleDiscard,
     handleOpenChange,
@@ -41,9 +42,11 @@ function UnsavedChangesDialog({
     isOpen,
     isSavingFromDialog,
     saveIcon = <Save />,
-    saveText = 'Save',
-    title = 'Unsaved changes',
+    saveText,
+    title,
 }: UnsavedChangesDialogProps) {
+    const { t } = useTranslation(['ui', 'common']);
+
     return (
         <Dialog
             onOpenChange={handleOpenChange}
@@ -63,8 +66,8 @@ function UnsavedChangesDialog({
                 }}
             >
                 <DialogHeader>
-                    <DialogTitle>{title}</DialogTitle>
-                    <DialogDescription>{description}</DialogDescription>
+                    <DialogTitle>{title ?? t('unsavedChanges.title')}</DialogTitle>
+                    <DialogDescription>{description ?? t('unsavedChanges.description')}</DialogDescription>
                 </DialogHeader>
                 <DialogFooter className="flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                     <Button
@@ -72,14 +75,14 @@ function UnsavedChangesDialog({
                         onClick={handleCancel}
                         variant="outline"
                     >
-                        Cancel
+                        {t('common:actions.cancel')}
                     </Button>
                     <Button
                         disabled={isSavingFromDialog}
                         onClick={handleDiscard}
                         variant="destructive"
                     >
-                        {discardText}
+                        {discardText ?? t('common:actions.discard')}
                     </Button>
                     <Button
                         disabled={isSavingFromDialog || !canSave}
@@ -89,7 +92,7 @@ function UnsavedChangesDialog({
                         variant="default"
                     >
                         {isSavingFromDialog ? <Spinner variant="circle" /> : saveIcon}
-                        {saveText}
+                        {saveText ?? t('common:actions.save')}
                     </Button>
                 </DialogFooter>
             </DialogContent>

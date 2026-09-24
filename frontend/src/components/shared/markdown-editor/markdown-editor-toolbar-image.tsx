@@ -2,6 +2,7 @@ import type { Editor } from '@tiptap/react';
 
 import { ImagePlus } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -16,6 +17,7 @@ interface ImagePopoverProps {
 }
 
 export function ImagePopover({ disabled, editor }: ImagePopoverProps) {
+    const { t } = useTranslation('editor');
     const [open, setOpen] = useState(false);
 
     return (
@@ -27,7 +29,7 @@ export function ImagePopover({ disabled, editor }: ImagePopoverProps) {
                 <TooltipTrigger asChild>
                     <PopoverTrigger asChild>
                         <Button
-                            aria-label="Insert image"
+                            aria-label={t('image.insert')}
                             data-toolbar-item=""
                             disabled={disabled}
                             size="icon-sm"
@@ -38,7 +40,7 @@ export function ImagePopover({ disabled, editor }: ImagePopoverProps) {
                         </Button>
                     </PopoverTrigger>
                 </TooltipTrigger>
-                <TooltipContent>Insert image</TooltipContent>
+                <TooltipContent>{t('image.insert')}</TooltipContent>
             </Tooltip>
             <PopoverContent
                 align="start"

@@ -1,4 +1,7 @@
-import { type ComponentProps, useState } from 'react';
+import type { TFunction } from 'i18next';
+
+import { type ComponentProps, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import * as z from 'zod';
 
@@ -10,52 +13,50 @@ import { useAppForm } from '@/hooks/use-app-form';
 import { api, resolveApiErrorMessage } from '@/lib/axios';
 import { cn } from '@/lib/utils';
 
-const passwordChangeSchema = z
-    .object({
-        confirmPassword: z.string().min(1, { message: 'Confirm your password' }),
-        currentPassword: z.string().min(1, { message: 'Current password is required' }),
-        newPassword: z
-            .string()
-            .min(8, { message: 'Password must be at least 8 characters' })
-            // bcrypt, which hashes it server-side, refuses anything longer than 72 bytes.
-            .refine((password) => new TextEncoder().encode(password).length <= 72, {
-                message: 'Password must not exceed 72 characters',
-            })
-            .refine(
-                (password) => {
-                    if (password.length > 15) {
-                        return true;
-                    }
+/**
+ * Password policy (mirrors the backend): 8–72 bytes; either 16+ characters of any
+ * composition, or 8–15 characters with a digit, lowercase, uppercase and a special
+ * character from `!@#$&*`. Only the messages are translated — keep the rules intact.
+ */
+const createPasswordChangeSchema = (t: TFunction<'auth'>) =>
+    z
+        .object({
+            confirmPassword: z.string().min(1, { message: t('passwordChange.validation.confirmRequired') }),
+            currentPassword: z.string().min(1, { message: t('passwordChange.validation.currentRequired') }),
+            newPassword: z
+                .string()
+                .min(8, { message: t('passwordChange.validation.minLength') })
+                // bcrypt, which hashes it server-side, refuses anything longer than 72 bytes.
+                .refine((password) => new TextEncoder().encode(password).length <= 72, {
+                    message: t('passwordChange.validation.maxLength'),
+                })
+                .refine(
+                    (password) => {
+                        if (password.length > 15) {
+                            return true;
+                        }
 
-                    return (
-                        password.length >= 8 &&
-                        /[0-9]/.test(password) &&
-                        /[a-z]/.test(password) &&
-                        /[A-Z]/.test(password) &&
-                        /[!@#$&*]/.test(password)
-                    );
-                },
-                {
-                    message:
-                        'Password must be either longer than 15 characters, or at least 8 characters with a number, lowercase, uppercase, and special character (!@#$&*)',
-                },
-            ),
-    })
-    .refine((data) => data.newPassword === data.confirmPassword, {
-        message: "Passwords don't match",
-        path: ['confirmPassword'],
-    })
-    .refine((data) => data.currentPassword !== data.newPassword, {
-        message: 'New password must be different from current password',
-        path: ['newPassword'],
-    });
-
-const ERROR_BY_CODE: Record<string, string> = {
-    'Users.ChangePasswordCurrentUser.InvalidCurrentPassword': 'Current password is incorrect',
-    'Users.ChangePasswordCurrentUser.InvalidNewPassword': 'New password does not meet requirements',
-    'Users.ChangePasswordCurrentUser.InvalidPassword': 'Password validation failed',
-    'Users.NotFound': 'User not found',
-};
+                        return (
+                            password.length >= 8 &&
+                            /[0-9]/.test(password) &&
+                            /[a-z]/.test(password) &&
+                            /[A-Z]/.test(password) &&
+                            /[!@#$&*]/.test(password)
+                        );
+                    },
+                    {
+                        message: t('passwordChange.validation.complexity'),
+                    },
+                ),
+        })
+        .refine((data) => data.newPassword === data.confirmPassword, {
+            message: t('passwordChange.validation.mismatch'),
+            path: ['confirmPassword'],
+        })
+        .refine((data) => data.currentPassword !== data.newPassword, {
+            message: t('passwordChange.validation.sameAsCurrent'),
+            path: ['newPassword'],
+        });
 
 interface PasswordChangeFormProps {
     buttonSize?: ComponentProps<typeof Button>['size'];
@@ -65,7 +66,7 @@ interface PasswordChangeFormProps {
     onSuccess?: () => void;
 }
 
-type PasswordChangeFormValues = z.infer<typeof passwordChangeSchema>;
+type PasswordChangeFormValues = z.infer<ReturnType<typeof createPasswordChangeSchema>>;
 
 export function PasswordChangeForm({
     buttonSize = 'default',
@@ -74,7 +75,9 @@ export function PasswordChangeForm({
     onSkip,
     onSuccess,
 }: PasswordChangeFormProps) {
+    const { t } = useTranslation(['auth', 'common']);
     const [error, setError] = useState<null | string>(null);
+    const passwordChangeSchema = useMemo(() => createPasswordChangeSchema(t), [t]);
 
     const form = useAppForm<PasswordChangeFormValues>({
         defaultValues: {
@@ -96,11 +99,20 @@ export function PasswordChangeForm({
             });
 
             form.reset();
-            toast.success('Password successfully changed');
+            toast.success(t('passwordChange.success'));
 
             onSuccess?.();
         } catch (err: unknown) {
-            setError(resolveApiErrorMessage(err, ERROR_BY_CODE, 'Failed to change password'));
+            const errorByCode: Record<string, string> = {
+                'Users.ChangePasswordCurrentUser.InvalidCurrentPassword': t(
+                    'passwordChange.errors.invalidCurrentPassword',
+                ),
+                'Users.ChangePasswordCurrentUser.InvalidNewPassword': t('passwordChange.errors.invalidNewPassword'),
+                'Users.ChangePasswordCurrentUser.InvalidPassword': t('passwordChange.errors.invalidPassword'),
+                'Users.NotFound': t('passwordChange.errors.userNotFound'),
+            };
+
+            setError(resolveApiErrorMessage(err, errorByCode, t('passwordChange.errors.failed')));
         }
     };
 
@@ -114,7 +126,7 @@ export function PasswordChangeForm({
             type="button"
             variant="ghost"
         >
-            Skip for now
+            {t('passwordChange.skip')}
         </Button>
     );
     const cancelButton = onCancel && (
@@ -125,7 +137,7 @@ export function PasswordChangeForm({
             type="button"
             variant="outline"
         >
-            Cancel
+            {t('common:actions.cancel')}
         </Button>
     );
     const submitButton = (
@@ -133,7 +145,7 @@ export function PasswordChangeForm({
             className={cn(isVertical && 'w-full')}
             size={buttonSize}
         >
-            <span>Update Password</span>
+            <span>{t('passwordChange.submit')}</span>
         </FormSubmitButton>
     );
 
@@ -149,11 +161,11 @@ export function PasswordChangeForm({
                     name="currentPassword"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Current Password</FormLabel>
+                            <FormLabel>{t('passwordChange.currentLabel')}</FormLabel>
                             <FormControl>
                                 <InputPassword
                                     {...field}
-                                    placeholder="Enter your current password"
+                                    placeholder={t('passwordChange.currentPlaceholder')}
                                 />
                             </FormControl>
                             <FormMessage />
@@ -166,17 +178,14 @@ export function PasswordChangeForm({
                     name="newPassword"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>New Password</FormLabel>
+                            <FormLabel>{t('passwordChange.newLabel')}</FormLabel>
                             <FormControl>
                                 <InputPassword
                                     {...field}
-                                    placeholder="Enter your new password"
+                                    placeholder={t('passwordChange.newPlaceholder')}
                                 />
                             </FormControl>
-                            <FormDescription className="text-xs">
-                                Must be 16+ characters, or 8+ with number, lowercase, uppercase, and special character
-                                (!@#$&*)
-                            </FormDescription>
+                            <FormDescription className="text-xs">{t('passwordChange.newDescription')}</FormDescription>
                             <FormMessage />
                         </FormItem>
                     )}
@@ -187,11 +196,11 @@ export function PasswordChangeForm({
                     name="confirmPassword"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Confirm New Password</FormLabel>
+                            <FormLabel>{t('passwordChange.confirmLabel')}</FormLabel>
                             <FormControl>
                                 <InputPassword
                                     {...field}
-                                    placeholder="Confirm your new password"
+                                    placeholder={t('passwordChange.confirmPlaceholder')}
                                 />
                             </FormControl>
                             <FormMessage />

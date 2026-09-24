@@ -1,5 +1,6 @@
 import { useQuery } from '@apollo/client/react';
 import { Activity, CircleDollarSign, Cpu, GitFork } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import type { UsageStatsFragmentFragment } from '@/graphql/types';
 
@@ -21,6 +22,7 @@ import {
 import { formatCost, formatDuration, formatNumber, formatTokenCount } from '@/lib/utils/format';
 
 export function DashboardOverview() {
+    const { t } = useTranslation('dashboard');
     const {
         data: usageTotalData,
         error: usageTotalError,
@@ -69,7 +71,7 @@ export function DashboardOverview() {
         stats: item.stats,
     }));
     const modelRows = (usageByModelData?.usageStatsByModel ?? []).map((item) => ({
-        label: `${item.model} (${item.provider})`,
+        label: t('overview.modelLabel', { model: item.model, provider: item.provider }),
         stats: item.stats,
     }));
     const agentTypeRows = (usageByAgentTypeData?.usageStatsByAgentType ?? []).map((item) => ({
@@ -85,43 +87,49 @@ export function DashboardOverview() {
         <div className="flex flex-col gap-6">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <MetricCard
-                    description={`Tasks: ${flowsTotal?.totalTasksCount ?? 0} · Subtasks: ${flowsTotal?.totalSubtasksCount ?? 0} · Assistants: ${flowsTotal?.totalAssistantsCount ?? 0}`}
+                    description={t('overview.metrics.totalFlows.description', {
+                        assistants: flowsTotal?.totalAssistantsCount ?? 0,
+                        subtasks: flowsTotal?.totalSubtasksCount ?? 0,
+                        tasks: flowsTotal?.totalTasksCount ?? 0,
+                    })}
                     error={!!flowsTotalError}
                     icon={<GitFork className="text-muted-foreground size-4" />}
                     loading={flowsTotalLoading}
-                    title="Total Flows"
+                    title={t('overview.metrics.totalFlows.title')}
                     value={flowsTotal ? formatNumber(flowsTotal.totalFlowsCount) : '0'}
                 />
                 <MetricCard
-                    description={`Total duration: ${toolcallsTotal ? formatDuration(toolcallsTotal.totalDurationSeconds) : '—'}`}
+                    description={t('overview.metrics.toolCalls.description', {
+                        duration: toolcallsTotal ? formatDuration(toolcallsTotal.totalDurationSeconds) : '—',
+                    })}
                     error={!!toolcallsTotalError}
                     icon={<Activity className="text-muted-foreground size-4" />}
                     loading={toolcallsTotalLoading}
-                    title="Tool Calls"
+                    title={t('overview.metrics.toolCalls.title')}
                     value={toolcallsTotal ? formatNumber(toolcallsTotal.totalCount) : '0'}
                 />
                 <MetricCard
-                    description="Input + Output tokens processed"
+                    description={t('overview.metrics.totalTokens.description')}
                     error={!!usageTotalError}
                     icon={<Cpu className="text-muted-foreground size-4" />}
                     loading={usageTotalLoading}
-                    title="Total Tokens"
+                    title={t('overview.metrics.totalTokens.title')}
                     value={formatTokenCount(totalTokens)}
                 />
                 <MetricCard
-                    description="Total LLM spending across all providers"
+                    description={t('overview.metrics.totalCost.description')}
                     error={!!usageTotalError}
                     icon={<CircleDollarSign className="text-muted-foreground size-4" />}
                     loading={usageTotalLoading}
-                    title="Total Cost"
+                    title={t('overview.metrics.totalCost.title')}
                     value={formatCost(totalCost)}
                 />
             </div>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Usage by Provider</CardTitle>
-                    <CardDescription>LLM token usage and costs grouped by provider</CardDescription>
+                    <CardTitle>{t('overview.byProvider.title')}</CardTitle>
+                    <CardDescription>{t('overview.byProvider.description')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     {usageByProviderLoading ? (
@@ -136,8 +144,8 @@ export function DashboardOverview() {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Usage by Model</CardTitle>
-                    <CardDescription>LLM token usage and costs grouped by model</CardDescription>
+                    <CardTitle>{t('overview.byModel.title')}</CardTitle>
+                    <CardDescription>{t('overview.byModel.description')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     {usageByModelLoading ? (
@@ -152,8 +160,8 @@ export function DashboardOverview() {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Usage by Agent Type</CardTitle>
-                    <CardDescription>LLM token usage and costs grouped by agent type</CardDescription>
+                    <CardTitle>{t('overview.byAgentType.title')}</CardTitle>
+                    <CardDescription>{t('overview.byAgentType.description')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     {usageByAgentTypeLoading ? (
@@ -168,8 +176,8 @@ export function DashboardOverview() {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Tool Calls by Function</CardTitle>
-                    <CardDescription>Execution statistics for each tool function</CardDescription>
+                    <CardTitle>{t('overview.byFunction.title')}</CardTitle>
+                    <CardDescription>{t('overview.byFunction.description')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     {toolcallsByFunctionLoading ? (
@@ -180,11 +188,19 @@ export function DashboardOverview() {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="whitespace-nowrap">Function</TableHead>
-                                    <TableHead className="whitespace-nowrap">Type</TableHead>
-                                    <TableHead className="text-right whitespace-nowrap">Count</TableHead>
-                                    <TableHead className="text-right whitespace-nowrap">Total Duration</TableHead>
-                                    <TableHead className="text-right whitespace-nowrap">Avg Duration</TableHead>
+                                    <TableHead className="whitespace-nowrap">
+                                        {t('overview.columns.function')}
+                                    </TableHead>
+                                    <TableHead className="whitespace-nowrap">{t('overview.columns.type')}</TableHead>
+                                    <TableHead className="text-right whitespace-nowrap">
+                                        {t('overview.columns.count')}
+                                    </TableHead>
+                                    <TableHead className="text-right whitespace-nowrap">
+                                        {t('overview.columns.totalDuration')}
+                                    </TableHead>
+                                    <TableHead className="text-right whitespace-nowrap">
+                                        {t('overview.columns.avgDuration')}
+                                    </TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -193,7 +209,9 @@ export function DashboardOverview() {
                                         <TableCell className="font-medium">{item.functionName}</TableCell>
                                         <TableCell>
                                             <Badge variant={item.isAgent ? 'secondary' : 'outline'}>
-                                                {item.isAgent ? 'Agent' : 'Tool'}
+                                                {item.isAgent
+                                                    ? t('overview.functionTypes.agent')
+                                                    : t('overview.functionTypes.tool')}
                                             </Badge>
                                         </TableCell>
                                         <TableCell className="text-right">{formatNumber(item.totalCount)}</TableCell>
@@ -247,18 +265,20 @@ function UsageStatsRow({ label, stats }: { label: string; stats: UsageStatsFragm
 }
 
 function UsageStatsTable({ rows }: { rows: Array<{ label: string; stats: UsageStatsFragmentFragment }> }) {
+    const { t } = useTranslation('dashboard');
+
     return (
         <Table>
             <TableHeader>
                 <TableRow>
-                    <TableHead className="whitespace-nowrap">Name</TableHead>
-                    <TableHead className="text-right whitespace-nowrap">Tokens In</TableHead>
-                    <TableHead className="text-right whitespace-nowrap">Tokens Out</TableHead>
-                    <TableHead className="text-right whitespace-nowrap">Cache In</TableHead>
-                    <TableHead className="text-right whitespace-nowrap">Cache Out</TableHead>
-                    <TableHead className="text-right whitespace-nowrap">Cost In</TableHead>
-                    <TableHead className="text-right whitespace-nowrap">Cost Out</TableHead>
-                    <TableHead className="text-right whitespace-nowrap">Total Cost</TableHead>
+                    <TableHead className="whitespace-nowrap">{t('overview.columns.name')}</TableHead>
+                    <TableHead className="text-right whitespace-nowrap">{t('overview.columns.tokensIn')}</TableHead>
+                    <TableHead className="text-right whitespace-nowrap">{t('overview.columns.tokensOut')}</TableHead>
+                    <TableHead className="text-right whitespace-nowrap">{t('overview.columns.cacheIn')}</TableHead>
+                    <TableHead className="text-right whitespace-nowrap">{t('overview.columns.cacheOut')}</TableHead>
+                    <TableHead className="text-right whitespace-nowrap">{t('overview.columns.costIn')}</TableHead>
+                    <TableHead className="text-right whitespace-nowrap">{t('overview.columns.costOut')}</TableHead>
+                    <TableHead className="text-right whitespace-nowrap">{t('overview.columns.totalCost')}</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>

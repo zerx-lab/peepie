@@ -1,5 +1,6 @@
 import { ArrowDownToLine, ArrowUp, FolderOpen, RefreshCw, TriangleAlert } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import {
     dedupeOverlappingPaths,
@@ -32,8 +33,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { findPullConflicts } from './flow-files-conflicts';
-import { CONTAINER_DEFAULT_PATH, CONTAINER_PATH_PREFIX } from './flow-files-constants';
-import { pluralizeItems } from './flow-files-utils';
+import { CONTAINER_DEFAULT_PATH, CONTAINER_PATH_PREFIX, CONTAINER_TARGET_DIRECTORY } from './flow-files-constants';
 import { useFlowContainerFiles } from './use-flow-container-files';
 import { useFlowFilesPull } from './use-flow-files-pull';
 
@@ -125,6 +125,7 @@ export function FlowFilesPullDialog({ cachedFiles, flowId, isOpen, onClose, onSu
  * owns the listing browser UI and the per-action plan derivation.
  */
 function FlowFilesPullDialogForm({ cachedFiles, flowId, onClose, onSuccess }: FlowFilesPullDialogFormProps) {
+    const { t } = useTranslation(['fileManager', 'common']);
     const [currentPath, setCurrentPath] = useState<string>(CONTAINER_DEFAULT_PATH);
     const [pathInputValue, setPathInputValue] = useState<string>(CONTAINER_DEFAULT_PATH);
     const [selectedPaths, setSelectedPaths] = useState<ReadonlySet<string>>(() => new Set<string>());
@@ -307,19 +308,24 @@ function FlowFilesPullDialogForm({ cachedFiles, flowId, onClose, onSuccess }: Fl
 
     const primaryLabel = useMemo(() => {
         if (selectedPaths.size === 0) {
-            return `Pull ${currentPath}`;
+            return t('pullDialog.pullPath', { path: currentPath });
         }
 
-        return `Pull ${selectedPaths.size} ${pluralizeItems(selectedPaths.size)}`;
-    }, [currentPath, selectedPaths.size]);
+        return t('pullDialog.pullSelected', { count: selectedPaths.size });
+    }, [currentPath, selectedPaths.size, t]);
 
     const overwriteLabel = useMemo(() => {
         if (selectedPaths.size === 0) {
-            return 'Pull with overwrite';
+            return t('pullDialog.pullWithOverwrite');
         }
 
-        return `Pull ${selectedPaths.size} with overwrite`;
-    }, [selectedPaths.size]);
+        return t('pullDialog.pullSelectedWithOverwrite', { count: selectedPaths.size });
+    }, [selectedPaths.size, t]);
+
+    const skippedNames = listingFailures
+        .slice(0, 5)
+        .map((failure) => failure.name)
+        .join(', ');
 
     // The FileManager doesn't ship a "selection only" mode — passing an empty
     // bulk-actions array is the cheapest way to surface the checkboxes.
@@ -331,7 +337,7 @@ function FlowFilesPullDialogForm({ cachedFiles, flowId, onClose, onSuccess }: Fl
                 <EmptyMedia variant="icon">
                     <FolderOpen />
                 </EmptyMedia>
-                <EmptyTitle>Failed to list container</EmptyTitle>
+                <EmptyTitle>{t('pullDialog.listError')}</EmptyTitle>
                 <EmptyDescription>{listingError.message}</EmptyDescription>
             </EmptyHeader>
         </Empty>
@@ -341,10 +347,15 @@ function FlowFilesPullDialogForm({ cachedFiles, flowId, onClose, onSuccess }: Fl
                 <EmptyMedia variant="icon">
                     <TriangleAlert />
                 </EmptyMedia>
-                <EmptyTitle>Nothing readable here</EmptyTitle>
+                <EmptyTitle>{t('pullDialog.unreadable.title')}</EmptyTitle>
                 <EmptyDescription>
-                    None of the {listingFailures.length} {listingFailures.length === 1 ? 'entry' : 'entries'} in{' '}
-                    <code>{currentPath}</code> could be read.
+                    <Trans
+                        components={{ code: <code /> }}
+                        count={listingFailures.length}
+                        i18nKey="pullDialog.unreadable.description"
+                        ns="fileManager"
+                        values={{ path: currentPath }}
+                    />
                 </EmptyDescription>
             </EmptyHeader>
             <ul className="text-muted-foreground max-w-full space-y-1 px-4 text-left text-xs">
@@ -356,7 +367,9 @@ function FlowFilesPullDialogForm({ cachedFiles, flowId, onClose, onSuccess }: Fl
                         <span className="text-foreground font-medium">{failure.name}</span> — {failure.message}
                     </li>
                 ))}
-                {listingFailures.length > 5 && <li>…and {listingFailures.length - 5} more</li>}
+                {listingFailures.length > 5 && (
+                    <li>{t('pullDialog.unreadable.more', { count: listingFailures.length - 5 })}</li>
+                )}
             </ul>
         </Empty>
     ) : (
@@ -365,9 +378,14 @@ function FlowFilesPullDialogForm({ cachedFiles, flowId, onClose, onSuccess }: Fl
                 <EmptyMedia variant="icon">
                     <FolderOpen />
                 </EmptyMedia>
-                <EmptyTitle>Directory is empty</EmptyTitle>
+                <EmptyTitle>{t('pullDialog.emptyDirectory.title')}</EmptyTitle>
                 <EmptyDescription>
-                    Nothing to pull from <code>{currentPath}</code>.
+                    <Trans
+                        components={{ code: <code /> }}
+                        i18nKey="pullDialog.emptyDirectory.description"
+                        ns="fileManager"
+                        values={{ path: currentPath }}
+                    />
                 </EmptyDescription>
             </EmptyHeader>
         </Empty>
@@ -379,18 +397,22 @@ function FlowFilesPullDialogForm({ cachedFiles, flowId, onClose, onSuccess }: Fl
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <ArrowDownToLine className="size-4" />
-                        Pull from container
+                        {t('pullDialog.title')}
                     </DialogTitle>
                     <DialogDescription>
-                        Browse the running container and select files or directories to sync into the local cache under{' '}
-                        <code>container/</code>. Click the arrow on a folder row or double-click the row to drill in.
+                        <Trans
+                            components={{ code: <code /> }}
+                            i18nKey="pullDialog.description"
+                            ns="fileManager"
+                            values={{ path: CONTAINER_TARGET_DIRECTORY }}
+                        />
                     </DialogDescription>
                 </DialogHeader>
 
                 <div className="flex flex-col gap-3">
                     <div className="flex items-end gap-2">
                         <div className="flex-1">
-                            <Label className="mb-1.5 block text-sm font-normal">Container path</Label>
+                            <Label className="mb-1.5 block text-sm font-normal">{t('pullDialog.pathLabel')}</Label>
                             <Autocomplete
                                 onCommit={navigateTo}
                                 onValueChange={setPathInputValue}
@@ -399,10 +421,10 @@ function FlowFilesPullDialogForm({ cachedFiles, flowId, onClose, onSuccess }: Fl
                                 <AutocompleteInput
                                     autoFocus
                                     disabled={isPulling}
-                                    placeholder="/work"
+                                    placeholder={CONTAINER_DEFAULT_PATH}
                                 />
                                 <AutocompleteContent>
-                                    <AutocompleteEmpty>No matching paths</AutocompleteEmpty>
+                                    <AutocompleteEmpty>{t('pullDialog.noMatchingPaths')}</AutocompleteEmpty>
                                     <AutocompleteGroup>
                                         {pathSuggestions.map((suggestion) => (
                                             <AutocompleteItem
@@ -421,7 +443,7 @@ function FlowFilesPullDialogForm({ cachedFiles, flowId, onClose, onSuccess }: Fl
                             <TooltipTrigger asChild>
                                 <span>
                                     <Button
-                                        aria-label="Parent directory"
+                                        aria-label={t('pullDialog.parentDirectory')}
                                         disabled={isUpDisabled}
                                         onClick={handleNavigateUp}
                                         size="icon-sm"
@@ -432,14 +454,14 @@ function FlowFilesPullDialogForm({ cachedFiles, flowId, onClose, onSuccess }: Fl
                                     </Button>
                                 </span>
                             </TooltipTrigger>
-                            <TooltipContent>Parent directory</TooltipContent>
+                            <TooltipContent>{t('pullDialog.parentDirectory')}</TooltipContent>
                         </Tooltip>
 
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <span>
                                     <Button
-                                        aria-label="Refresh listing"
+                                        aria-label={t('pullDialog.refreshListing')}
                                         disabled={isListingLoading || isPulling}
                                         onClick={handleRefresh}
                                         size="icon-sm"
@@ -450,7 +472,7 @@ function FlowFilesPullDialogForm({ cachedFiles, flowId, onClose, onSuccess }: Fl
                                     </Button>
                                 </span>
                             </TooltipTrigger>
-                            <TooltipContent>Refresh listing</TooltipContent>
+                            <TooltipContent>{t('pullDialog.refreshListing')}</TooltipContent>
                         </Tooltip>
                     </div>
 
@@ -458,16 +480,15 @@ function FlowFilesPullDialogForm({ cachedFiles, flowId, onClose, onSuccess }: Fl
                         <Alert>
                             <TriangleAlert />
                             <AlertTitle>
-                                {listingFailures.length} {listingFailures.length === 1 ? 'entry' : 'entries'} could not
-                                be read
+                                {t('pullDialog.partialFailure.title', { count: listingFailures.length })}
                             </AlertTitle>
                             <AlertDescription>
-                                The readable entries are shown below. Skipped:{' '}
-                                {listingFailures
-                                    .slice(0, 5)
-                                    .map((failure) => failure.name)
-                                    .join(', ')}
-                                {listingFailures.length > 5 ? `, and ${listingFailures.length - 5} more` : ''}.
+                                {listingFailures.length > 5
+                                    ? t('pullDialog.partialFailure.descriptionWithMore', {
+                                          count: listingFailures.length - 5,
+                                          names: skippedNames,
+                                      })
+                                    : t('pullDialog.partialFailure.description', { names: skippedNames })}
                             </AlertDescription>
                         </Alert>
                     )}
@@ -475,10 +496,9 @@ function FlowFilesPullDialogForm({ cachedFiles, flowId, onClose, onSuccess }: Fl
                     {isListingTruncated && (
                         <Alert>
                             <TriangleAlert />
-                            <AlertTitle>Directory truncated</AlertTitle>
+                            <AlertTitle>{t('pullDialog.truncated.title')}</AlertTitle>
                             <AlertDescription>
-                                This directory has too many entries to list in full; only the first {files.length} are
-                                shown. Open a subfolder to see the rest.
+                                {t('pullDialog.truncated.description', { count: files.length })}
                             </AlertDescription>
                         </Alert>
                     )}
@@ -502,7 +522,7 @@ function FlowFilesPullDialogForm({ cachedFiles, flowId, onClose, onSuccess }: Fl
                         type="button"
                         variant="outline"
                     >
-                        Cancel
+                        {t('common:actions.cancel')}
                     </Button>
                     <OverwriteButtons
                         isDisabled={isPullDisabled}

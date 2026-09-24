@@ -9,6 +9,7 @@ import { WebglAddon } from '@xterm/addon-webgl';
 import { Terminal } from '@xterm/xterm';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import i18n from '@/i18n';
 import { Log } from '@/lib/log';
 import { isMac } from '@/lib/utils/platform';
 
@@ -345,7 +346,7 @@ function showLinkTooltip(container: HTMLElement, event: MouseEvent, uri: string,
 
     const hint = document.createElement('div');
     hint.style.cssText = 'opacity:0.6;font-size:11px;margin-top:2px';
-    hint.textContent = `${mac ? 'Cmd' : 'Ctrl'}+Click to open`;
+    hint.textContent = i18n.t('editor:terminal.openLinkHint', { modifier: mac ? 'Cmd' : 'Ctrl' });
     tooltip.appendChild(hint);
 
     container.style.position = 'relative';

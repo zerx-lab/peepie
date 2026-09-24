@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ChevronDown, Database, ListFilter, Search, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { useDebouncedCallback } from 'use-debounce';
 import { z } from 'zod';
 
@@ -26,6 +27,7 @@ const searchFormSchema = z.object({
 });
 
 function FlowVectorStores() {
+    const { t } = useTranslation('flowDetails');
     const { flowData, flowId } = useFlow();
 
     const logs = useMemo(() => flowData?.vectorStoreLogs ?? [], [flowData?.vectorStoreLogs]);
@@ -153,13 +155,13 @@ function FlowVectorStores() {
                                         <InputGroupInput
                                             {...field}
                                             autoComplete="off"
-                                            placeholder="Search vector store logs..."
+                                            placeholder={t('vectorStores.searchPlaceholder')}
                                             type="text"
                                         />
                                         {field.value && (
                                             <InputGroupAddon align="inline-end">
                                                 <InputGroupButton
-                                                    aria-label="Clear vector store search"
+                                                    aria-label={t('vectorStores.clearSearch')}
                                                     onClick={() => {
                                                         form.reset({ search: '' });
                                                         setDebouncedSearchValue('');
@@ -208,7 +210,7 @@ function FlowVectorStores() {
 
                     {!isScrolledToBottom && (
                         <Button
-                            aria-label="Scroll to latest vector store log"
+                            aria-label={t('vectorStores.scrollToLatest')}
                             className="absolute right-4 bottom-4 z-10 shadow-md hover:shadow-lg"
                             onClick={() => scrollToEnd()}
                             size="icon-sm"
@@ -228,8 +230,8 @@ function FlowVectorStores() {
                         <EmptyMedia variant="icon">
                             <ListFilter />
                         </EmptyMedia>
-                        <EmptyTitle>No vector store logs found</EmptyTitle>
-                        <EmptyDescription>Try adjusting your search or filter parameters</EmptyDescription>
+                        <EmptyTitle>{t('vectorStores.notFound')}</EmptyTitle>
+                        <EmptyDescription>{t('filters.adjustHint')}</EmptyDescription>
                     </EmptyHeader>
                     <EmptyContent>
                         <Button
@@ -237,7 +239,7 @@ function FlowVectorStores() {
                             variant="outline"
                         >
                             <X />
-                            Reset filters
+                            {t('filters.reset')}
                         </Button>
                     </EmptyContent>
                 </Empty>
@@ -247,10 +249,8 @@ function FlowVectorStores() {
                         <EmptyMedia variant="icon">
                             <Database />
                         </EmptyMedia>
-                        <EmptyTitle>No vector store logs available</EmptyTitle>
-                        <EmptyDescription>
-                            Vector store logs will appear here when the agent uses knowledge database
-                        </EmptyDescription>
+                        <EmptyTitle>{t('vectorStores.empty.title')}</EmptyTitle>
+                        <EmptyDescription>{t('vectorStores.empty.description')}</EmptyDescription>
                     </EmptyHeader>
                 </Empty>
             )}

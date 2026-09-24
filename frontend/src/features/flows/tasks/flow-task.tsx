@@ -1,4 +1,5 @@
 import { memo, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { TaskFragmentFragment } from '@/graphql/types';
 
@@ -24,6 +25,7 @@ const containsSearchValue = (text: null | string | undefined, searchValue: strin
 };
 
 function FlowTask({ searchValue = '', task }: FlowTaskProps) {
+    const { t } = useTranslation('flowDetails');
     const { id, result, status, subtasks, title } = task;
     const [isDetailsVisible, setIsDetailsVisible] = useState(false);
 
@@ -82,7 +84,7 @@ function FlowTask({ searchValue = '', task }: FlowTaskProps) {
                 <FlowTaskStatusIcon
                     className="bg-background ring-border ring-background relative z-1 -mt-px size-5 rounded-full ring-3"
                     status={status}
-                    tooltip={`Task ID: ${id}`}
+                    tooltip={t('meta.taskId', { id })}
                 />
                 <div className="flex flex-1 flex-col gap-2">
                     <div className="font-semibold">
@@ -101,7 +103,11 @@ function FlowTask({ searchValue = '', task }: FlowTaskProps) {
                                 value={progress}
                             />
                             <div className="text-muted-foreground shrink-0 text-xs text-nowrap">
-                                {progress}% completed ({completedSubtasksCount} of {subtasks?.length})
+                                {t('tasks.progress', {
+                                    completed: completedSubtasksCount,
+                                    progress,
+                                    total: subtasks?.length ?? 0,
+                                })}
                             </div>
                         </div>
                     )}
@@ -112,7 +118,7 @@ function FlowTask({ searchValue = '', task }: FlowTaskProps) {
                                 className="cursor-pointer"
                                 onClick={() => setIsDetailsVisible(!isDetailsVisible)}
                             >
-                                {isDetailsVisible ? 'Hide details' : 'Show details'}
+                                {isDetailsVisible ? t('details.hide') : t('details.show')}
                             </div>
                             {isDetailsVisible && (
                                 <Card className="mt-4">
@@ -143,7 +149,7 @@ function FlowTask({ searchValue = '', task }: FlowTaskProps) {
                     ))}
                 </div>
             ) : (
-                <div className="text-muted-foreground mt-2 ml-6 text-xs">Waiting for subtasks to be created...</div>
+                <div className="text-muted-foreground mt-2 ml-6 text-xs">{t('tasks.waitingForSubtasks')}</div>
             )}
         </div>
     );

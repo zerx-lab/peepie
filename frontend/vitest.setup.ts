@@ -1,5 +1,8 @@
 import '@testing-library/jest-dom/vitest';
 
+// Initializes i18next with the bundled English resources so components render source strings.
+import '@/i18n';
+
 import { cleanup } from '@testing-library/react';
 import { afterEach } from 'vitest';
 
@@ -38,9 +41,11 @@ if (typeof Element !== 'undefined' && !Element.prototype.hasPointerCapture) {
     Element.prototype.hasPointerCapture = function hasPointerCapture() {
         return false;
     };
+
     Element.prototype.setPointerCapture = function setPointerCapture() {
         /* no-op for jsdom */
     };
+
     Element.prototype.releasePointerCapture = function releasePointerCapture() {
         /* no-op for jsdom */
     };

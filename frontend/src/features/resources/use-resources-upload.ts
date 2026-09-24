@@ -1,4 +1,7 @@
+import type { TFunction } from 'i18next';
+
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import type { UserResourceFragmentFragment } from '@/graphql/types';
@@ -13,7 +16,6 @@ import {
     RESOURCES_API_PATH,
 } from './resources-constants';
 import { restResourceEntryToFragment, type RestResourceList } from './resources-rest';
-import { pluralizeItems } from './resources-utils';
 
 interface UploadOptions {
     /** Virtual directory path inside the user's library. Empty/undefined uploads to root. */
@@ -62,18 +64,19 @@ interface UseResourcesUploadResult {
     uploadFiles: (selectedFiles: File[], options?: UploadOptions) => Promise<null | UploadResponse>;
 }
 
-const UPLOAD_OVERWRITE_HINT = 'Resource already exists — please rename or remove the existing entry';
-
-const buildUploadSuccessMessage = (uploadedCount: number, dir?: string) => {
-    const target = dir ? `to /${dir}` : 'to your library';
-
+const buildUploadSuccessMessage = (t: TFunction<'resources'>, uploadedCount: number, dir?: string) => {
     if (uploadedCount === 1) {
-        return { description: `Uploaded ${target}`, title: 'File uploaded' };
+        return {
+            description: dir ? t('upload.toasts.uploadedToDir', { dir }) : t('upload.toasts.uploadedToLibrary'),
+            title: t('upload.toasts.fileUploaded'),
+        };
     }
 
     return {
-        description: `${uploadedCount} files uploaded ${target}`,
-        title: `${uploadedCount} ${pluralizeItems(uploadedCount)} uploaded`,
+        description: dir
+            ? t('upload.toasts.filesUploadedToDir', { count: uploadedCount, dir })
+            : t('upload.toasts.filesUploadedToLibrary', { count: uploadedCount }),
+        title: t('upload.toasts.itemsUploaded', { count: uploadedCount }),
     };
 };
 
@@ -83,6 +86,7 @@ const buildUploadSuccessMessage = (uploadedCount: number, dir?: string) => {
  * declaratively.
  */
 export function useResourcesUpload({ defaultDir, onSuccess }: UseResourcesUploadParams = {}): UseResourcesUploadResult {
+    const { t } = useTranslation('resources');
     const inputRef = useRef<HTMLInputElement | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [fileInputKey, setFileInputKey] = useState(0);
@@ -128,7 +132,7 @@ export function useResourcesUpload({ defaultDir, onSuccess }: UseResourcesUpload
             });
 
             if (validationError) {
-                toast.error('Upload failed', { description: validationError });
+                toast.error(t('upload.toasts.failed'), { description: validationError });
 
                 return null;
             }
@@ -161,7 +165,7 @@ export function useResourcesUpload({ defaultDir, onSuccess }: UseResourcesUpload
                     total: raw.total ?? 0,
                 };
                 const uploadedCount = data.items.length;
-                const message = buildUploadSuccessMessage(uploadedCount, targetDir);
+                const message = buildUploadSuccessMessage(t, uploadedCount, targetDir);
 
                 toast.success(message.title, { description: message.description });
 
@@ -169,18 +173,18 @@ export function useResourcesUpload({ defaultDir, onSuccess }: UseResourcesUpload
 
                 return data;
             } catch (error) {
-                const description = getApiErrorMessage(error, 'Failed to upload files', {
-                    409: UPLOAD_OVERWRITE_HINT,
+                const description = getApiErrorMessage(error, t('upload.toasts.failedFallback'), {
+                    409: t('upload.toasts.alreadyExists'),
                 });
 
-                toast.error('Upload failed', { description });
+                toast.error(t('upload.toasts.failed'), { description });
 
                 return null;
             } finally {
                 setIsUploading(false);
             }
         },
-        [onSuccess],
+        [onSuccess, t],
     );
 
     const handleFileSelection = useCallback(

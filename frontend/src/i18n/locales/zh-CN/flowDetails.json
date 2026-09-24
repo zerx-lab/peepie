@@ -1,0 +1,246 @@
+{
+    "tabs": {
+        "automation": "自动化",
+        "assistant": "助手",
+        "dashboard": "仪表盘",
+        "terminal": "终端",
+        "tasks": "任务",
+        "agents": "智能体",
+        "tools": "搜索",
+        "vectorStores": "向量存储",
+        "files": "文件",
+        "screenshots": "截图",
+        "overview": "概览"
+    },
+    "details": {
+        "show": "显示详情",
+        "hide": "隐藏详情"
+    },
+    "meta": {
+        "taskId": "任务 ID：{{id}}",
+        "subtaskId": "子任务 ID：{{id}}"
+    },
+    "filters": {
+        "adjustHint": "请尝试调整搜索或筛选条件",
+        "reset": "重置筛选"
+    },
+    "status": {
+        "created": "已创建",
+        "failed": "失败",
+        "finished": "已完成",
+        "running": "运行中",
+        "waiting": "等待中"
+    },
+    "agentTypes": {
+        "adviser": "顾问",
+        "assistant": "助手",
+        "coder": "编码员",
+        "enricher": "信息补充器",
+        "generator": "生成器",
+        "installer": "安装器",
+        "memorist": "记忆员",
+        "pentester": "渗透测试员",
+        "primaryAgent": "主智能体",
+        "refiner": "优化器",
+        "reflector": "反思器",
+        "reporter": "报告员",
+        "searcher": "搜索员",
+        "summarizer": "摘要器",
+        "toolCallFixer": "工具调用修复器"
+    },
+    "messageTypes": {
+        "advice": "建议",
+        "answer": "回答",
+        "ask": "提问",
+        "browser": "浏览器",
+        "done": "完成",
+        "file": "文件",
+        "input": "输入",
+        "report": "报告",
+        "search": "搜索",
+        "terminal": "终端",
+        "thoughts": "思考"
+    },
+    "tasksDropdown": {
+        "filterTasks": "筛选任务",
+        "searchPlaceholder": "搜索任务...",
+        "notFound": "未找到任务",
+        "noAvailable": "暂无可用任务",
+        "clearFilter": "清除筛选"
+    },
+    "messages": {
+        "showThinking": "显示思考过程",
+        "hideThinking": "隐藏思考过程",
+        "searchPlaceholder": "搜索消息...",
+        "clearSearch": "清除消息搜索",
+        "scrollToLatest": "滚动到最新消息",
+        "notFound": "未找到消息",
+        "automationEmpty": {
+            "title": "暂无进行中的任务",
+            "description": "启动新任务可能需要一些时间，因为 Peepie 智能体需要下载所需的 Docker 镜像"
+        },
+        "placeholders": {
+            "selectFlow": "请选择一个流程...",
+            "default": "输入消息...",
+            "automationStarting": "流程正在启动...",
+            "automationEnded": "此流程已结束。请创建新流程以继续。",
+            "automationRunning": "Peepie 正在工作... 点击“停止”可中断",
+            "automationWaiting": "提供更多上下文或指令...",
+            "assistantCreating": "正在创建助手...",
+            "assistantNew": "输入消息以创建新助手...",
+            "assistantStarting": "助手正在启动...",
+            "assistantEnded": "此助手会话已结束。请创建新助手以继续。",
+            "assistantRunning": "助手正在运行... 点击“停止”可中断",
+            "assistantWaiting": "继续对话..."
+        }
+    },
+    "assistants": {
+        "select": "选择助手",
+        "new": "新建",
+        "unavailable": "（不可用）",
+        "deleteAriaLabel": "删除 {{title}}",
+        "searchPlaceholder": "搜索助手...",
+        "notFound": "未找到助手。",
+        "create": "创建新助手",
+        "groups": {
+            "active": "进行中（{{total}}）",
+            "finished": "已完成（{{total}}）",
+            "failed": "失败（{{total}}）"
+        },
+        "itemType": "助手",
+        "deleteTitle": "删除助手",
+        "creating": {
+            "title": "正在创建助手...",
+            "description": "正在为你配置新助手，请稍候"
+        },
+        "noMessages": {
+            "title": "暂无消息",
+            "description": "此助手暂无消息"
+        },
+        "newEmpty": {
+            "title": "新助手",
+            "description": "在下方输入消息以创建新助手..."
+        }
+    },
+    "tasks": {
+        "searchPlaceholder": "搜索任务和子任务...",
+        "clearSearch": "清除任务搜索",
+        "scrollToLatest": "滚动到最新任务",
+        "empty": {
+            "title": "此流程暂无任务",
+            "description": "智能体开始工作后，任务将显示在这里"
+        },
+        "progress": "已完成 {{progress}}%（{{completed}}/{{total}}）",
+        "waitingForSubtasks": "正在等待创建子任务...",
+        "description": "描述",
+        "result": "结果"
+    },
+    "agents": {
+        "searchPlaceholder": "搜索智能体日志...",
+        "clearSearch": "清除智能体搜索",
+        "scrollToLatest": "滚动到最新智能体日志",
+        "notFound": "未找到智能体日志",
+        "empty": {
+            "title": "暂无智能体日志",
+            "description": "智能体工作时，日志将显示在这里"
+        }
+    },
+    "tools": {
+        "toolName": "工具名称",
+        "searchPlaceholder": "搜索工具日志...",
+        "clearSearch": "清除工具搜索",
+        "scrollToLatest": "滚动到最新工具日志",
+        "notFound": "未找到搜索日志",
+        "empty": {
+            "title": "暂无搜索日志",
+            "description": "智能体执行搜索时，搜索日志将显示在这里"
+        }
+    },
+    "vectorStores": {
+        "searchPlaceholder": "搜索向量存储日志...",
+        "clearSearch": "清除向量存储搜索",
+        "scrollToLatest": "滚动到最新向量存储日志",
+        "notFound": "未找到向量存储日志",
+        "empty": {
+            "title": "暂无向量存储日志",
+            "description": "智能体使用知识库时，向量存储日志将显示在这里"
+        },
+        "actions": {
+            "retrieve": "检索",
+            "store": "存储"
+        },
+        "description": {
+            "storedInMemory": "已存入记忆",
+            "retrievedFromMemory": "已从记忆中检索",
+            "storedDocType": "已存储 {{docType}}",
+            "retrievedDocType": "已检索 {{docType}}",
+            "codeLang": "语言：{{codeLang}}",
+            "toolName": "工具：{{toolName}}",
+            "guideType": "主题：{{guideType}}",
+            "answerType": "类型：{{answerType}}",
+            "separator": "，"
+        }
+    },
+    "screenshots": {
+        "sourceUrl": "来源 URL",
+        "searchPlaceholder": "搜索截图...",
+        "clearSearch": "清除截图搜索",
+        "scrollToLatest": "滚动到最新截图",
+        "empty": {
+            "title": "暂无截图",
+            "description": "智能体截图后，截图将显示在这里"
+        }
+    },
+    "terminal": {
+        "searchPlaceholder": "搜索终端日志...",
+        "previousMatch": "上一个匹配",
+        "nextMatch": "下一个匹配",
+        "clearSearch": "清除终端搜索",
+        "clearSearchTitle": "清除搜索",
+        "notFound": "未找到终端日志"
+    },
+    "dashboard": {
+        "selectFlow": "请选择一个流程以查看仪表盘",
+        "metrics": {
+            "tasks": "任务",
+            "tasksDescription": "子任务：{{subtasks}} · 助手：{{assistants}}",
+            "toolCalls": "工具调用",
+            "toolCallsDescription": "耗时：{{duration}}",
+            "tokens": "Token",
+            "tokensDescription": "输入 + 输出 Token",
+            "cost": "费用",
+            "costDescription": "此流程的 LLM 花费"
+        },
+        "byModel": {
+            "title": "按模型和提供商统计用量",
+            "description": "按模型和提供商分组的 LLM Token 用量与费用，以及使用的智能体类型"
+        },
+        "byAgentType": {
+            "title": "按智能体类型统计用量",
+            "description": "此流程中各智能体类型的 LLM Token 用量与费用"
+        },
+        "byFunction": {
+            "title": "按函数统计工具调用",
+            "description": "此流程中各工具函数的执行统计"
+        },
+        "columns": {
+            "agents": "智能体",
+            "agentType": "智能体类型",
+            "tokensIn": "输入 Token",
+            "tokensOut": "输出 Token",
+            "cacheIn": "缓存输入",
+            "cacheOut": "缓存输出",
+            "costIn": "输入费用",
+            "costOut": "输出费用",
+            "totalCost": "总费用",
+            "function": "函数",
+            "count": "次数",
+            "totalDuration": "总耗时",
+            "avgDuration": "平均耗时"
+        },
+        "functionType": {
+            "agent": "智能体",
+            "tool": "工具"
+        }
+    }
+}

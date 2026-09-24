@@ -1,4 +1,4 @@
-# PentAGI Frontend
+# Peepie Frontend
 
 A chat application built with React, TypeScript, and GraphQL that enables intelligent conversations with AI agents.
 
@@ -91,6 +91,8 @@ src/
 -   Agent communication logs
 
 ## Development
+
+Desktop sidebar navigation labels stay on one line during collapse and expansion. The shared `SidebarMenuButton` clips text as the sidebar narrows instead of wrapping labels into extra rows; keep this behavior for both settings and main navigation.
 
 ### Prerequisites
 

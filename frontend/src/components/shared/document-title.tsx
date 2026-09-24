@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useMatches } from 'react-router-dom';
 
 import { type ApolloTitleComponent, isApolloTitle } from '@/lib/route-titles/apollo-title';
@@ -20,6 +21,7 @@ const hasTitle = (handle: unknown): handle is { title: TitleResolver } => {
  * exposing `handle.title` and renders accordingly:
  *
  *   handle: { title: 'Dashboard' }                          // static
+ *   handle: { title: () => i18n.t('layout:titles.x') }      // translated
  *   handle: { title: (p) => formatPromptId(p.promptId!) }   // params-derived
  *   handle: { title: FlowTitle }                            // reactive (Apollo)
  *
@@ -34,6 +36,8 @@ const hasTitle = (handle: unknown): handle is { title: TitleResolver } => {
  * See https://react.dev/reference/react-dom/components/title.
  */
 export function DocumentTitle() {
+    // Re-render on language switch: resolvers translate via `i18n.t` at call time.
+    useTranslation();
     const matches = useMatches();
     const match = matches.findLast((m) => hasTitle(m.handle));
 

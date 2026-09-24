@@ -5,10 +5,14 @@ import { AlignCenter, AlignLeft, AlignRight } from 'lucide-react';
 
 export type ColumnAlign = 'center' | 'left' | 'right';
 
-export const ALIGN_OPTIONS: { icon: LucideIcon; label: string; value: ColumnAlign }[] = [
-    { icon: AlignLeft, label: 'Left', value: 'left' },
-    { icon: AlignCenter, label: 'Center', value: 'center' },
-    { icon: AlignRight, label: 'Right', value: 'right' },
+export const ALIGN_OPTIONS: {
+    icon: LucideIcon;
+    labelKey: 'table.align.center' | 'table.align.left' | 'table.align.right';
+    value: ColumnAlign;
+}[] = [
+    { icon: AlignLeft, labelKey: 'table.align.left', value: 'left' },
+    { icon: AlignCenter, labelKey: 'table.align.center', value: 'center' },
+    { icon: AlignRight, labelKey: 'table.align.right', value: 'right' },
 ];
 
 export function clearLineContents(editor: Editor, axis: 'column' | 'row'): void {

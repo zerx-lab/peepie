@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client/react';
-import { format } from 'date-fns';
 import { ChevronRight, Clock, Wrench } from 'lucide-react';
 import { memo, useDeferredValue, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from 'recharts';
 
 import type { FlowFragmentFragment, UsageStatsPeriod } from '@/graphql/types';
@@ -20,6 +20,8 @@ import {
     ToolcallsStatsByPeriodDocument,
     UsageStatsByPeriodDocument,
 } from '@/graphql/types';
+import { useLanguage } from '@/hooks/use-language';
+import { getIntlLocale } from '@/i18n/format';
 import { cn } from '@/lib/utils';
 import { formatCost, formatDuration, formatNumber, formatTokenCount } from '@/lib/utils/format';
 
@@ -31,12 +33,16 @@ const CHART_COLORS = {
     bar2: 'var(--color-chart-5)',
 };
 
-const formatDateLabel = (dateString: string): string => {
-    try {
-        return format(new Date(dateString), 'MMM d');
-    } catch {
-        return dateString;
-    }
+const createDateLabelFormatter = (locale: string) => {
+    const dateFormat = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' });
+
+    return (dateString: string): string => {
+        try {
+            return dateFormat.format(new Date(dateString));
+        } catch {
+            return dateString;
+        }
+    };
 };
 
 const axisTickStyle = { fill: 'var(--color-muted-foreground)', fontSize: 12 };
@@ -62,6 +68,9 @@ type FlowExecution = {
 };
 
 export function DashboardAnalytics({ period }: { period: UsageStatsPeriod }) {
+    const { t } = useTranslation('dashboard');
+    const { language } = useLanguage();
+    const formatDateLabel = useMemo(() => createDateLabelFormatter(getIntlLocale(language)), [language]);
     const {
         data: usageByPeriodData,
         error: usageByPeriodError,
@@ -152,12 +161,12 @@ export function DashboardAnalytics({ period }: { period: UsageStatsPeriod }) {
     return (
         <div className="flex flex-col gap-6">
             <ChartCard
-                description="Flows, tasks, and subtasks created per day"
+                description={t('analytics.flowsActivity.description')}
                 empty={!flowsByPeriodLoading && flowsChartData.length === 0}
                 error={!!flowsByPeriodError}
                 height={320}
                 loading={flowsByPeriodLoading}
-                title="Flows Activity Over Time"
+                title={t('analytics.flowsActivity.title')}
             >
                 <BarChart
                     data={flowsChartData}
@@ -192,19 +201,19 @@ export function DashboardAnalytics({ period }: { period: UsageStatsPeriod }) {
                     <Bar
                         dataKey="flows"
                         fill={CHART_COLORS.area1}
-                        name="Flows"
+                        name={t('analytics.series.flows')}
                         radius={[4, 4, 0, 0]}
                     />
                     <Bar
                         dataKey="tasks"
                         fill={CHART_COLORS.area2}
-                        name="Tasks"
+                        name={t('analytics.series.tasks')}
                         radius={[4, 4, 0, 0]}
                     />
                     <Bar
                         dataKey="subtasks"
                         fill={CHART_COLORS.area3}
-                        name="Subtasks"
+                        name={t('analytics.series.subtasks')}
                         radius={[4, 4, 0, 0]}
                     />
                 </BarChart>
@@ -212,11 +221,11 @@ export function DashboardAnalytics({ period }: { period: UsageStatsPeriod }) {
 
             <div className="grid gap-6 lg:grid-cols-2">
                 <ChartCard
-                    description="Number of tool executions per day"
+                    description={t('analytics.toolCalls.description')}
                     empty={!toolcallsByPeriodLoading && toolcallsChartData.length === 0}
                     error={!!toolcallsByPeriodError}
                     loading={toolcallsByPeriodLoading}
-                    title="Tool Calls Over Time"
+                    title={t('analytics.toolCalls.title')}
                 >
                     <BarChart
                         data={toolcallsChartData}
@@ -251,18 +260,18 @@ export function DashboardAnalytics({ period }: { period: UsageStatsPeriod }) {
                         <Bar
                             dataKey="count"
                             fill={CHART_COLORS.bar1}
-                            name="Tool Calls"
+                            name={t('analytics.series.toolCalls')}
                             radius={[4, 4, 0, 0]}
                         />
                     </BarChart>
                 </ChartCard>
 
                 <ChartCard
-                    description="Input and output tokens processed daily"
+                    description={t('analytics.tokenUsage.description')}
                     empty={!usageByPeriodLoading && usageChartData.length === 0}
                     error={!!usageByPeriodError}
                     loading={usageByPeriodLoading}
-                    title="Token Usage Over Time"
+                    title={t('analytics.tokenUsage.title')}
                 >
                     <AreaChart
                         data={usageChartData}
@@ -299,7 +308,7 @@ export function DashboardAnalytics({ period }: { period: UsageStatsPeriod }) {
                             dataKey="tokensIn"
                             fill={CHART_COLORS.area1}
                             fillOpacity={0.3}
-                            name="Tokens In"
+                            name={t('analytics.series.tokensIn')}
                             stroke={CHART_COLORS.area1}
                             type="monotone"
                         />
@@ -307,7 +316,7 @@ export function DashboardAnalytics({ period }: { period: UsageStatsPeriod }) {
                             dataKey="tokensOut"
                             fill={CHART_COLORS.area2}
                             fillOpacity={0.3}
-                            name="Tokens Out"
+                            name={t('analytics.series.tokensOut')}
                             stroke={CHART_COLORS.area2}
                             type="monotone"
                         />
@@ -316,12 +325,12 @@ export function DashboardAnalytics({ period }: { period: UsageStatsPeriod }) {
             </div>
 
             <ChartCard
-                description="LLM spending per day. May stay near zero when using local engines — this is expected."
+                description={t('analytics.cost.description')}
                 empty={!usageByPeriodLoading && usageChartData.length === 0}
                 error={!!usageByPeriodError}
                 height={240}
                 loading={usageByPeriodLoading}
-                title="Cost Over Time"
+                title={t('analytics.cost.title')}
             >
                 <AreaChart
                     data={usageChartData}
@@ -358,7 +367,7 @@ export function DashboardAnalytics({ period }: { period: UsageStatsPeriod }) {
                         dataKey="costIn"
                         fill={CHART_COLORS.area1}
                         fillOpacity={0.3}
-                        name="Cost In"
+                        name={t('analytics.series.costIn')}
                         stroke={CHART_COLORS.area1}
                         type="monotone"
                     />
@@ -366,7 +375,7 @@ export function DashboardAnalytics({ period }: { period: UsageStatsPeriod }) {
                         dataKey="costOut"
                         fill={CHART_COLORS.area3}
                         fillOpacity={0.3}
-                        name="Cost Out"
+                        name={t('analytics.series.costOut')}
                         stroke={CHART_COLORS.area3}
                         type="monotone"
                     />
@@ -375,8 +384,8 @@ export function DashboardAnalytics({ period }: { period: UsageStatsPeriod }) {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Flow Execution Details</CardTitle>
-                    <CardDescription>Execution time and tool calls breakdown per flow</CardDescription>
+                    <CardTitle>{t('analytics.execution.title')}</CardTitle>
+                    <CardDescription>{t('analytics.execution.description')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     {executionStatsLoading ? (
@@ -390,7 +399,7 @@ export function DashboardAnalytics({ period }: { period: UsageStatsPeriod }) {
                         <DashboardError className="py-8" />
                     ) : !deferredExecutionStats.length ? (
                         <p className="text-muted-foreground py-8 text-center text-sm">
-                            No flow executions in this period
+                            {t('analytics.execution.empty')}
                         </p>
                     ) : (
                         <div
@@ -421,9 +430,17 @@ const FlowExecutionItem = memo(function FlowExecutionItem({
     flow: FlowExecution;
     flowMeta?: FlowFragmentFragment;
 }) {
+    const { t } = useTranslation('dashboard');
     const [isOpen, setIsOpen] = useState(false);
     const taskCount = flow.tasks.length;
     const subtaskCount = flow.tasks.reduce((sum, task) => sum + task.subtasks.length, 0);
+    const summary = [
+        t('analytics.execution.taskCount', { count: taskCount }),
+        subtaskCount > 0 && t('analytics.execution.subtaskCount', { count: subtaskCount }),
+        flow.totalAssistantsCount > 0 && t('analytics.execution.assistantCount', { count: flow.totalAssistantsCount }),
+    ]
+        .filter(Boolean)
+        .join(' · ');
 
     return (
         <Collapsible
@@ -438,16 +455,13 @@ const FlowExecutionItem = memo(function FlowExecutionItem({
                 <ChevronRight className={`mt-1 size-4 shrink-0 transition-transform ${isOpen ? 'rotate-90' : ''}`} />
                 <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                        <span className="truncate font-medium">{flow.flowTitle || `Flow #${flow.flowId}`}</span>
+                        <span className="truncate font-medium">
+                            {flow.flowTitle || t('analytics.execution.flowFallback', { id: flow.flowId })}
+                        </span>
                         {flowMeta?.status && <FlowStatusBadge status={flowMeta.status} />}
                         {flowMeta?.provider?.name && <Badge variant="secondary">{flowMeta.provider.name}</Badge>}
                     </div>
-                    <div className="text-muted-foreground mt-0.5 text-xs">
-                        {taskCount} {taskCount === 1 ? 'task' : 'tasks'}
-                        {subtaskCount > 0 && ` · ${subtaskCount} ${subtaskCount === 1 ? 'subtask' : 'subtasks'}`}
-                        {flow.totalAssistantsCount > 0 &&
-                            ` · ${flow.totalAssistantsCount} ${flow.totalAssistantsCount === 1 ? 'assistant' : 'assistants'}`}
-                    </div>
+                    <div className="text-muted-foreground mt-0.5 text-xs">{summary}</div>
                 </div>
                 <div className="text-muted-foreground flex shrink-0 items-center gap-4 pt-1 text-sm">
                     <span className="flex items-center gap-1">
@@ -475,6 +489,7 @@ const FlowExecutionItem = memo(function FlowExecutionItem({
 });
 
 const TaskExecutionItem = memo(function TaskExecutionItem({ task }: { task: FlowExecution['tasks'][number] }) {
+    const { t } = useTranslation('dashboard');
     const [isOpen, setIsOpen] = useState(false);
     const hasSubtasks = task.subtasks.length > 0;
 
@@ -492,7 +507,9 @@ const TaskExecutionItem = memo(function TaskExecutionItem({ task }: { task: Flow
                 ) : (
                     <span className="size-3 shrink-0" />
                 )}
-                <div className="text-muted-foreground flex-1 truncate">{task.taskTitle || `Task #${task.taskId}`}</div>
+                <div className="text-muted-foreground flex-1 truncate">
+                    {task.taskTitle || t('analytics.execution.taskFallback', { id: task.taskId })}
+                </div>
                 <div className="text-muted-foreground flex items-center gap-4 text-xs">
                     <span className="flex items-center gap-1">
                         <Clock className="size-3" />
@@ -513,7 +530,8 @@ const TaskExecutionItem = memo(function TaskExecutionItem({ task }: { task: Flow
                                 key={subtask.subtaskId}
                             >
                                 <div className="flex-1 truncate">
-                                    {subtask.subtaskTitle || `Subtask #${subtask.subtaskId}`}
+                                    {subtask.subtaskTitle ||
+                                        t('analytics.execution.subtaskFallback', { id: subtask.subtaskId })}
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <span className="flex items-center gap-1">

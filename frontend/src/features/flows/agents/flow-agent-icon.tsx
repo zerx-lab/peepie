@@ -17,6 +17,7 @@ import {
     Skull,
     Wrench,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { AgentType } from '@/graphql/types';
@@ -48,18 +49,48 @@ const icons: Record<AgentType, LucideIcon> = {
 };
 const defaultIcon = HelpCircle;
 
-function FlowAgentIcon({ className, type, tooltip = type }: FlowAgentIconProps) {
+export const agentTypeLabelKeys = {
+    [AgentType.Adviser]: 'agentTypes.adviser',
+    [AgentType.Assistant]: 'agentTypes.assistant',
+    [AgentType.Coder]: 'agentTypes.coder',
+    [AgentType.Enricher]: 'agentTypes.enricher',
+    [AgentType.Generator]: 'agentTypes.generator',
+    [AgentType.Installer]: 'agentTypes.installer',
+    [AgentType.Memorist]: 'agentTypes.memorist',
+    [AgentType.Pentester]: 'agentTypes.pentester',
+    [AgentType.PrimaryAgent]: 'agentTypes.primaryAgent',
+    [AgentType.Refiner]: 'agentTypes.refiner',
+    [AgentType.Reflector]: 'agentTypes.reflector',
+    [AgentType.Reporter]: 'agentTypes.reporter',
+    [AgentType.Searcher]: 'agentTypes.searcher',
+    [AgentType.Summarizer]: 'agentTypes.summarizer',
+    [AgentType.ToolCallFixer]: 'agentTypes.toolCallFixer',
+} as const satisfies Record<AgentType, string>;
+
+export function useAgentTypeLabel() {
+    const { t } = useTranslation('flowDetails');
+
+    return (type?: string) => {
+        const key = type ? agentTypeLabelKeys[type as AgentType] : undefined;
+
+        return key ? t(key) : formatName(type);
+    };
+}
+
+function FlowAgentIcon({ className, tooltip, type }: FlowAgentIconProps) {
+    const getAgentTypeLabel = useAgentTypeLabel();
     const Icon = type ? icons[type] || defaultIcon : defaultIcon;
     const iconElement = <Icon className={cn('size-3 shrink-0', className)} />;
+    const tooltipText = tooltip ?? (type ? getAgentTypeLabel(type) : undefined);
 
-    if (!tooltip) {
+    if (!tooltipText) {
         return iconElement;
     }
 
     return (
         <Tooltip>
             <TooltipTrigger asChild>{iconElement}</TooltipTrigger>
-            <TooltipContent>{formatName(tooltip)}</TooltipContent>
+            <TooltipContent>{tooltipText}</TooltipContent>
         </Tooltip>
     );
 }

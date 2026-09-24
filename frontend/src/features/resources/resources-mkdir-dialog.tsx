@@ -1,5 +1,6 @@
 import { FolderPlus } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -8,7 +9,11 @@ import { FormSubmitButton } from '@/components/ui/form-submit-button';
 import { Input } from '@/components/ui/input';
 import { useAppForm } from '@/hooks/use-app-form';
 
-import { resourcesMkdirFormSchema, type ResourcesMkdirFormValues, useResourcesMkdir } from './use-resources-mkdir';
+import {
+    createResourcesMkdirFormSchema,
+    type ResourcesMkdirFormValues,
+    useResourcesMkdir,
+} from './use-resources-mkdir';
 
 interface ResourcesMkdirDialogFormProps {
     defaultParentPath: string;
@@ -48,11 +53,13 @@ export function ResourcesMkdirDialog({ defaultParentPath = '', isOpen, onClose }
 }
 
 function ResourcesMkdirDialogForm({ defaultParentPath, onClose }: ResourcesMkdirDialogFormProps) {
+    const { t } = useTranslation(['resources', 'common']);
     const { isCreating, mkdir } = useResourcesMkdir();
+    const schema = useMemo(() => createResourcesMkdirFormSchema(t), [t]);
 
     const form = useAppForm<ResourcesMkdirFormValues>({
         defaultValues: { path: buildDefaultPath(defaultParentPath) },
-        schema: resourcesMkdirFormSchema,
+        schema,
     });
 
     useEffect(() => {
@@ -72,12 +79,9 @@ function ResourcesMkdirDialogForm({ defaultParentPath, onClose }: ResourcesMkdir
             <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                     <FolderPlus className="size-4" />
-                    Create directory
+                    {t('mkdir.title')}
                 </DialogTitle>
-                <DialogDescription>
-                    Create a virtual directory inside your resource library. Existing parent directories are reused
-                    automatically.
-                </DialogDescription>
+                <DialogDescription>{t('mkdir.description')}</DialogDescription>
             </DialogHeader>
 
             <Form {...form}>
@@ -91,18 +95,22 @@ function ResourcesMkdirDialogForm({ defaultParentPath, onClose }: ResourcesMkdir
                         name="path"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Path</FormLabel>
+                                <FormLabel>{t('mkdir.pathLabel')}</FormLabel>
                                 <FormControl>
                                     <Input
                                         {...field}
                                         autoComplete="off"
                                         autoFocus
                                         disabled={isCreating}
-                                        placeholder="reports/2025"
+                                        placeholder={t('mkdir.pathPlaceholder')}
                                     />
                                 </FormControl>
                                 <FormDescription>
-                                    Relative path. Use <code>/</code> to nest into subdirectories.
+                                    <Trans
+                                        components={{ code: <code /> }}
+                                        i18nKey="mkdir.pathHint"
+                                        t={t}
+                                    />
                                 </FormDescription>
                                 <FormMessage />
                             </FormItem>
@@ -116,9 +124,9 @@ function ResourcesMkdirDialogForm({ defaultParentPath, onClose }: ResourcesMkdir
                             type="button"
                             variant="outline"
                         >
-                            Cancel
+                            {t('common:actions.cancel')}
                         </Button>
-                        <FormSubmitButton icon={<FolderPlus />}>Create</FormSubmitButton>
+                        <FormSubmitButton icon={<FolderPlus />}>{t('common:actions.create')}</FormSubmitButton>
                     </div>
                 </form>
             </Form>

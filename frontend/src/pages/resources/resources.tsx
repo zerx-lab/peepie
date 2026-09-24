@@ -1,5 +1,6 @@
 import { ColumnsSettings, Copy, FileSymlink, Folder, FolderPlus, FolderUp, Search, Upload, X } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import type { OverwriteConflict } from '@/components/shared/overwrite';
@@ -44,10 +45,11 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/
 import { FileDropZone } from '@/components/ui/file-drop-zone';
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
+import { MAX_FILE_SIZE_MB, MAX_UPLOAD_TOTAL_SIZE_MB } from '@/features/resources/resources-constants';
 import { ResourcesCopyDialog } from '@/features/resources/resources-copy-dialog';
 import { ResourcesMkdirDialog } from '@/features/resources/resources-mkdir-dialog';
 import { ResourcesMoveDialog } from '@/features/resources/resources-move-dialog';
-import { buildResourcesDownloadHref, pluralizeItems, toFileNode } from '@/features/resources/resources-utils';
+import { buildResourcesDownloadHref, toFileNode } from '@/features/resources/resources-utils';
 import { useResourcesDelete } from '@/features/resources/use-resources-delete';
 import { useResourcesMove } from '@/features/resources/use-resources-move';
 import { useResourcesSearch } from '@/features/resources/use-resources-search';
@@ -103,6 +105,7 @@ const seedViewOptions = (storageKey: string): ResourcesViewOptions => {
 };
 
 function Resources() {
+    const { t } = useTranslation(['resources', 'common']);
     const { error, isInitialLoading, refetch, resources } = useResources();
     const search = useResourcesSearch();
 
@@ -220,35 +223,41 @@ function Resources() {
         [dndMoveAction],
     );
 
-    const handleCopyPath = useCallback(async (file: FileNode) => {
-        const wasCopied = await copyToClipboard(file.path);
+    const handleCopyPath = useCallback(
+        async (file: FileNode) => {
+            const wasCopied = await copyToClipboard(file.path);
 
-        if (wasCopied) {
-            toast.success('Path copied to clipboard');
+            if (wasCopied) {
+                toast.success(t('clipboard.pathCopied'));
 
-            return;
-        }
+                return;
+            }
 
-        toast.error('Failed to copy path');
-    }, []);
+            toast.error(t('clipboard.pathCopyFailed'));
+        },
+        [t],
+    );
 
     // Join the selected paths with `\n` so the result pastes as a clean
     // newline-separated list into the agent chat, a shell command, or notes.
-    const handleBulkCopyPaths = useCallback(async (paths: string[]) => {
-        if (paths.length === 0) {
-            return;
-        }
+    const handleBulkCopyPaths = useCallback(
+        async (paths: string[]) => {
+            if (paths.length === 0) {
+                return;
+            }
 
-        const wasCopied = await copyToClipboard(paths.join('\n'));
+            const wasCopied = await copyToClipboard(paths.join('\n'));
 
-        if (wasCopied) {
-            toast.success(`${paths.length} ${pluralizeItems(paths.length)} copied to clipboard`);
+            if (wasCopied) {
+                toast.success(t('clipboard.pathsCopied', { count: paths.length }));
 
-            return;
-        }
+                return;
+            }
 
-        toast.error('Failed to copy paths');
-    }, []);
+            toast.error(t('clipboard.pathsCopyFailed'));
+        },
+        [t],
+    );
 
     /**
      * "Open" gesture — fires on double-click or Enter for a file row.
@@ -304,7 +313,7 @@ function Resources() {
                 appliesToFiles: false,
                 icon: FolderPlus,
                 id: 'resources-mkdir-here',
-                label: 'New folder',
+                label: t('rowActions.newFolder'),
                 onSelect: handleMkdirHere,
                 separatorBefore: true,
             },
@@ -313,14 +322,14 @@ function Resources() {
                 appliesToFiles: false,
                 icon: Upload,
                 id: 'resources-upload-here',
-                label: 'Upload files',
+                label: t('rowActions.uploadFiles'),
                 onSelect: handleUploadHere,
             },
             {
                 appliesToDirs: true,
                 icon: FileSymlink,
                 id: 'resources-rename',
-                label: 'Rename or move',
+                label: t('rowActions.renameOrMove'),
                 onSelect: (file) => setFilesToMove([file]),
                 separatorBefore: true,
             },
@@ -328,12 +337,12 @@ function Resources() {
                 appliesToDirs: true,
                 icon: Copy,
                 id: 'resources-copy',
-                label: 'Copy to…',
+                label: t('rowActions.copyTo'),
                 onSelect: (file) => setFilesToCopy([file]),
             },
             deleteAction(deletion.requestDelete),
         ],
-        [deletion.requestDelete, handleCopyPath, handleMkdirHere, handleUploadHere],
+        [deletion.requestDelete, handleCopyPath, handleMkdirHere, handleUploadHere, t],
     );
 
     // Bulk-action set, rendered in the bulk-actions bar when at least one row
@@ -347,6 +356,8 @@ function Resources() {
             bulkCopyPathsAction(handleBulkCopyPaths),
             bulkDeleteAction(deletion.deleteFiles),
         ],
+        // `handleBulkCopyPaths` depends on `t`, so the shared actions (labels resolved at build time)
+        // are rebuilt on language switch.
         [deletion.deleteFiles, handleBulkCopyPaths],
     );
 
@@ -358,17 +369,17 @@ function Resources() {
             {
                 icon: FolderPlus,
                 id: 'resources-empty-mkdir',
-                label: 'New folder',
+                label: t('rowActions.newFolder'),
                 onSelect: () => setIsMkdirOpen(true),
             },
             {
                 icon: Upload,
                 id: 'resources-empty-upload',
-                label: 'Upload files',
+                label: t('rowActions.uploadFiles'),
                 onSelect: upload.openFilePicker,
             },
         ],
-        [upload.openFilePicker],
+        [t, upload.openFilePicker],
     );
 
     const handleDeleteDialogOpenChange = useCallback(
@@ -383,21 +394,21 @@ function Resources() {
     const pageHeader = (
         <AppHeader>
             <AppHeaderContent>
-                <AppHeaderTitle icon={<Folder className="size-4 shrink-0" />}>Resources</AppHeaderTitle>
+                <AppHeaderTitle icon={<Folder className="size-4 shrink-0" />}>{t('page.title')}</AppHeaderTitle>
             </AppHeaderContent>
             <AppHeaderActions>
                 <AppHeaderAction
                     disabled={upload.isUploading}
                     icon={<FolderPlus />}
-                    label="New folder"
+                    label={t('page.newFolder')}
                     onClick={() => setIsMkdirOpen(true)}
                     variant="outline"
                 />
                 <AppHeaderAction
-                    aria-label={upload.isUploading ? 'Uploading...' : 'Upload files'}
+                    aria-label={upload.isUploading ? t('page.uploading') : t('page.uploadFiles')}
                     disabled={upload.isUploading}
                     icon={upload.isUploading ? <Spinner variant="circle" /> : <Upload />}
-                    label={upload.isUploading ? 'Uploading...' : 'Upload files'}
+                    label={upload.isUploading ? t('page.uploading') : t('page.uploadFiles')}
                     onClick={upload.openFilePicker}
                     variant="secondary"
                 />
@@ -409,13 +420,16 @@ function Resources() {
 
     const noResourcesState = (
         <FileDropZone
-            actionLabel="Upload files"
-            description="Upload documents so PentAGI agents can reference them during your flows. You can also drag & drop files anywhere in this panel."
-            hint="Up to 300 MB per file · 2 GB per upload"
+            actionLabel={t('page.uploadFiles')}
+            description={t('emptyState.description')}
+            hint={t('emptyState.hint', {
+                maxFileSizeMb: MAX_FILE_SIZE_MB,
+                maxTotalSizeGb: MAX_UPLOAD_TOTAL_SIZE_MB / 1024,
+            })}
             isDragging={isDragging}
             isUploading={upload.isUploading}
             onBrowse={upload.openFilePicker}
-            title="No resources yet"
+            title={t('emptyState.title')}
         />
     );
 
@@ -425,9 +439,14 @@ function Resources() {
                 <EmptyMedia variant="icon">
                     <Search />
                 </EmptyMedia>
-                <EmptyTitle>No matches</EmptyTitle>
+                <EmptyTitle>{t('noMatches.title')}</EmptyTitle>
                 <EmptyDescription>
-                    No resources match <code>{search.debouncedQuery.trim()}</code>. Try a different query.
+                    <Trans
+                        components={{ code: <code /> }}
+                        i18nKey="noMatches.description"
+                        t={t}
+                        values={{ query: search.debouncedQuery.trim() }}
+                    />
                 </EmptyDescription>
             </EmptyHeader>
         </Empty>
@@ -442,7 +461,7 @@ function Resources() {
                     <ErrorState
                         message={error.message}
                         onRetry={refetch}
-                        title="Error loading resources"
+                        title={t('page.loadErrorTitle')}
                     />
                 </div>
             </>
@@ -471,7 +490,7 @@ function Resources() {
                     <div className="bg-primary/10 border-primary pointer-events-none absolute inset-2 z-30 flex items-center justify-center rounded-lg border-2 border-dashed">
                         <div className="text-link flex flex-col items-center gap-2">
                             <FolderUp className="size-8" />
-                            <span className="text-sm font-medium">Drop files to upload</span>
+                            <span className="text-sm font-medium">{t('page.dropToUpload')}</span>
                         </div>
                     </div>
                 )}
@@ -479,17 +498,17 @@ function Resources() {
                 <div className="flex items-center gap-2">
                     <InputGroup className="max-w-sm flex-1">
                         <InputGroupInput
-                            aria-label="Search resources"
+                            aria-label={t('page.searchAriaLabel')}
                             autoComplete="off"
                             onChange={(event) => search.setQuery(event.target.value)}
-                            placeholder="Search resources..."
+                            placeholder={t('page.searchPlaceholder')}
                             type="text"
                             value={search.rawQuery}
                         />
                         {search.rawQuery ? (
                             <InputGroupAddon align="inline-end">
                                 <InputGroupButton
-                                    aria-label="Clear resource search"
+                                    aria-label={t('page.clearSearchAriaLabel')}
                                     onClick={search.resetSearch}
                                     type="button"
                                 >
@@ -501,7 +520,7 @@ function Resources() {
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button
-                                aria-label="Column settings"
+                                aria-label={t('page.columnSettingsAriaLabel')}
                                 className="ml-auto"
                                 size="icon"
                                 variant="outline"
@@ -515,14 +534,14 @@ function Resources() {
                                 onCheckedChange={() => toggleViewOption('size')}
                                 onSelect={(event) => event.preventDefault()}
                             >
-                                Size
+                                {t('viewOptions.size')}
                             </DropdownMenuCheckboxItem>
                             <DropdownMenuCheckboxItem
                                 checked={viewOptions.modified}
                                 onCheckedChange={() => toggleViewOption('modified')}
                                 onSelect={(event) => event.preventDefault()}
                             >
-                                Modified
+                                {t('viewOptions.modified')}
                             </DropdownMenuCheckboxItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuCheckboxItem
@@ -530,7 +549,7 @@ function Resources() {
                                 onCheckedChange={() => toggleViewOption('foldersFirst')}
                                 onSelect={(event) => event.preventDefault()}
                             >
-                                Folders first
+                                {t('viewOptions.foldersFirst')}
                             </DropdownMenuCheckboxItem>
                             <DropdownMenuCheckboxItem
                                 checked={viewOptions.isModifiedRelative}
@@ -538,7 +557,7 @@ function Resources() {
                                 onCheckedChange={() => toggleViewOption('isModifiedRelative')}
                                 onSelect={(event) => event.preventDefault()}
                             >
-                                Relative dates
+                                {t('viewOptions.relativeDates')}
                             </DropdownMenuCheckboxItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -587,13 +606,21 @@ function Resources() {
                 />
 
                 <ConfirmationDialog
-                    confirmText="Delete"
+                    confirmText={t('common:actions.delete')}
                     handleConfirm={deletion.confirmDelete}
                     handleOpenChange={handleDeleteDialogOpenChange}
                     isOpen={!!deletion.fileToDelete}
                     itemName={deletion.fileToDelete?.name}
-                    itemType={deletion.fileToDelete?.isDir ? 'directory' : 'resource'}
-                    title={deletion.fileToDelete?.isDir ? 'Delete directory' : 'Delete resource'}
+                    itemType={
+                        deletion.fileToDelete?.isDir
+                            ? t('deleteDialog.itemTypeDirectory')
+                            : t('deleteDialog.itemTypeResource')
+                    }
+                    title={
+                        deletion.fileToDelete?.isDir
+                            ? t('deleteDialog.titleDirectory')
+                            : t('deleteDialog.titleResource')
+                    }
                 />
             </div>
         </>

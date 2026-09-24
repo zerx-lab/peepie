@@ -1,5 +1,6 @@
 import { ListCheck, ListTodo } from 'lucide-react';
 import { memo, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { SubtaskFragmentFragment } from '@/graphql/types';
 
@@ -22,6 +23,7 @@ const containsSearchValue = (text: null | string | undefined, searchValue: strin
 };
 
 function FlowSubtask({ searchValue = '', subtask }: FlowSubtaskProps) {
+    const { t } = useTranslation('flowDetails');
     const { description, id, result, status, title } = subtask;
     const [isDetailsVisible, setIsDetailsVisible] = useState(false);
     const hasDetails = description || result;
@@ -64,7 +66,7 @@ function FlowSubtask({ searchValue = '', subtask }: FlowSubtaskProps) {
             <FlowTaskStatusIcon
                 className="bg-background ring-border ring-background relative z-1 mt-px rounded-full ring-3"
                 status={status}
-                tooltip={`Subtask ID: ${id}`}
+                tooltip={t('meta.subtaskId', { id })}
             />
             <div className="flex flex-1 flex-col gap-2">
                 <div className="text-sm">
@@ -82,7 +84,7 @@ function FlowSubtask({ searchValue = '', subtask }: FlowSubtaskProps) {
                             className="cursor-pointer hover:underline"
                             onClick={() => setIsDetailsVisible(!isDetailsVisible)}
                         >
-                            {isDetailsVisible ? 'Hide details' : 'Show details'}
+                            {isDetailsVisible ? t('details.hide') : t('details.show')}
                         </div>
                         {isDetailsVisible && (
                             <div className="mt-4 flex flex-col gap-4">
@@ -90,7 +92,7 @@ function FlowSubtask({ searchValue = '', subtask }: FlowSubtaskProps) {
                                     <Card>
                                         <CardHeader className="p-3">
                                             <CardTitle className="flex items-center gap-2">
-                                                <ListTodo className="size-4 shrink-0" /> Description
+                                                <ListTodo className="size-4 shrink-0" /> {t('tasks.description')}
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent className="p-3 pt-0">
@@ -108,7 +110,7 @@ function FlowSubtask({ searchValue = '', subtask }: FlowSubtaskProps) {
                                     <Card>
                                         <CardHeader className="p-3">
                                             <CardTitle className="flex items-center gap-2">
-                                                <ListCheck className="size-4 shrink-0" /> Result
+                                                <ListCheck className="size-4 shrink-0" /> {t('tasks.result')}
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent className="p-3 pt-0">

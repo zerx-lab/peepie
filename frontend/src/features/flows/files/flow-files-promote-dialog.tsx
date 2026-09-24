@@ -1,5 +1,6 @@
 import { BookmarkPlus } from 'lucide-react';
 import { useEffect, useMemo } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import type { FileNode } from '@/components/shared/file-manager';
 import type { OverwriteConflict } from '@/components/shared/overwrite';
@@ -14,7 +15,7 @@ import { useResources } from '@/providers/resources-provider';
 
 import { stripFlowRootPrefix } from './flow-files-utils';
 import {
-    flowFilesPromoteFormSchema,
+    createFlowFilesPromoteFormSchema,
     type FlowFilesPromoteFormValues,
     useFlowFilesPromote,
 } from './use-flow-files-promote';
@@ -134,6 +135,8 @@ export function FlowFilesPromoteDialog({ files, flowId, onClose }: FlowFilesProm
 }
 
 function FlowFilesPromoteDialogForm({ files, flowId, onClose }: FlowFilesPromoteDialogFormProps) {
+    const { t } = useTranslation(['fileManager', 'common']);
+    const formSchema = useMemo(() => createFlowFilesPromoteFormSchema(t), [t]);
     const { isPromoting, promote } = useFlowFilesPromote({ flowId });
     const { resources } = useResources();
     const isMulti = files.length > 1;
@@ -148,7 +151,7 @@ function FlowFilesPromoteDialogForm({ files, flowId, onClose }: FlowFilesPromote
 
     const form = useAppForm<FlowFilesPromoteFormValues>({
         defaultValues: { destination: defaultDestination },
-        schema: flowFilesPromoteFormSchema,
+        schema: formSchema,
     });
 
     useEffect(() => {
@@ -164,7 +167,7 @@ function FlowFilesPromoteDialogForm({ files, flowId, onClose }: FlowFilesPromote
      */
     const overwriteAction = useOverwrite<PromotePlan>({
         execute: (plan, force) => promote(plan.sources, plan.destination, force),
-        findConflicts: (plan) => plan.targets.filter((t) => resourcePaths.has(t.destination)),
+        findConflicts: (plan) => plan.targets.filter((target) => resourcePaths.has(target.destination)),
         onSuccess: onClose,
         // Race-fallback: backend doesn't return per-path conflict descriptors
         // on a 409, so we synthesize them from the plan we just submitted.
@@ -182,8 +185,12 @@ function FlowFilesPromoteDialogForm({ files, flowId, onClose }: FlowFilesPromote
     // Convention: stay enabled until the first submit, then reflect validity (so an invalid submit surfaces
     // errors instead of a silently-dead button). Mirrors FormSubmitButton's requireValid gate.
     const isSubmitDisabled = form.formState.isSubmitted && !form.formState.isValid;
-    const titleText = isMulti ? `Save ${files.length} items as resources` : 'Save as resource';
-    const overwriteCtaLabel = isMulti ? `Save ${files.length} with overwrite` : 'Save with overwrite';
+    const titleText = isMulti
+        ? t('promoteDialog.titleMany', { count: files.length })
+        : t('flowFiles.actions.saveAsResource');
+    const overwriteCtaLabel = isMulti
+        ? t('promoteDialog.saveManyWithOverwrite', { count: files.length })
+        : t('promoteDialog.saveWithOverwrite');
 
     return (
         <>
@@ -195,15 +202,14 @@ function FlowFilesPromoteDialogForm({ files, flowId, onClose }: FlowFilesPromote
                     </DialogTitle>
                     <DialogDescription>
                         {isMulti ? (
-                            <>
-                                Promote every selected entry from this flow into your global resource library so you can
-                                reuse them in other flows.
-                            </>
+                            t('promoteDialog.descriptionMany')
                         ) : (
-                            <>
-                                Promote <code>{files[0].path}</code> from this flow into your global resource library so
-                                you can reuse it in other flows.
-                            </>
+                            <Trans
+                                components={{ code: <code /> }}
+                                i18nKey="promoteDialog.descriptionOne"
+                                ns="fileManager"
+                                values={{ path: files[0].path }}
+                            />
                         )}
                     </DialogDescription>
                 </DialogHeader>
@@ -219,7 +225,11 @@ function FlowFilesPromoteDialogForm({ files, flowId, onClose }: FlowFilesPromote
                             name="destination"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>{isMulti ? 'Destination directory' : 'Destination path'}</FormLabel>
+                                    <FormLabel>
+                                        {isMulti
+                                            ? t('promoteDialog.destinationDirectory')
+                                            : t('promoteDialog.destinationPath')}
+                                    </FormLabel>
                                     <FormControl>
                                         <Input
                                             {...field}
@@ -228,22 +238,20 @@ function FlowFilesPromoteDialogForm({ files, flowId, onClose }: FlowFilesPromote
                                             disabled={isPromoting}
                                             placeholder={
                                                 isMulti
-                                                    ? 'Leave empty to save into the library root'
-                                                    : 'results/scan.txt'
+                                                    ? t('promoteDialog.directoryPlaceholder')
+                                                    : t('promoteDialog.pathPlaceholder')
                                             }
                                         />
                                     </FormControl>
                                     <FormDescription>
                                         {isMulti ? (
-                                            <>
-                                                Relative directory inside your resource library. Leave empty for the
-                                                root. Each item keeps its current filename.
-                                            </>
+                                            t('promoteDialog.directoryHint')
                                         ) : (
-                                            <>
-                                                Relative path inside your resource library. Use <code>/</code> to nest
-                                                into subdirectories.
-                                            </>
+                                            <Trans
+                                                components={{ code: <code /> }}
+                                                i18nKey="promoteDialog.pathHint"
+                                                ns="fileManager"
+                                            />
                                         )}
                                     </FormDescription>
                                     <FormMessage />
@@ -258,7 +266,7 @@ function FlowFilesPromoteDialogForm({ files, flowId, onClose }: FlowFilesPromote
                                 type="button"
                                 variant="outline"
                             >
-                                Cancel
+                                {t('common:actions.cancel')}
                             </Button>
                             <OverwriteButtons
                                 isDisabled={isSubmitDisabled}
@@ -268,7 +276,7 @@ function FlowFilesPromoteDialogForm({ files, flowId, onClose }: FlowFilesPromote
                                 }}
                                 overwriteLabel={overwriteCtaLabel}
                                 primaryIcon={BookmarkPlus}
-                                primaryLabel="Save"
+                                primaryLabel={t('common:actions.save')}
                                 primaryType="submit"
                             />
                         </div>

@@ -20,12 +20,12 @@ import {
     filterFileManagerTree,
     findNodeByPath,
     formatFileSize,
+    formatItemCount,
     formatModifiedAbsolute,
     formatModifiedRelative,
     getCheckboxState,
     isEverySelected,
     normalizeRootGroups,
-    pluralizeItemsEnglish,
     removeAll,
     resolveSelectionModifier,
     sortFileManagerTree,
@@ -458,14 +458,14 @@ describe('collectSubtreePaths', () => {
     });
 });
 
-describe('pluralizeItemsEnglish', () => {
+describe('formatItemCount', () => {
     it('uses singular for 1', () => {
-        expect(pluralizeItemsEnglish(1)).toBe('1 item');
+        expect(formatItemCount(1)).toBe('1 item');
     });
 
     it('uses plural for 0 and >1', () => {
-        expect(pluralizeItemsEnglish(0)).toBe('0 items');
-        expect(pluralizeItemsEnglish(5)).toBe('5 items');
+        expect(formatItemCount(0)).toBe('0 items');
+        expect(formatItemCount(5)).toBe('5 items');
     });
 });
 

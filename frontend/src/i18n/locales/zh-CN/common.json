@@ -1,0 +1,82 @@
+{
+    "actions": {
+        "add": "添加",
+        "apply": "应用",
+        "back": "返回",
+        "cancel": "取消",
+        "clear": "清除",
+        "close": "关闭",
+        "confirm": "确认",
+        "continue": "继续",
+        "copy": "复制",
+        "create": "创建",
+        "delete": "删除",
+        "discard": "放弃",
+        "download": "下载",
+        "duplicate": "复制副本",
+        "edit": "编辑",
+        "export": "导出",
+        "import": "导入",
+        "open": "打开",
+        "refresh": "刷新",
+        "remove": "移除",
+        "rename": "重命名",
+        "reset": "重置",
+        "retry": "重试",
+        "save": "保存",
+        "search": "搜索",
+        "select": "选择",
+        "submit": "提交",
+        "update": "更新",
+        "upload": "上传",
+        "view": "查看"
+    },
+    "status": {
+        "loading": "加载中...",
+        "saving": "保存中...",
+        "copied": "已复制",
+        "copiedToClipboard": "已复制到剪贴板",
+        "copyFailed": "复制失败",
+        "enabled": "已启用",
+        "disabled": "已禁用",
+        "error": "错误",
+        "success": "成功",
+        "warning": "警告",
+        "unknown": "未知",
+        "none": "无",
+        "all": "全部",
+        "yes": "是",
+        "no": "否",
+        "notAvailable": "不适用"
+    },
+    "fields": {
+        "name": "名称",
+        "description": "描述",
+        "status": "状态",
+        "type": "类型",
+        "actions": "操作",
+        "createdAt": "创建时间",
+        "updatedAt": "更新时间",
+        "provider": "提供商",
+        "model": "模型",
+        "id": "ID"
+    },
+    "language": {
+        "label": "语言",
+        "system": "跟随系统",
+        "systemWithValue": "跟随系统（{{language}}）",
+        "names": {
+            "en": "English",
+            "zh-CN": "简体中文"
+        }
+    },
+    "formats": {
+        "time": "HH:mm:ss",
+        "dateTimeThisYear": "M月d日 HH:mm",
+        "dateTime": "yyyy年M月d日 HH:mm",
+        "dateTimeShortThisYear": "M月d日 HH:mm",
+        "dateTimeShort": "yyyy年M月d日 HH:mm",
+        "date": "yyyy年M月d日",
+        "monthYear": "yyyy年M月"
+    }
+}

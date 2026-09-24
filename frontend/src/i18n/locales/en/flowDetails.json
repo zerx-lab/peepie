@@ -1,0 +1,246 @@
+{
+    "tabs": {
+        "automation": "Automation",
+        "assistant": "Assistant",
+        "dashboard": "Dashboard",
+        "terminal": "Terminal",
+        "tasks": "Tasks",
+        "agents": "Agents",
+        "tools": "Searches",
+        "vectorStores": "Vector Store",
+        "files": "Files",
+        "screenshots": "Screenshots",
+        "overview": "Overview"
+    },
+    "details": {
+        "show": "Show details",
+        "hide": "Hide details"
+    },
+    "meta": {
+        "taskId": "Task ID: {{id}}",
+        "subtaskId": "Subtask ID: {{id}}"
+    },
+    "filters": {
+        "adjustHint": "Try adjusting your search or filter parameters",
+        "reset": "Reset filters"
+    },
+    "status": {
+        "created": "Created",
+        "failed": "Failed",
+        "finished": "Finished",
+        "running": "Running",
+        "waiting": "Waiting"
+    },
+    "agentTypes": {
+        "adviser": "Adviser",
+        "assistant": "Assistant",
+        "coder": "Coder",
+        "enricher": "Enricher",
+        "generator": "Generator",
+        "installer": "Installer",
+        "memorist": "Memorist",
+        "pentester": "Pentester",
+        "primaryAgent": "Primary Agent",
+        "refiner": "Refiner",
+        "reflector": "Reflector",
+        "reporter": "Reporter",
+        "searcher": "Searcher",
+        "summarizer": "Summarizer",
+        "toolCallFixer": "Tool Call Fixer"
+    },
+    "messageTypes": {
+        "advice": "Advice",
+        "answer": "Answer",
+        "ask": "Ask",
+        "browser": "Browser",
+        "done": "Done",
+        "file": "File",
+        "input": "Input",
+        "report": "Report",
+        "search": "Search",
+        "terminal": "Terminal",
+        "thoughts": "Thoughts"
+    },
+    "tasksDropdown": {
+        "filterTasks": "Filter tasks",
+        "searchPlaceholder": "Search tasks...",
+        "notFound": "Tasks not found",
+        "noAvailable": "No available tasks",
+        "clearFilter": "Clear filter"
+    },
+    "messages": {
+        "showThinking": "Show thinking",
+        "hideThinking": "Hide thinking",
+        "searchPlaceholder": "Search messages...",
+        "clearSearch": "Clear message search",
+        "scrollToLatest": "Scroll to latest message",
+        "notFound": "No messages found",
+        "automationEmpty": {
+            "title": "No active tasks",
+            "description": "Starting a new task may take some time as the Peepie agent downloads the required Docker image"
+        },
+        "placeholders": {
+            "selectFlow": "Select a flow...",
+            "default": "Type your message...",
+            "automationStarting": "The flow is starting...",
+            "automationEnded": "This flow has ended. Create a new one to continue.",
+            "automationRunning": "Peepie is working... Click Stop to interrupt",
+            "automationWaiting": "Provide additional context or instructions...",
+            "assistantCreating": "Creating assistant...",
+            "assistantNew": "Type a message to create a new assistant...",
+            "assistantStarting": "Assistant is starting...",
+            "assistantEnded": "This assistant session has ended. Create a new one to continue.",
+            "assistantRunning": "Assistant is running... Click Stop to interrupt",
+            "assistantWaiting": "Continue the conversation..."
+        }
+    },
+    "assistants": {
+        "select": "Select assistant",
+        "new": "New",
+        "unavailable": "(unavailable)",
+        "deleteAriaLabel": "Delete {{title}}",
+        "searchPlaceholder": "Search assistants...",
+        "notFound": "No assistants found.",
+        "create": "Create new assistant",
+        "groups": {
+            "active": "Active ({{total}})",
+            "finished": "Finished ({{total}})",
+            "failed": "Failed ({{total}})"
+        },
+        "itemType": "assistant",
+        "deleteTitle": "Delete Assistant",
+        "creating": {
+            "title": "Creating assistant...",
+            "description": "Please wait while we set up your new assistant"
+        },
+        "noMessages": {
+            "title": "No messages",
+            "description": "No messages found for this assistant"
+        },
+        "newEmpty": {
+            "title": "New assistant",
+            "description": "Type a message below to create a new assistant..."
+        }
+    },
+    "tasks": {
+        "searchPlaceholder": "Search tasks and subtasks...",
+        "clearSearch": "Clear task search",
+        "scrollToLatest": "Scroll to latest task",
+        "empty": {
+            "title": "No tasks found for this flow",
+            "description": "Tasks will appear here once the agent starts working"
+        },
+        "progress": "{{progress}}% completed ({{completed}} of {{total}})",
+        "waitingForSubtasks": "Waiting for subtasks to be created...",
+        "description": "Description",
+        "result": "Result"
+    },
+    "agents": {
+        "searchPlaceholder": "Search agent logs...",
+        "clearSearch": "Clear agent search",
+        "scrollToLatest": "Scroll to latest agent log",
+        "notFound": "No agent logs found",
+        "empty": {
+            "title": "No agent logs available",
+            "description": "Agent logs will appear here when agents are working"
+        }
+    },
+    "tools": {
+        "toolName": "Tool name",
+        "searchPlaceholder": "Search tool logs...",
+        "clearSearch": "Clear tool search",
+        "scrollToLatest": "Scroll to latest tool log",
+        "notFound": "No search logs found",
+        "empty": {
+            "title": "No search logs available",
+            "description": "Search logs will appear here when the agent performs searches"
+        }
+    },
+    "vectorStores": {
+        "searchPlaceholder": "Search vector store logs...",
+        "clearSearch": "Clear vector store search",
+        "scrollToLatest": "Scroll to latest vector store log",
+        "notFound": "No vector store logs found",
+        "empty": {
+            "title": "No vector store logs available",
+            "description": "Vector store logs will appear here when the agent uses knowledge database"
+        },
+        "actions": {
+            "retrieve": "Retrieve",
+            "store": "Store"
+        },
+        "description": {
+            "storedInMemory": "stored in memory",
+            "retrievedFromMemory": "retrieved from memory",
+            "storedDocType": "stored {{docType}}",
+            "retrievedDocType": "retrieved {{docType}}",
+            "codeLang": "on {{codeLang}} language",
+            "toolName": "by {{toolName}} tool",
+            "guideType": "about {{guideType}}",
+            "answerType": "as a {{answerType}}",
+            "separator": " "
+        }
+    },
+    "screenshots": {
+        "sourceUrl": "Source URL",
+        "searchPlaceholder": "Search screenshots...",
+        "clearSearch": "Clear screenshot search",
+        "scrollToLatest": "Scroll to latest screenshot",
+        "empty": {
+            "title": "No screenshots available",
+            "description": "Screenshots will appear here once the agent captures them"
+        }
+    },
+    "terminal": {
+        "searchPlaceholder": "Search terminal logs...",
+        "previousMatch": "Previous match",
+        "nextMatch": "Next match",
+        "clearSearch": "Clear terminal search",
+        "clearSearchTitle": "Clear search",
+        "notFound": "No terminal logs found"
+    },
+    "dashboard": {
+        "selectFlow": "Select a flow to view the dashboard",
+        "metrics": {
+            "tasks": "Tasks",
+            "tasksDescription": "Subtasks: {{subtasks}} · Assistants: {{assistants}}",
+            "toolCalls": "Tool Calls",
+            "toolCallsDescription": "Duration: {{duration}}",
+            "tokens": "Tokens",
+            "tokensDescription": "Input + Output tokens",
+            "cost": "Cost",
+            "costDescription": "LLM spending for this flow"
+        },
+        "byModel": {
+            "title": "Usage by Model & Provider",
+            "description": "LLM token usage and costs grouped by model and provider, with agent types used"
+        },
+        "byAgentType": {
+            "title": "Usage by Agent Type",
+            "description": "LLM token usage and costs per agent type in this flow"
+        },
+        "byFunction": {
+            "title": "Tool Calls by Function",
+            "description": "Execution statistics per tool function in this flow"
+        },
+        "columns": {
+            "agents": "Agents",
+            "agentType": "Agent Type",
+            "tokensIn": "Tokens In",
+            "tokensOut": "Tokens Out",
+            "cacheIn": "Cache In",
+            "cacheOut": "Cache Out",
+            "costIn": "Cost In",
+            "costOut": "Cost Out",
+            "totalCost": "Total Cost",
+            "function": "Function",
+            "count": "Count",
+            "totalDuration": "Total Duration",
+            "avgDuration": "Avg Duration"
+        },
+        "functionType": {
+            "agent": "Agent",
+            "tool": "Tool"
+        }
+    }
+}

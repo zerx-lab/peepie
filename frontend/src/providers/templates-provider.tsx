@@ -11,6 +11,7 @@ import {
     FlowTemplateUpdatedDocument,
     UpdateFlowTemplateDocument,
 } from '@/graphql/types';
+import i18n from '@/i18n';
 import { Log } from '@/lib/log';
 import { useUser } from '@/providers/user-provider';
 
@@ -100,8 +101,9 @@ export function TemplatesProvider({ children }: TemplatesProviderProps) {
                     },
                 });
             } catch (error) {
-                const errorMessage = error instanceof Error ? error.message : 'Failed to create template';
-                toast.error('Failed to create template', {
+                const fallback = i18n.t('templates:errors.create');
+                const errorMessage = error instanceof Error ? error.message : fallback;
+                toast.error(fallback, {
                     description: errorMessage,
                 });
                 Log.error('Error creating template:', error);
@@ -124,8 +126,9 @@ export function TemplatesProvider({ children }: TemplatesProviderProps) {
                     },
                 });
             } catch (error) {
-                const errorMessage = error instanceof Error ? error.message : 'Failed to update template';
-                toast.error('Failed to update template', {
+                const fallback = i18n.t('templates:errors.update');
+                const errorMessage = error instanceof Error ? error.message : fallback;
+                toast.error(fallback, {
                     description: errorMessage,
                 });
                 Log.error('Error updating template:', error);
@@ -144,8 +147,9 @@ export function TemplatesProvider({ children }: TemplatesProviderProps) {
                     },
                 });
             } catch (error) {
-                const errorMessage = error instanceof Error ? error.message : 'Failed to delete template';
-                toast.error('Failed to delete template', {
+                const fallback = i18n.t('templates:errors.delete');
+                const errorMessage = error instanceof Error ? error.message : fallback;
+                toast.error(fallback, {
                     description: errorMessage,
                 });
                 Log.error('Error deleting template:', error);
@@ -185,7 +189,7 @@ export function useTemplates() {
     const context = useContext(TemplatesContext);
 
     if (context === undefined) {
-        throw new Error('useTemplates must be used within TemplatesProvider');
+        throw new Error(i18n.t('templates:errors.providerMissing'));
     }
 
     return context;

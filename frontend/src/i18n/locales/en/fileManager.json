@@ -1,0 +1,226 @@
+{
+    "tree": {
+        "ariaLabel": "File tree"
+    },
+    "header": {
+        "selectAll": "Select all",
+        "collapseAll": "Collapse all",
+        "expandAll": "Expand all"
+    },
+    "columns": {
+        "name": "Name",
+        "size": "Size",
+        "modified": "Modified"
+    },
+    "sort": {
+        "columns": {
+            "name": "name",
+            "size": "size",
+            "modified": "modified date"
+        },
+        "ascending": "Sort by {{column}} (ascending)",
+        "descending": "Sort by {{column}} (descending)",
+        "clear": "Clear sorting on {{column}}"
+    },
+    "row": {
+        "select": "Select {{name}}",
+        "actions": "Row actions"
+    },
+    "relative": {
+        "justNow": "just now",
+        "minutes_one": "{{count}}m ago",
+        "minutes_other": "{{count}}m ago",
+        "hours_one": "{{count}}h ago",
+        "hours_other": "{{count}}h ago",
+        "days_one": "{{count}}d ago",
+        "days_other": "{{count}}d ago",
+        "weeks_one": "{{count}}w ago",
+        "weeks_other": "{{count}}w ago",
+        "months_one": "{{count}}mo ago",
+        "months_other": "{{count}}mo ago",
+        "years_one": "{{count}}y ago",
+        "years_other": "{{count}}y ago"
+    },
+    "itemCount_one": "{{count}} item",
+    "itemCount_other": "{{count}} items",
+    "bulk": {
+        "selected_one": "{{count}} selected",
+        "selected_other": "{{count}} selected",
+        "selectedWithSize": "{{selected}} · {{size}}",
+        "moreActions": "More actions"
+    },
+    "actions": {
+        "copyPath": "Copy path",
+        "copyPaths": "Copy paths",
+        "moveTo": "Move to…",
+        "copyTo": "Copy to…",
+        "saveAsResources": "Save as resources"
+    },
+    "bulkDelete": {
+        "title": "Delete {{countLabel}}",
+        "description": "This will delete {{countLabel}}. This action cannot be undone."
+    },
+    "flowFiles": {
+        "groups": {
+            "uploads": "Uploads",
+            "resources": "Resources",
+            "container": "Container"
+        },
+        "actions": {
+            "saveAsResource": "Save as resource"
+        },
+        "empty": {
+            "title": "No files in cache",
+            "description": "Upload files to make them available at <code>{{path}}</code>, or use Pull to sync files from the running container. You can also drag & drop files here."
+        },
+        "noMatches": {
+            "title": "No matches",
+            "description": "No files match <code>{{query}}</code>. Try a different query."
+        },
+        "dropToUpload": "Drop files to upload",
+        "search": {
+            "placeholder": "Search files...",
+            "clear": "Clear file search"
+        },
+        "upload": {
+            "label": "Upload files",
+            "tooltip": "Pushed to <code>{{path}}</code> — immediately accessible inside the container."
+        },
+        "attach": {
+            "label": "Attach resources",
+            "tooltip": "Copied from the library to <code>{{path}}</code> — immediately accessible inside the container."
+        },
+        "pull": {
+            "label": "Pull from container",
+            "tooltipTitle": "Pull file or directory from container",
+            "tooltipDescription": "Snapshots are stored separately under <strong>{{group}}</strong>.",
+            "containerNotRunning": "Container is not running"
+        },
+        "deleteDialog": {
+            "file": "file",
+            "directory": "directory",
+            "titleFile": "Delete File",
+            "titleDirectory": "Delete Directory"
+        },
+        "toasts": {
+            "pathCopied": "Path copied to clipboard",
+            "pathCopyFailed": "Failed to copy path",
+            "pathsCopied_one": "{{count}} item copied to clipboard",
+            "pathsCopied_other": "{{count}} items copied to clipboard",
+            "pathsCopyFailed": "Failed to copy paths",
+            "loadFailed": "Failed to load files",
+            "uploadedOne": "File uploaded",
+            "uploadedOneDescription": "Available at {{path}}",
+            "uploadedMany_one": "{{count}} file uploaded",
+            "uploadedMany_other": "{{count}} files uploaded",
+            "uploadedManyDescription_one": "{{count}} file is now available under {{path}}",
+            "uploadedManyDescription_other": "{{count}} files are now available under {{path}}",
+            "uploadFailed": "Upload failed",
+            "uploadFailedFallback": "Failed to upload files",
+            "directoryDeleted": "Directory deleted",
+            "fileDeleted": "File deleted",
+            "itemsDeleted_one": "{{count}} item deleted",
+            "itemsDeleted_other": "{{count}} items deleted",
+            "deleteFailed": "Delete failed",
+            "deleteFailedFallback": "Failed to delete file",
+            "pulled": "Pulled from container",
+            "pulledOneDescription": "Saved to local cache under {{path}}",
+            "pulledManyDescription_one": "Saved {{count}} item to local cache under {{path}}",
+            "pulledManyDescription_other": "Saved {{count}} items to local cache under {{path}}",
+            "pullFailed": "Pull failed",
+            "pullFailedFallback": "Failed to pull from container",
+            "saved": "Saved to resources",
+            "savedOneDescription": "Stored at {{destination}} in your resource library",
+            "savedManyDescription_one": "Stored {{count}} item under {{destination}} in your resource library",
+            "savedManyDescription_other": "Stored {{count}} items under {{destination}} in your resource library",
+            "saveFailed": "Save as resource failed",
+            "saveFailedFallback": "Failed to save resource",
+            "attached": "Resources attached",
+            "attachedDescription_one": "Copied {{count}} item to {{path}}",
+            "attachedDescription_other": "Copied {{count}} items to {{path}}",
+            "attachFailed": "Attach failed",
+            "attachFailedFallback": "Failed to attach resources",
+            "invalidResourceIds": "Invalid resource IDs."
+        }
+    },
+    "pullDialog": {
+        "title": "Pull from container",
+        "description": "Browse the running container and select files or directories to sync into the local cache under <code>{{path}}</code>. Click the arrow on a folder row or double-click the row to drill in.",
+        "pathLabel": "Container path",
+        "noMatchingPaths": "No matching paths",
+        "parentDirectory": "Parent directory",
+        "refreshListing": "Refresh listing",
+        "listError": "Failed to list container",
+        "listErrorFallback": "Failed to load container files",
+        "unreadable": {
+            "title": "Nothing readable here",
+            "description_one": "None of the {{count}} entry in <code>{{path}}</code> could be read.",
+            "description_other": "None of the {{count}} entries in <code>{{path}}</code> could be read.",
+            "more_one": "…and {{count}} more",
+            "more_other": "…and {{count}} more"
+        },
+        "emptyDirectory": {
+            "title": "Directory is empty",
+            "description": "Nothing to pull from <code>{{path}}</code>."
+        },
+        "partialFailure": {
+            "title_one": "{{count}} entry could not be read",
+            "title_other": "{{count}} entries could not be read",
+            "description": "The readable entries are shown below. Skipped: {{names}}.",
+            "descriptionWithMore_one": "The readable entries are shown below. Skipped: {{names}}, and {{count}} more.",
+            "descriptionWithMore_other": "The readable entries are shown below. Skipped: {{names}}, and {{count}} more."
+        },
+        "truncated": {
+            "title": "Directory truncated",
+            "description_one": "This directory has too many entries to list in full; only the first {{count}} is shown. Open a subfolder to see the rest.",
+            "description_other": "This directory has too many entries to list in full; only the first {{count}} are shown. Open a subfolder to see the rest."
+        },
+        "pullPath": "Pull {{path}}",
+        "pullSelected_one": "Pull {{count}} item",
+        "pullSelected_other": "Pull {{count}} items",
+        "pullWithOverwrite": "Pull with overwrite",
+        "pullSelectedWithOverwrite_one": "Pull {{count}} with overwrite",
+        "pullSelectedWithOverwrite_other": "Pull {{count}} with overwrite"
+    },
+    "attachDialog": {
+        "title": "Attach resources",
+        "description": "Pick files and/or folders from your global library — they will be copied into <code>{{cachePath}}</code> of this flow and made available at <code>{{containerPath}}</code> inside the container.",
+        "searchPlaceholder": "Search resources...",
+        "clearSearch": "Clear resource search",
+        "empty": {
+            "title": "Resource library is empty",
+            "description": "Upload resources first to attach them to a flow."
+        },
+        "noMatches": {
+            "title": "No matches",
+            "description": "No resources match <code>{{query}}</code>."
+        },
+        "selectHint": "Select one or more items",
+        "attach": "Attach",
+        "attachSelected_one": "Attach {{count}}",
+        "attachSelected_other": "Attach {{count}}",
+        "attachWithOverwrite": "Attach with overwrite",
+        "attachSelectedWithOverwrite_one": "Attach {{count}} with overwrite",
+        "attachSelectedWithOverwrite_other": "Attach {{count}} with overwrite"
+    },
+    "promoteDialog": {
+        "titleMany_one": "Save {{count}} item as resources",
+        "titleMany_other": "Save {{count}} items as resources",
+        "descriptionMany": "Promote every selected entry from this flow into your global resource library so you can reuse them in other flows.",
+        "descriptionOne": "Promote <code>{{path}}</code> from this flow into your global resource library so you can reuse it in other flows.",
+        "destinationDirectory": "Destination directory",
+        "destinationPath": "Destination path",
+        "directoryPlaceholder": "Leave empty to save into the library root",
+        "pathPlaceholder": "results/scan.txt",
+        "directoryHint": "Relative directory inside your resource library. Leave empty for the root. Each item keeps its current filename.",
+        "pathHint": "Relative path inside your resource library. Use <code>/</code> to nest into subdirectories.",
+        "saveWithOverwrite": "Save with overwrite",
+        "saveManyWithOverwrite_one": "Save {{count}} with overwrite",
+        "saveManyWithOverwrite_other": "Save {{count}} with overwrite",
+        "validation": {
+            "required": "Destination cannot be empty",
+            "relative": "Destination must be a relative path",
+            "noParentSegments": "Destination must not contain \"..\""
+        }
+    }
+}

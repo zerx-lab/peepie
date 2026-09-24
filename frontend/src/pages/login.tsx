@@ -1,6 +1,7 @@
 import { useLocation, useSearchParams } from 'react-router-dom';
 
 import Logo from '@/components/icons/logo';
+import { LanguageSelect } from '@/components/shared/language-switcher';
 import { Spinner } from '@/components/ui/spinner';
 import LoginForm from '@/features/authentication/login-form';
 import { routes } from '@/lib/routes';
@@ -19,7 +20,8 @@ function Login() {
     );
 
     return (
-        <div className="flex h-dvh w-full items-center justify-center">
+        <div className="relative flex h-dvh w-full items-center justify-center">
+            <LanguageSelect className="absolute top-4 right-4 z-10 w-auto" />
             <div className="h-dvh w-full lg:grid lg:grid-cols-2">
                 <div className="flex items-center justify-center px-4 py-12">
                     {!isLoading ? (

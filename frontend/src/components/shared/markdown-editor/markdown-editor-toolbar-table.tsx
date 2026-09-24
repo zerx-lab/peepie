@@ -13,6 +13,7 @@ import {
     Table as TableIcon,
     Trash2,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -42,6 +43,7 @@ interface TableMenuProps {
 }
 
 export function TableMenu({ columnAlign, disabled, editor, isActive, isHeaderRow }: TableMenuProps) {
+    const { t } = useTranslation('editor');
     const run = (fn: (chain: ReturnType<Editor['chain']>) => ReturnType<Editor['chain']>) =>
         fn(editor.chain().focus()).run();
 
@@ -51,7 +53,7 @@ export function TableMenu({ columnAlign, disabled, editor, isActive, isHeaderRow
                 <TooltipTrigger asChild>
                     <DropdownMenuTrigger asChild>
                         <Button
-                            aria-label="Table"
+                            aria-label={t('table.label')}
                             className={cn('gap-0.5 px-1.5', isActive && 'bg-accent text-accent-foreground')}
                             data-toolbar-item=""
                             disabled={disabled}
@@ -64,7 +66,7 @@ export function TableMenu({ columnAlign, disabled, editor, isActive, isHeaderRow
                         </Button>
                     </DropdownMenuTrigger>
                 </TooltipTrigger>
-                <TooltipContent>Table</TooltipContent>
+                <TooltipContent>{t('table.label')}</TooltipContent>
             </Tooltip>
             <DropdownMenuContent
                 align="start"
@@ -86,7 +88,7 @@ export function TableMenu({ columnAlign, disabled, editor, isActive, isHeaderRow
                             role="menuitemcheckbox"
                         >
                             <PanelTop className="text-muted-foreground size-4 shrink-0" />
-                            <span>Header row</span>
+                            <span>{t('table.headerRow')}</span>
                             <Switch
                                 checked={isHeaderRow}
                                 className="pointer-events-none ml-auto"
@@ -96,24 +98,24 @@ export function TableMenu({ columnAlign, disabled, editor, isActive, isHeaderRow
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onSelect={() => run((chain) => chain.addRowBefore())}>
                             <ArrowUp className="text-muted-foreground size-4 shrink-0" />
-                            Insert row above
+                            {t('table.insertRowAbove')}
                         </DropdownMenuItem>
                         <DropdownMenuItem onSelect={() => run((chain) => chain.addRowAfter())}>
                             <ArrowDown className="text-muted-foreground size-4 shrink-0" />
-                            Insert row below
+                            {t('table.insertRowBelow')}
                         </DropdownMenuItem>
                         <DropdownMenuItem onSelect={() => run((chain) => chain.addColumnBefore())}>
                             <ArrowLeft className="text-muted-foreground size-4 shrink-0" />
-                            Insert column left
+                            {t('table.insertColumnLeft')}
                         </DropdownMenuItem>
                         <DropdownMenuItem onSelect={() => run((chain) => chain.addColumnAfter())}>
                             <ArrowRight className="text-muted-foreground size-4 shrink-0" />
-                            Insert column right
+                            {t('table.insertColumnRight')}
                         </DropdownMenuItem>
                         <DropdownMenuSub>
                             <DropdownMenuSubTrigger>
                                 <AlignLeft className="text-muted-foreground size-4 shrink-0" />
-                                Align column
+                                {t('table.alignColumn')}
                             </DropdownMenuSubTrigger>
                             <DropdownMenuSubContent>
                                 {ALIGN_OPTIONS.map((option) => (
@@ -124,7 +126,7 @@ export function TableMenu({ columnAlign, disabled, editor, isActive, isHeaderRow
                                         role="menuitemradio"
                                     >
                                         <option.icon className="text-muted-foreground size-4 shrink-0" />
-                                        <span>{option.label}</span>
+                                        <span>{t(option.labelKey)}</span>
                                         {(columnAlign ?? 'left') === option.value ? (
                                             <Check className="ml-auto size-4 shrink-0" />
                                         ) : null}
@@ -135,16 +137,16 @@ export function TableMenu({ columnAlign, disabled, editor, isActive, isHeaderRow
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onSelect={() => run((chain) => chain.deleteRow())}>
                             <Delete className="text-muted-foreground size-4 shrink-0 -rotate-90" />
-                            Delete row
+                            {t('table.deleteRow')}
                         </DropdownMenuItem>
                         <DropdownMenuItem onSelect={() => run((chain) => chain.deleteColumn())}>
                             <Delete className="text-muted-foreground size-4 shrink-0" />
-                            Delete column
+                            {t('table.deleteColumn')}
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onSelect={() => run((chain) => chain.deleteTable())}>
                             <Trash2 className="text-muted-foreground size-4 shrink-0" />
-                            Delete table
+                            {t('table.deleteTable')}
                         </DropdownMenuItem>
                     </>
                 ) : (
@@ -152,7 +154,7 @@ export function TableMenu({ columnAlign, disabled, editor, isActive, isHeaderRow
                         onSelect={() => run((chain) => chain.insertTable({ cols: 3, rows: 3, withHeaderRow: true }))}
                     >
                         <TableIcon className="text-muted-foreground size-4 shrink-0" />
-                        Insert table
+                        {t('table.insertTable')}
                     </DropdownMenuItem>
                 )}
             </DropdownMenuContent>

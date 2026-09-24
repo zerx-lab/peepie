@@ -13,11 +13,11 @@ import {
     Terminal,
     User as UserIcon,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { MessageLogType } from '@/graphql/types';
 import { cn } from '@/lib/utils';
-import { formatName } from '@/lib/utils/format';
 
 interface MessageTypeIconProps {
     className?: string;
@@ -40,18 +40,35 @@ const messageTypeIcons: Record<MessageLogType, LucideIcon> = {
 };
 const defaultIcon = Brain;
 
-function FlowMessageTypeIcon({ className, type, tooltip = type }: MessageTypeIconProps) {
+const messageTypeLabelKeys = {
+    [MessageLogType.Advice]: 'messageTypes.advice',
+    [MessageLogType.Answer]: 'messageTypes.answer',
+    [MessageLogType.Ask]: 'messageTypes.ask',
+    [MessageLogType.Browser]: 'messageTypes.browser',
+    [MessageLogType.Done]: 'messageTypes.done',
+    [MessageLogType.File]: 'messageTypes.file',
+    [MessageLogType.Input]: 'messageTypes.input',
+    [MessageLogType.Report]: 'messageTypes.report',
+    [MessageLogType.Search]: 'messageTypes.search',
+    [MessageLogType.Terminal]: 'messageTypes.terminal',
+    [MessageLogType.Thoughts]: 'messageTypes.thoughts',
+} as const satisfies Record<MessageLogType, string>;
+
+function FlowMessageTypeIcon({ className, tooltip, type }: MessageTypeIconProps) {
+    const { t } = useTranslation('flowDetails');
     const Icon = type ? messageTypeIcons[type] || defaultIcon : defaultIcon;
     const iconElement = <Icon className={cn('size-3 shrink-0', className)} />;
+    const labelKey = type ? messageTypeLabelKeys[type] : undefined;
+    const tooltipText = tooltip ?? (labelKey ? t(labelKey) : type);
 
-    if (!tooltip) {
+    if (!tooltipText) {
         return iconElement;
     }
 
     return (
         <Tooltip>
             <TooltipTrigger asChild>{iconElement}</TooltipTrigger>
-            <TooltipContent>{formatName(tooltip)}</TooltipContent>
+            <TooltipContent>{tooltipText}</TooltipContent>
         </Tooltip>
     );
 }

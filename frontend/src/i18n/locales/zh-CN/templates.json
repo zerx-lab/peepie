@@ -1,0 +1,72 @@
+{
+    "name": "模板",
+    "plural": "模板",
+    "new": "新建模板",
+    "newButton": "新建模板",
+    "titlePlaceholder": "模板标题",
+    "renamed": "模板重命名成功",
+    "renameHint": "双击重命名",
+    "actions": {
+        "menu": "模板操作",
+        "deleting": "正在删除...",
+        "view": "视图",
+        "rawTooltip": "编辑原始模板"
+    },
+    "errors": {
+        "create": "创建模板失败",
+        "update": "更新模板失败",
+        "delete": "删除模板失败",
+        "loadOne": "加载模板失败",
+        "loadList": "加载模板失败",
+        "notFound": "未找到模板",
+        "notFoundDescription": "您要查找的模板不存在。",
+        "providerMissing": "useTemplates 必须在 TemplatesProvider 内使用"
+    },
+    "dialog": {
+        "itemType": "模板",
+        "replace": "替换",
+        "replaceTitle": "替换内容？",
+        "replaceDescription": "当前表单已有内容。是否用所选预设替换？"
+    },
+    "list": {
+        "title": "标题",
+        "text": "文本",
+        "openMenu": "打开菜单",
+        "loadingTitle": "正在加载模板...",
+        "loadingDescription": "正在获取流程模板，请稍候",
+        "emptyTitle": "暂无模板",
+        "emptyDescription": "创建第一个模板以开始使用",
+        "entityName": "模板",
+        "filterPlaceholder": "筛选模板..."
+    },
+    "form": {
+        "textRequired": "文本为必填项",
+        "titleRequired": "标题为必填项",
+        "createTitle": "创建新模板",
+        "editTitle": "编辑模板",
+        "description": "添加标题和内容，或从预设开始。",
+        "title": "标题",
+        "titleHint": "此模板的简短名称",
+        "content": "模板内容",
+        "contentHint": "描述任务，或从预设开始",
+        "backToList": "返回模板列表"
+    },
+    "presets": {
+        "title": "预设模板",
+        "description": "点击预设填充表单，或展开预览内容。",
+        "expand": "预览{{title}}",
+        "titles": {
+            "web": "Web 应用安全评估",
+            "network": "网络基础设施发现与映射",
+            "directory": "Active Directory 渗透测试",
+            "api": "API 安全测试",
+            "cloud": "云基础设施安全审计（AWS）",
+            "wordpress": "WordPress 安全评估",
+            "surface": "外部攻击面评估",
+            "internal": "内部网络渗透测试",
+            "mobile": "移动应用安全测试（API 后端）",
+            "devops": "DevOps 与 CI/CD 流水线安全",
+            "database": "数据库安全评估"
+        }
+    }
+}

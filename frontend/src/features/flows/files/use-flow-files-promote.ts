@@ -1,25 +1,30 @@
+import type { TFunction } from 'i18next';
+
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
 import type { OverwriteOutcome } from '@/components/shared/overwrite';
 import type { RestResourceList } from '@/features/resources/resources-rest';
 
-import { pluralizeItems } from '@/features/resources/resources-utils';
 import { api, getApiErrorMessage, getApiErrorStatusCode } from '@/lib/axios';
 
 import { FLOW_FILES_PROMOTE_API_PATH } from './flow-files-constants';
 
-export const flowFilesPromoteFormSchema = z.object({
-    destination: z
-        .string()
-        .trim()
-        .min(1, { message: 'Destination cannot be empty' })
-        .refine((value) => !value.startsWith('/'), { message: 'Destination must be a relative path' })
-        .refine((value) => !value.split('/').includes('..'), { message: 'Destination must not contain ".."' }),
-});
+export const createFlowFilesPromoteFormSchema = (t: TFunction<'fileManager'>) =>
+    z.object({
+        destination: z
+            .string()
+            .trim()
+            .min(1, { message: t('promoteDialog.validation.required') })
+            .refine((value) => !value.startsWith('/'), { message: t('promoteDialog.validation.relative') })
+            .refine((value) => !value.split('/').includes('..'), {
+                message: t('promoteDialog.validation.noParentSegments'),
+            }),
+    });
 
-export type FlowFilesPromoteFormValues = z.infer<typeof flowFilesPromoteFormSchema>;
+export type FlowFilesPromoteFormValues = z.infer<ReturnType<typeof createFlowFilesPromoteFormSchema>>;
 
 interface PromoteRequestBody {
     destination: string;
@@ -53,6 +58,7 @@ interface UseFlowFilesPromoteResult {
  * with toast notifications and a loading flag.
  */
 export function useFlowFilesPromote({ flowId }: UseFlowFilesPromoteParams): UseFlowFilesPromoteResult {
+    const { t } = useTranslation('fileManager');
     const [isPromoting, setIsPromoting] = useState(false);
 
     const promote = useCallback(
@@ -76,10 +82,13 @@ export function useFlowFilesPromote({ flowId }: UseFlowFilesPromoteParams): UseF
 
                 const description =
                     sources.length === 1
-                        ? `Stored at ${destination.trim()} in your resource library`
-                        : `Stored ${sources.length} ${pluralizeItems(sources.length)} under ${destination.trim()} in your resource library`;
+                        ? t('flowFiles.toasts.savedOneDescription', { destination: destination.trim() })
+                        : t('flowFiles.toasts.savedManyDescription', {
+                              count: sources.length,
+                              destination: destination.trim(),
+                          });
 
-                toast.success('Saved to resources', { description });
+                toast.success(t('flowFiles.toasts.saved'), { description });
 
                 return { kind: 'ok' };
             } catch (error) {
@@ -87,16 +96,16 @@ export function useFlowFilesPromote({ flowId }: UseFlowFilesPromoteParams): UseF
                     return { kind: 'conflict' };
                 }
 
-                const description = getApiErrorMessage(error, 'Failed to save resource');
+                const description = getApiErrorMessage(error, t('flowFiles.toasts.saveFailedFallback'));
 
-                toast.error('Save as resource failed', { description });
+                toast.error(t('flowFiles.toasts.saveFailed'), { description });
 
                 return { kind: 'error' };
             } finally {
                 setIsPromoting(false);
             }
         },
-        [flowId],
+        [flowId, t],
     );
 
     return {

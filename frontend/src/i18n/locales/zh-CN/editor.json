@@ -1,0 +1,100 @@
+{
+    "placeholder": "输入内容…",
+    "toolbar": {
+        "label": "格式",
+        "bold": "粗体",
+        "italic": "斜体",
+        "strikethrough": "删除线",
+        "inlineCode": "行内代码",
+        "blockquote": "引用",
+        "codeBlock": "代码块",
+        "horizontalRule": "分隔线",
+        "clearFormatting": "清除格式",
+        "undo": "撤销",
+        "redo": "重做"
+    },
+    "heading": {
+        "tooltip": "文本样式",
+        "triggerLabel": "文本样式：{{style}}",
+        "h1": "标题 1",
+        "h2": "标题 2",
+        "h3": "标题 3",
+        "h4": "标题 4",
+        "h5": "标题 5",
+        "h6": "标题 6",
+        "text": "正文"
+    },
+    "list": {
+        "tooltip": "列表",
+        "triggerLabel": "列表：{{list}}",
+        "none": "无",
+        "bullet": "无序列表",
+        "ordered": "有序列表",
+        "task": "任务列表"
+    },
+    "table": {
+        "label": "表格",
+        "headerRow": "表头行",
+        "insertRowAbove": "在上方插入行",
+        "insertRowBelow": "在下方插入行",
+        "insertColumnLeft": "在左侧插入列",
+        "insertColumnRight": "在右侧插入列",
+        "alignColumn": "列对齐",
+        "align": {
+            "left": "左对齐",
+            "center": "居中",
+            "right": "右对齐"
+        },
+        "deleteRow": "删除行",
+        "deleteColumn": "删除列",
+        "deleteTable": "删除表格",
+        "insertTable": "插入表格",
+        "columnActions": "列操作",
+        "rowActions": "行操作",
+        "insertLeft": "在左侧插入",
+        "insertRight": "在右侧插入",
+        "insertAbove": "在上方插入",
+        "insertBelow": "在下方插入",
+        "clearContents": "清除内容"
+    },
+    "link": {
+        "label": "链接",
+        "urlLabel": "链接 URL",
+        "urlPlaceholder": "https://example.com",
+        "apply": "应用链接",
+        "openInNewTab": "在新标签页中打开链接",
+        "remove": "移除链接",
+        "invalidUrl": "仅允许 http、https、mailto 和 tel 链接。"
+    },
+    "image": {
+        "insert": "插入图片",
+        "apply": "应用图片",
+        "remove": "移除图片",
+        "urlLabel": "图片 URL",
+        "urlPlaceholder": "https://example.com/image.png",
+        "altLabel": "替代文本（可选）",
+        "altPlaceholder": "描述这张图片",
+        "invalidUrl": "仅允许 http(s) 或 base64 栅格图片 URL。"
+    },
+    "viewMode": {
+        "rich": "富文本编辑器",
+        "raw": "源码"
+    },
+    "taskItem": {
+        "checkboxLabel": "任务项复选框：{{item}}",
+        "emptyItem": "空任务项"
+    },
+    "terminal": {
+        "openLinkHint": "{{modifier}}+单击打开"
+    },
+    "detailNavigation": {
+        "previous": "上一个",
+        "next": "下一个",
+        "openList": "打开{{title}}列表（{{position}}）",
+        "showAllMatching": "显示所有匹配的{{title}}",
+        "searchPlaceholder": "搜索…",
+        "clearSearch": "清除搜索",
+        "noItemsMatchQuery": "没有与“{{query}}”匹配的项。",
+        "noItemsMatchFilter": "没有与当前筛选条件匹配的项。"
+    }
+}

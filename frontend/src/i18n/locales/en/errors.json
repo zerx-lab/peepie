@@ -1,0 +1,12 @@
+{
+    "unexpectedResponse": "Unexpected response from server",
+    "confirmInput": "Please confirm your input.",
+    "clipboard": {
+        "copyFailed": "Failed to copy to clipboard"
+    },
+    "upload": {
+        "tooManyFiles": "Too many files: max {{max}} per upload",
+        "fileTooLarge": "File \"{{name}}\" is larger than {{maxSizeMb}} MB",
+        "totalTooLarge": "Total upload size exceeds the {{maxSizeMb}} MB limit"
+    }
+}

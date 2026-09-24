@@ -1,0 +1,147 @@
+{
+    "page": {
+        "title": "Resources",
+        "newFolder": "New folder",
+        "uploadFiles": "Upload files",
+        "uploading": "Uploading...",
+        "dropToUpload": "Drop files to upload",
+        "searchPlaceholder": "Search resources...",
+        "searchAriaLabel": "Search resources",
+        "clearSearchAriaLabel": "Clear resource search",
+        "columnSettingsAriaLabel": "Column settings",
+        "loadErrorTitle": "Error loading resources"
+    },
+    "viewOptions": {
+        "size": "Size",
+        "modified": "Modified",
+        "foldersFirst": "Folders first",
+        "relativeDates": "Relative dates"
+    },
+    "rowActions": {
+        "newFolder": "New folder",
+        "uploadFiles": "Upload files",
+        "renameOrMove": "Rename or move",
+        "copyTo": "Copy to…"
+    },
+    "emptyState": {
+        "title": "No resources yet",
+        "description": "Upload documents so Peepie agents can reference them during your flows. You can also drag & drop files anywhere in this panel.",
+        "hint": "Up to {{maxFileSizeMb}} MB per file · {{maxTotalSizeGb}} GB per upload"
+    },
+    "noMatches": {
+        "title": "No matches",
+        "description": "No resources match <code>{{query}}</code>. Try a different query."
+    },
+    "deleteDialog": {
+        "titleResource": "Delete resource",
+        "titleDirectory": "Delete directory",
+        "itemTypeResource": "resource",
+        "itemTypeDirectory": "directory"
+    },
+    "clipboard": {
+        "pathCopied": "Path copied to clipboard",
+        "pathCopyFailed": "Failed to copy path",
+        "pathsCopied_one": "{{count}} item copied to clipboard",
+        "pathsCopied_other": "{{count}} items copied to clipboard",
+        "pathsCopyFailed": "Failed to copy paths"
+    },
+    "validation": {
+        "destinationRequired": "Destination cannot be empty",
+        "destinationRelative": "Destination must be a relative path",
+        "destinationNoParent": "Destination must not contain \"..\"",
+        "pathRequired": "Path cannot be empty",
+        "pathRelative": "Path must be relative (no leading \"/\")",
+        "pathNoParent": "Path must not contain \"..\""
+    },
+    "destination": {
+        "directoryLabel": "Destination directory",
+        "multiHint": "Relative directory inside your library. Leave empty for the root. Each item keeps its current filename."
+    },
+    "mkdir": {
+        "title": "Create directory",
+        "description": "Create a virtual directory inside your resource library. Existing parent directories are reused automatically.",
+        "pathLabel": "Path",
+        "pathPlaceholder": "reports/2025",
+        "pathHint": "Relative path. Use <code>/</code> to nest into subdirectories.",
+        "toasts": {
+            "created": "Directory created",
+            "createdDescription": "Created at /{{path}}",
+            "failed": "Create directory failed",
+            "failedFallback": "Failed to create directory"
+        }
+    },
+    "move": {
+        "titleMulti_one": "Move {{count}} item",
+        "titleMulti_other": "Move {{count}} items",
+        "titleDirectory": "Move directory",
+        "titleResource": "Rename or move resource",
+        "descriptionMulti": "Move every selected item into the destination directory.",
+        "descriptionSingle": "Update the path of <code>{{path}}</code>.",
+        "newPathLabel": "New path",
+        "multiPlaceholder": "Leave empty to move into the library root",
+        "singleHint": "Relative path inside your library. End with <code>/</code> to drop the entry into that directory.",
+        "submit": "Move",
+        "overwrite": "Move with overwrite",
+        "overwriteMulti_one": "Move {{count}} with overwrite",
+        "overwriteMulti_other": "Move {{count}} with overwrite",
+        "toasts": {
+            "moved": "Resource moved",
+            "movedTo": "Moved to /{{destination}}",
+            "movedItems_one": "Moved {{count}} item into /{{destination}}",
+            "movedItems_other": "Moved {{count}} items into /{{destination}}",
+            "failed": "Move failed",
+            "failedFallback": "Failed to move resource"
+        }
+    },
+    "copy": {
+        "titleMulti_one": "Copy {{count}} item",
+        "titleMulti_other": "Copy {{count}} items",
+        "titleDirectory": "Copy directory",
+        "titleResource": "Copy resource",
+        "descriptionMulti": "Duplicate every selected item into the destination directory.",
+        "descriptionSingle": "Duplicate <code>{{path}}</code> to a new path.",
+        "pathLabel": "Destination path",
+        "multiPlaceholder": "Leave empty to copy into the library root",
+        "singleHint": "Relative path inside your library.",
+        "overwrite": "Copy with overwrite",
+        "overwriteMulti_one": "Copy {{count}} with overwrite",
+        "overwriteMulti_other": "Copy {{count}} with overwrite",
+        "toasts": {
+            "copied": "Resource copied",
+            "copiedTo": "Copied to /{{destination}}",
+            "copiedItems_one": "Copied {{count}} item into /{{destination}}",
+            "copiedItems_other": "Copied {{count}} items into /{{destination}}",
+            "failed": "Copy failed",
+            "failedFallback": "Failed to copy resource"
+        }
+    },
+    "delete": {
+        "toasts": {
+            "directoryDeleted": "Directory deleted",
+            "resourceDeleted": "Resource deleted",
+            "itemsDeleted_one": "{{count}} item deleted",
+            "itemsDeleted_other": "{{count}} items deleted",
+            "failed": "Delete failed",
+            "failedFallback": "Failed to delete resource"
+        }
+    },
+    "upload": {
+        "toasts": {
+            "fileUploaded": "File uploaded",
+            "itemsUploaded_one": "{{count}} item uploaded",
+            "itemsUploaded_other": "{{count}} items uploaded",
+            "uploadedToDir": "Uploaded to /{{dir}}",
+            "uploadedToLibrary": "Uploaded to your library",
+            "filesUploadedToDir_one": "{{count}} file uploaded to /{{dir}}",
+            "filesUploadedToDir_other": "{{count}} files uploaded to /{{dir}}",
+            "filesUploadedToLibrary_one": "{{count}} file uploaded to your library",
+            "filesUploadedToLibrary_other": "{{count}} files uploaded to your library",
+            "failed": "Upload failed",
+            "failedFallback": "Failed to upload files",
+            "alreadyExists": "Resource already exists — please rename or remove the existing entry"
+        }
+    },
+    "provider": {
+        "loadFailed": "Failed to load resources"
+    }
+}

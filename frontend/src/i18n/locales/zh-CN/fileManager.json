@@ -1,0 +1,200 @@
+{
+    "tree": {
+        "ariaLabel": "文件树"
+    },
+    "header": {
+        "selectAll": "全选",
+        "collapseAll": "全部折叠",
+        "expandAll": "全部展开"
+    },
+    "columns": {
+        "name": "名称",
+        "size": "大小",
+        "modified": "修改时间"
+    },
+    "sort": {
+        "columns": {
+            "name": "名称",
+            "size": "大小",
+            "modified": "修改时间"
+        },
+        "ascending": "按{{column}}排序（升序）",
+        "descending": "按{{column}}排序（降序）",
+        "clear": "清除{{column}}排序"
+    },
+    "row": {
+        "select": "选择 {{name}}",
+        "actions": "行操作"
+    },
+    "relative": {
+        "justNow": "刚刚",
+        "minutes_other": "{{count}} 分钟前",
+        "hours_other": "{{count}} 小时前",
+        "days_other": "{{count}} 天前",
+        "weeks_other": "{{count}} 周前",
+        "months_other": "{{count}} 个月前",
+        "years_other": "{{count}} 年前"
+    },
+    "itemCount_other": "{{count}} 项",
+    "bulk": {
+        "selected_other": "已选择 {{count}} 项",
+        "selectedWithSize": "{{selected}} · {{size}}",
+        "moreActions": "更多操作"
+    },
+    "actions": {
+        "copyPath": "复制路径",
+        "copyPaths": "复制路径",
+        "moveTo": "移动到…",
+        "copyTo": "复制到…",
+        "saveAsResources": "保存为资源"
+    },
+    "bulkDelete": {
+        "title": "删除 {{countLabel}}",
+        "description": "将删除 {{countLabel}}。此操作无法撤销。"
+    },
+    "flowFiles": {
+        "groups": {
+            "uploads": "上传",
+            "resources": "资源",
+            "container": "容器"
+        },
+        "actions": {
+            "saveAsResource": "保存为资源"
+        },
+        "empty": {
+            "title": "缓存中没有文件",
+            "description": "上传文件后可在 <code>{{path}}</code> 中使用，或使用“拉取”从运行中的容器同步文件。也可以将文件拖放到此处。"
+        },
+        "noMatches": {
+            "title": "无匹配结果",
+            "description": "没有文件匹配 <code>{{query}}</code>。请尝试其他关键词。"
+        },
+        "dropToUpload": "拖放文件以上传",
+        "search": {
+            "placeholder": "搜索文件...",
+            "clear": "清除文件搜索"
+        },
+        "upload": {
+            "label": "上传文件",
+            "tooltip": "上传到 <code>{{path}}</code>，容器内可立即访问。"
+        },
+        "attach": {
+            "label": "附加资源",
+            "tooltip": "从资源库复制到 <code>{{path}}</code>，容器内可立即访问。"
+        },
+        "pull": {
+            "label": "从容器拉取",
+            "tooltipTitle": "从容器拉取文件或目录",
+            "tooltipDescription": "快照单独存放在 <strong>{{group}}</strong> 下。",
+            "containerNotRunning": "容器未运行"
+        },
+        "deleteDialog": {
+            "file": "文件",
+            "directory": "目录",
+            "titleFile": "删除文件",
+            "titleDirectory": "删除目录"
+        },
+        "toasts": {
+            "pathCopied": "路径已复制到剪贴板",
+            "pathCopyFailed": "复制路径失败",
+            "pathsCopied_other": "已复制 {{count}} 项到剪贴板",
+            "pathsCopyFailed": "复制路径失败",
+            "loadFailed": "加载文件失败",
+            "uploadedOne": "文件已上传",
+            "uploadedOneDescription": "可在 {{path}} 访问",
+            "uploadedMany_other": "已上传 {{count}} 个文件",
+            "uploadedManyDescription_other": "{{count}} 个文件现已位于 {{path}} 下",
+            "uploadFailed": "上传失败",
+            "uploadFailedFallback": "上传文件失败",
+            "directoryDeleted": "目录已删除",
+            "fileDeleted": "文件已删除",
+            "itemsDeleted_other": "已删除 {{count}} 项",
+            "deleteFailed": "删除失败",
+            "deleteFailedFallback": "删除文件失败",
+            "pulled": "已从容器拉取",
+            "pulledOneDescription": "已保存到本地缓存 {{path}} 下",
+            "pulledManyDescription_other": "已将 {{count}} 项保存到本地缓存 {{path}} 下",
+            "pullFailed": "拉取失败",
+            "pullFailedFallback": "从容器拉取失败",
+            "saved": "已保存到资源",
+            "savedOneDescription": "已存储到资源库中的 {{destination}}",
+            "savedManyDescription_other": "已将 {{count}} 项存储到资源库中的 {{destination}} 下",
+            "saveFailed": "保存为资源失败",
+            "saveFailedFallback": "保存资源失败",
+            "attached": "资源已附加",
+            "attachedDescription_other": "已复制 {{count}} 项到 {{path}}",
+            "attachFailed": "附加失败",
+            "attachFailedFallback": "附加资源失败",
+            "invalidResourceIds": "资源 ID 无效。"
+        }
+    },
+    "pullDialog": {
+        "title": "从容器拉取",
+        "description": "浏览运行中的容器，选择要同步到本地缓存 <code>{{path}}</code> 下的文件或目录。点击文件夹行上的箭头或双击该行即可进入。",
+        "pathLabel": "容器路径",
+        "noMatchingPaths": "没有匹配的路径",
+        "parentDirectory": "上级目录",
+        "refreshListing": "刷新列表",
+        "listError": "无法列出容器内容",
+        "listErrorFallback": "加载容器文件失败",
+        "unreadable": {
+            "title": "没有可读取的内容",
+            "description_other": "<code>{{path}}</code> 中的 {{count}} 个条目均无法读取。",
+            "more_other": "…以及其他 {{count}} 个"
+        },
+        "emptyDirectory": {
+            "title": "目录为空",
+            "description": "<code>{{path}}</code> 中没有可拉取的内容。"
+        },
+        "partialFailure": {
+            "title_other": "{{count}} 个条目无法读取",
+            "description": "下方显示可读取的条目。已跳过：{{names}}。",
+            "descriptionWithMore_other": "下方显示可读取的条目。已跳过：{{names}}，以及其他 {{count}} 个。"
+        },
+        "truncated": {
+            "title": "目录已截断",
+            "description_other": "该目录条目过多，无法完整列出；仅显示前 {{count}} 个。打开子文件夹查看其余内容。"
+        },
+        "pullPath": "拉取 {{path}}",
+        "pullSelected_other": "拉取 {{count}} 项",
+        "pullWithOverwrite": "覆盖拉取",
+        "pullSelectedWithOverwrite_other": "覆盖拉取 {{count}} 项"
+    },
+    "attachDialog": {
+        "title": "附加资源",
+        "description": "从全局资源库中选择文件和/或文件夹，它们将被复制到此流程的 <code>{{cachePath}}</code> 中，并在容器内的 <code>{{containerPath}}</code> 可用。",
+        "searchPlaceholder": "搜索资源...",
+        "clearSearch": "清除资源搜索",
+        "empty": {
+            "title": "资源库为空",
+            "description": "请先上传资源，再将其附加到流程。"
+        },
+        "noMatches": {
+            "title": "无匹配结果",
+            "description": "没有资源匹配 <code>{{query}}</code>。"
+        },
+        "selectHint": "选择一项或多项",
+        "attach": "附加",
+        "attachSelected_other": "附加 {{count}} 项",
+        "attachWithOverwrite": "覆盖附加",
+        "attachSelectedWithOverwrite_other": "覆盖附加 {{count}} 项"
+    },
+    "promoteDialog": {
+        "titleMany_other": "将 {{count}} 项保存为资源",
+        "descriptionMany": "将此流程中所有选中的条目提升到全局资源库，以便在其他流程中复用。",
+        "descriptionOne": "将此流程中的 <code>{{path}}</code> 提升到全局资源库，以便在其他流程中复用。",
+        "destinationDirectory": "目标目录",
+        "destinationPath": "目标路径",
+        "directoryPlaceholder": "留空则保存到资源库根目录",
+        "pathPlaceholder": "results/scan.txt",
+        "directoryHint": "资源库中的相对目录。留空表示根目录。每项保留当前文件名。",
+        "pathHint": "资源库中的相对路径。使用 <code>/</code> 嵌套到子目录。",
+        "saveWithOverwrite": "覆盖保存",
+        "saveManyWithOverwrite_other": "覆盖保存 {{count}} 项",
+        "validation": {
+            "required": "目标不能为空",
+            "relative": "目标必须是相对路径",
+            "noParentSegments": "目标不能包含“..”"
+        }
+    }
+}

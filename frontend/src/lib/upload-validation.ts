@@ -10,6 +10,8 @@
  * validator — it only checks size and count.
  */
 
+import i18n from '@/i18n';
+
 export interface UploadValidationLimits {
     maxFiles: number;
     maxFileSizeMb: number;
@@ -21,7 +23,7 @@ const MEGABYTE = 1024 * 1024;
 /**
  * Validate a batch of `File` objects against the supplied limits. Returns
  * `null` when the batch is acceptable or the user-facing error message for
- * the **first** violation otherwise — callers typically forward this string
+ * the **first** violation (translated at call time) otherwise — callers typically forward this string
  * directly into a `toast.error('Upload failed', { description })`.
  *
  * Empty batches are treated as a no-op (`null`); callers usually short-circuit
@@ -29,7 +31,7 @@ const MEGABYTE = 1024 * 1024;
  */
 export const validateUploadBatch = (files: readonly File[], limits: UploadValidationLimits): null | string => {
     if (files.length > limits.maxFiles) {
-        return `Too many files: max ${limits.maxFiles} per upload`;
+        return i18n.t('errors:upload.tooManyFiles', { max: limits.maxFiles });
     }
 
     const maxBytesPerFile = limits.maxFileSizeMb * MEGABYTE;
@@ -38,14 +40,14 @@ export const validateUploadBatch = (files: readonly File[], limits: UploadValida
 
     for (const file of files) {
         if (file.size > maxBytesPerFile) {
-            return `File "${file.name}" is larger than ${limits.maxFileSizeMb} MB`;
+            return i18n.t('errors:upload.fileTooLarge', { maxSizeMb: limits.maxFileSizeMb, name: file.name });
         }
 
         totalBytes += file.size;
     }
 
     if (totalBytes > maxTotalBytes) {
-        return `Total upload size exceeds the ${limits.maxTotalSizeMb} MB limit`;
+        return i18n.t('errors:upload.totalTooLarge', { maxSizeMb: limits.maxTotalSizeMb });
     }
 
     return null;

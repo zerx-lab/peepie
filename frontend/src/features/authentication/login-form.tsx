@@ -1,4 +1,7 @@
-import { useState } from 'react';
+import type { TFunction } from 'i18next';
+
+import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 
@@ -17,42 +20,43 @@ import { useUser } from '@/providers/user-provider';
 
 import { PasswordChangeForm } from './password-change-form';
 
-const formSchema = z.object({
-    mail: z
-        .string()
-        .min(1, {
-            message: 'Login is required',
-        })
-        .refine(
-            (value) => z.string().email().safeParse(value).success || ['admin', 'demo'].includes(value.toLowerCase()),
-            {
-                message: 'Invalid login',
-            },
-        ),
-    password: z.string().min(1, {
-        message: 'Password is required',
-    }),
-});
-
-const errorMessage = 'Invalid login or password';
-const errorProviderMessage = 'Authentication failed';
+const createLoginSchema = (t: TFunction<'auth'>) =>
+    z.object({
+        mail: z
+            .string()
+            .min(1, {
+                message: t('login.validation.loginRequired'),
+            })
+            .refine(
+                (value) =>
+                    z.string().email().safeParse(value).success || ['admin', 'demo'].includes(value.toLowerCase()),
+                {
+                    message: t('login.validation.invalidLogin'),
+                },
+            ),
+        password: z.string().min(1, {
+            message: t('login.validation.passwordRequired'),
+        }),
+    });
 
 interface AuthProviderAction {
     icon: React.ReactNode;
     id: OAuthProvider;
-    name: string;
+    labelKey: 'login.continueWithGithub' | 'login.continueWithGoogle';
 }
+
+type LoginFormValues = z.infer<ReturnType<typeof createLoginSchema>>;
 
 const providerActions: AuthProviderAction[] = [
     {
         icon: <Google className="size-5" />,
         id: 'google',
-        name: 'Continue with Google',
+        labelKey: 'login.continueWithGoogle',
     },
     {
         icon: <Github className="size-5" />,
         id: 'github',
-        name: 'Continue with GitHub',
+        labelKey: 'login.continueWithGithub',
     },
 ];
 
@@ -62,7 +66,9 @@ interface LoginFormProps {
 }
 
 function LoginForm({ providers, returnUrl = routes.newFlow }: LoginFormProps) {
-    const form = useAppForm<z.infer<typeof formSchema>>({
+    const { t } = useTranslation('auth');
+    const formSchema = useMemo(() => createLoginSchema(t), [t]);
+    const form = useAppForm<LoginFormValues>({
         defaultValues: {
             mail: '',
             password: '',
@@ -75,7 +81,9 @@ function LoginForm({ providers, returnUrl = routes.newFlow }: LoginFormProps) {
     const navigate = useNavigate();
     const { authInfo, isAuthenticated, login, loginWithOAuth, setAuth } = useUser();
 
-    const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+    const handleSubmit = async (values: LoginFormValues) => {
+        const errorMessage = t('errors.invalidCredentials');
+
         setError(null);
 
         try {
@@ -107,14 +115,14 @@ function LoginForm({ providers, returnUrl = routes.newFlow }: LoginFormProps) {
             const result = await loginWithOAuth(provider);
 
             if (!result.success) {
-                setError(result.error || errorProviderMessage);
+                setError(result.error || t('errors.authFailed'));
 
                 return;
             }
 
             navigate(returnUrl);
         } catch (error) {
-            setError(error instanceof Error ? error.message : errorMessage);
+            setError(error instanceof Error ? error.message : t('errors.invalidCredentials'));
         } finally {
             setIsSubmitting(false);
         }
@@ -154,10 +162,8 @@ function LoginForm({ providers, returnUrl = routes.newFlow }: LoginFormProps) {
     if (shouldShowPasswordChange) {
         return (
             <div className="mx-auto flex w-[350px] flex-col gap-6">
-                <h1 className="text-center text-3xl font-bold">Update Password</h1>
-                <p className="text-muted-foreground text-center text-sm">
-                    You need to change your password before continuing.
-                </p>
+                <h1 className="text-center text-3xl font-bold">{t('passwordChange.title')}</h1>
+                <p className="text-muted-foreground text-center text-sm">{t('passwordChange.requiredDescription')}</p>
                 <PasswordChangeForm
                     layout="vertical"
                     onSkip={handleSkipPasswordChange}
@@ -174,7 +180,7 @@ function LoginForm({ providers, returnUrl = routes.newFlow }: LoginFormProps) {
                 noValidate
                 onSubmit={form.handleSubmit(handleSubmit)}
             >
-                <h1 className="text-center text-3xl font-bold">PentAGI</h1>
+                <h1 className="text-center text-3xl font-bold">Peepie</h1>
 
                 {providers?.length > 0 && (
                     <>
@@ -190,7 +196,7 @@ function LoginForm({ providers, returnUrl = routes.newFlow }: LoginFormProps) {
                                         variant="secondary"
                                     >
                                         {provider.icon}
-                                        {provider.name}
+                                        {t(provider.labelKey)}
                                     </Button>
                                 ))}
                         </div>
@@ -200,7 +206,7 @@ function LoginForm({ providers, returnUrl = routes.newFlow }: LoginFormProps) {
                                 <div className="w-full border-t border-gray-300" />
                             </div>
                             <div className="relative flex justify-center text-sm">
-                                <span className="bg-background px-2">or</span>
+                                <span className="bg-background px-2">{t('login.or')}</span>
                             </div>
                         </div>
                     </>
@@ -212,12 +218,12 @@ function LoginForm({ providers, returnUrl = routes.newFlow }: LoginFormProps) {
                         name="mail"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Login</FormLabel>
+                                <FormLabel>{t('login.loginLabel')}</FormLabel>
                                 <FormControl>
                                     <Input
                                         {...field}
                                         autoFocus
-                                        placeholder="Enter your email"
+                                        placeholder={t('login.loginPlaceholder')}
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -230,11 +236,11 @@ function LoginForm({ providers, returnUrl = routes.newFlow }: LoginFormProps) {
                         name="password"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Password</FormLabel>
+                                <FormLabel>{t('login.passwordLabel')}</FormLabel>
                                 <FormControl>
                                     <InputPassword
                                         {...field}
-                                        placeholder="Enter your password"
+                                        placeholder={t('login.passwordPlaceholder')}
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -243,7 +249,7 @@ function LoginForm({ providers, returnUrl = routes.newFlow }: LoginFormProps) {
                     />
 
                     <FormSubmitButton className="w-full">
-                        <span>Sign in</span>
+                        <span>{t('login.signIn')}</span>
                     </FormSubmitButton>
 
                     {error && <FormMessage>{error}</FormMessage>}

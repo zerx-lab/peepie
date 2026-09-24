@@ -11,6 +11,7 @@ import {
     useMemo,
     useState,
 } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -187,6 +188,8 @@ function FileManagerRowImpl({
     posInSet,
     setSize,
 }: FileManagerRowProps) {
+    // Subscribes the memoized row to language changes so the default formatters re-run.
+    const { t } = useTranslation('fileManager');
     const {
         formatModified = defaultFormatModified,
         gridTemplate,
@@ -439,7 +442,7 @@ function FileManagerRowImpl({
                     {...skipRowClickProps}
                 >
                     <Checkbox
-                        aria-label={`Select ${file.name}`}
+                        aria-label={t('row.select', { name: file.name })}
                         // Directories surface a tri-state value derived from their
                         // descendants; files (and edge cases without a precomputed
                         // value) fall back to the row's own selection flag.
@@ -529,7 +532,7 @@ function FileManagerRowImpl({
                         <DropdownMenu onOpenChange={setIsDropdownMenuOpen}>
                             <DropdownMenuTrigger asChild>
                                 <Button
-                                    aria-label="Row actions"
+                                    aria-label={t('row.actions')}
                                     className="opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100"
                                     size="icon-xs"
                                     variant="ghost"

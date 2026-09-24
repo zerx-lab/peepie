@@ -1,0 +1,72 @@
+{
+    "name": "Template",
+    "plural": "Templates",
+    "new": "New template",
+    "newButton": "New Template",
+    "titlePlaceholder": "Template title",
+    "renamed": "Template renamed successfully",
+    "renameHint": "Double-click to rename",
+    "actions": {
+        "menu": "Template actions",
+        "deleting": "Deleting...",
+        "view": "View",
+        "rawTooltip": "Edit the raw template"
+    },
+    "errors": {
+        "create": "Failed to create template",
+        "update": "Failed to update template",
+        "delete": "Failed to delete template",
+        "loadOne": "Error loading template",
+        "loadList": "Error loading templates",
+        "notFound": "Template not found",
+        "notFoundDescription": "The template you are looking for does not exist.",
+        "providerMissing": "useTemplates must be used within TemplatesProvider"
+    },
+    "dialog": {
+        "itemType": "template",
+        "replace": "Replace",
+        "replaceTitle": "Replace content?",
+        "replaceDescription": "Current form has content. Replace with the selected preset?"
+    },
+    "list": {
+        "title": "Title",
+        "text": "Text",
+        "openMenu": "Open menu",
+        "loadingTitle": "Loading templates...",
+        "loadingDescription": "Please wait while we fetch your flow templates",
+        "emptyTitle": "No templates yet",
+        "emptyDescription": "Create your first template to get started",
+        "entityName": "templates",
+        "filterPlaceholder": "Filter templates..."
+    },
+    "form": {
+        "textRequired": "Text is required",
+        "titleRequired": "Title is required",
+        "createTitle": "Create a new template",
+        "editTitle": "Edit template",
+        "description": "Add a title and content, or start from a preset.",
+        "title": "Title",
+        "titleHint": "A short name for this template",
+        "content": "Template content",
+        "contentHint": "Describe the task, or start from a preset",
+        "backToList": "Back to Templates"
+    },
+    "presets": {
+        "title": "Preset templates",
+        "description": "Click a preset to fill the form, or expand it to preview the content.",
+        "expand": "Preview {{title}}",
+        "titles": {
+            "web": "Web Application Security Assessment",
+            "network": "Network Infrastructure Discovery & Mapping",
+            "directory": "Active Directory Penetration Test",
+            "api": "API Security Testing",
+            "cloud": "Cloud Infrastructure Security Audit (AWS)",
+            "wordpress": "WordPress Security Assessment",
+            "surface": "External Attack Surface Assessment",
+            "internal": "Internal Network Penetration Test",
+            "mobile": "Mobile Application Security Testing (API Backend)",
+            "devops": "DevOps & CI/CD Pipeline Security",
+            "database": "Database Security Assessment"
+        }
+    }
+}

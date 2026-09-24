@@ -1,5 +1,6 @@
 import { Copy, Hammer } from 'lucide-react';
 import { memo, useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { SearchLogFragmentFragment } from '@/graphql/types';
 
@@ -23,6 +24,7 @@ const containsSearchValue = (text: null | string | undefined, searchValue: strin
 };
 
 function FlowTool({ log, searchValue = '' }: FlowToolProps) {
+    const { t } = useTranslation(['flowDetails', 'common']);
     const { createdAt, engine, executor, initiator, query, result, subtaskId, taskId } = log;
 
     const searchChecks = useMemo(() => {
@@ -76,7 +78,7 @@ function FlowTool({ log, searchValue = '' }: FlowToolProps) {
                                     <span>{formatName(engine)}</span>
                                 </span>
                             </TooltipTrigger>
-                            <TooltipContent>Tool name</TooltipContent>
+                            <TooltipContent>{t('tools.toolName')}</TooltipContent>
                         </Tooltip>
                     </div>
 
@@ -93,7 +95,7 @@ function FlowTool({ log, searchValue = '' }: FlowToolProps) {
                             className="cursor-pointer"
                             onClick={() => setIsDetailsVisible(!isDetailsVisible)}
                         >
-                            {isDetailsVisible ? 'Hide details' : 'Show details'}
+                            {isDetailsVisible ? t('details.hide') : t('details.show')}
                         </div>
                         {isDetailsVisible && (
                             <>
@@ -128,19 +130,19 @@ function FlowTool({ log, searchValue = '' }: FlowToolProps) {
                             onClick={handleCopy}
                         />
                     </TooltipTrigger>
-                    <TooltipContent>Copy</TooltipContent>
+                    <TooltipContent>{t('common:actions.copy')}</TooltipContent>
                 </Tooltip>
                 <span className="text-muted-foreground/50">{formatDate(new Date(createdAt))}</span>
                 {taskId && (
                     <>
                         <span className="text-muted-foreground/50">|</span>
-                        <span className="text-muted-foreground/50">Task ID: {taskId}</span>
+                        <span className="text-muted-foreground/50">{t('meta.taskId', { id: taskId })}</span>
                     </>
                 )}
                 {subtaskId && (
                     <>
                         <span className="text-muted-foreground/50">|</span>
-                        <span className="text-muted-foreground/50">Subtask ID: {subtaskId}</span>
+                        <span className="text-muted-foreground/50">{t('meta.subtaskId', { id: subtaskId })}</span>
                     </>
                 )}
             </div>

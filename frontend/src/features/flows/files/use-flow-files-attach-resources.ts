@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import type { OverwriteOutcome } from '@/components/shared/overwrite';
@@ -36,6 +37,7 @@ export function useFlowFilesAttachResources({
     flowId,
     onSuccess,
 }: UseFlowFilesAttachResourcesParams): UseFlowFilesAttachResourcesResult {
+    const { t } = useTranslation('fileManager');
     const [isAttaching, setIsAttaching] = useState(false);
 
     const attach = useCallback(
@@ -51,9 +53,9 @@ export function useFlowFilesAttachResources({
             } catch (error) {
                 // Non-numeric IDs indicate an upstream cache contract bug, not a user
                 // mistake. Surface a developer-friendly toast and bail out loudly.
-                const description = error instanceof Error ? error.message : 'Invalid resource IDs.';
+                const description = error instanceof Error ? error.message : t('flowFiles.toasts.invalidResourceIds');
 
-                toast.error('Attach failed', { description });
+                toast.error(t('flowFiles.toasts.attachFailed'), { description });
 
                 return { kind: 'error' };
             }
@@ -70,8 +72,11 @@ export function useFlowFilesAttachResources({
                     { timeout: 0 },
                 );
 
-                toast.success('Resources attached', {
-                    description: `Copied ${numericIds.length} ${numericIds.length === 1 ? 'item' : 'items'} to ${RESOURCES_TARGET_DIRECTORY}`,
+                toast.success(t('flowFiles.toasts.attached'), {
+                    description: t('flowFiles.toasts.attachedDescription', {
+                        count: numericIds.length,
+                        path: RESOURCES_TARGET_DIRECTORY,
+                    }),
                 });
                 onSuccess?.();
 
@@ -81,16 +86,16 @@ export function useFlowFilesAttachResources({
                     return { kind: 'conflict' };
                 }
 
-                const description = getApiErrorMessage(error, 'Failed to attach resources');
+                const description = getApiErrorMessage(error, t('flowFiles.toasts.attachFailedFallback'));
 
-                toast.error('Attach failed', { description });
+                toast.error(t('flowFiles.toasts.attachFailed'), { description });
 
                 return { kind: 'error' };
             } finally {
                 setIsAttaching(false);
             }
         },
-        [flowId, onSuccess],
+        [flowId, onSuccess, t],
     );
 
     return {

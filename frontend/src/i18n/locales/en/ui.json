@@ -1,0 +1,84 @@
+{
+    "autocomplete": {
+        "suggestions": "Suggestions"
+    },
+    "breadcrumb": {
+        "label": "breadcrumb",
+        "more": "More"
+    },
+    "confirmationDialog": {
+        "title": "Confirm Action",
+        "titleWithVerb": "{{verb}} {{itemType}}",
+        "description": "Are you sure you want to {{verb}} <item>{{itemName}}</item> {{itemType}}?",
+        "descriptionWithoutVerb": "Are you sure you want to perform this action on <item>{{itemName}}</item> {{itemType}}?",
+        "defaultItemName": "this",
+        "defaultItemType": "item"
+    },
+    "dataTable": {
+        "clearSearch": "Clear search",
+        "columns": "Columns",
+        "emptyTitle": "No {{entityName}} yet",
+        "filterPlaceholder": "Filter...",
+        "firstPage": "First page",
+        "lastPage": "Last page",
+        "nextPage": "Next page",
+        "previousPage": "Previous page",
+        "noEntities": "No {{entityName}}",
+        "noMatches": "No matches",
+        "noMatchesDescription": "No {{entityName}} match <query>{{query}}</query>. Try a different query.",
+        "noResults": "No results",
+        "noResultsSentence": "No results.",
+        "pageOf": "Page {{page}} of {{pageCount}}",
+        "rowsPerPage": "Rows per page",
+        "searchIn": "Search in",
+        "showing": "Showing {{start}}–{{end}} of {{total}}"
+    },
+    "dialog": {
+        "dismiss": "Dismiss dialog"
+    },
+    "errorState": {
+        "tryAgain": "Try again"
+    },
+    "fileDropZone": {
+        "browse": "Browse files",
+        "description": "or click the button to choose files from your computer",
+        "dropHere": "Drop files here",
+        "title": "Drag and drop your files"
+    },
+    "inputPassword": {
+        "hide": "Hide password",
+        "show": "Show password"
+    },
+    "inputSearch": {
+        "clear": "Clear {{label}}",
+        "placeholder": "Search..."
+    },
+    "overwrite": {
+        "anonymousItem": "an item",
+        "descriptionSingle": "An item named \"{{name}}\" already exists at /{{destination}}. Do you want to replace it?",
+        "descriptionMultiple_one": "{{count}} item already exists at the destination. Do you want to replace it?",
+        "descriptionMultiple_other": "{{count}} items already exist at the destination. Do you want to replace all of them?",
+        "replace": "Replace",
+        "replaceAll": "Replace all",
+        "title": "Replace existing item?"
+    },
+    "routeError": {
+        "title": "Something went wrong",
+        "chunkDescription": "A new version was likely just deployed. Reloading will load the latest one.",
+        "desyncDescription": "The page hit a display glitch. Reloading usually clears it.",
+        "unexpectedDescription": "The page ran into an unexpected error. Reloading usually clears it.",
+        "reload": "Reload"
+    },
+    "sheet": {
+        "dismiss": "Dismiss sheet"
+    },
+    "sidebar": {
+        "mobileDescription": "Displays the mobile sidebar.",
+        "title": "Sidebar",
+        "toggle": "Toggle Sidebar"
+    },
+    "unsavedChanges": {
+        "title": "Unsaved changes",
+        "description": "You have unsaved changes on this page. Would you like to save them before leaving?"
+    }
+}

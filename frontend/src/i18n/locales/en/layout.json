@@ -1,0 +1,54 @@
+{
+    "sidebar": {
+        "newFlow": "New Flow",
+        "dashboard": "Dashboard",
+        "flows": "Flows",
+        "newFlowAction": "New flow",
+        "templates": "Templates",
+        "newTemplate": "New template",
+        "resources": "Resources",
+        "uploadFile": "Upload file",
+        "knowledges": "Knowledges",
+        "newKnowledge": "New knowledge",
+        "recentFlows": "Recent Flows",
+        "favoriteFlows": "Favorite Flows",
+        "settings": "Settings",
+        "toggleFavorite": "Toggle favorite"
+    },
+    "userMenu": {
+        "userType": {
+            "local": "local",
+            "oauth": "oauth"
+        },
+        "theme": "Theme",
+        "themeSystem": "System theme",
+        "themeLight": "Light theme",
+        "themeDark": "Dark theme",
+        "profile": "Profile",
+        "logout": "Log out"
+    },
+    "titles": {
+        "account": "Account",
+        "apiTokens": "API Tokens",
+        "dashboard": "Dashboard",
+        "flow": "Flow",
+        "flowWithTitle": "Flow #{{id}} — {{title}}",
+        "flowReport": "Flow report",
+        "flows": "Flows",
+        "newKnowledge": "New knowledge",
+        "knowledge": "Knowledge",
+        "knowledges": "Knowledges",
+        "login": "Login",
+        "newFlow": "New flow",
+        "oauth": "OAuth",
+        "prompt": "Prompt",
+        "prompts": "Prompts",
+        "newProvider": "New provider",
+        "provider": "Provider",
+        "providers": "Providers",
+        "resources": "Resources",
+        "newTemplate": "New template",
+        "template": "Template",
+        "templates": "Templates"
+    }
+}

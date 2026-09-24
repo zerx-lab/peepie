@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 
 import { ArrowLeft, FileText, Key, Plug, Settings as SettingsIcon, User } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { NavLink, useLocation } from 'react-router-dom';
 
 import {
@@ -22,8 +23,10 @@ interface MenuItem {
     icon?: ReactNode;
     id: string;
     path: string;
-    title: string;
+    titleKey: SettingsNavKey;
 }
+
+type SettingsNavKey = 'account' | 'apiTokens' | 'prompts' | 'providers';
 
 interface SettingsSidebarMenuItemProps {
     item: MenuItem;
@@ -34,29 +37,30 @@ const menuItems: readonly MenuItem[] = [
         icon: <User className="size-4" />,
         id: 'account',
         path: routes.settings.account,
-        title: 'Account',
+        titleKey: 'account',
     },
     {
         icon: <Plug className="size-4" />,
         id: 'providers',
         path: routes.settings.providers,
-        title: 'Providers',
+        titleKey: 'providers',
     },
     {
         icon: <FileText className="size-4" />,
         id: 'prompts',
         path: routes.settings.prompts,
-        title: 'Prompts',
+        titleKey: 'prompts',
     },
     {
         icon: <Key className="size-4" />,
         id: 'api-tokens',
         path: routes.settings.apiTokens,
-        title: 'API Tokens',
+        titleKey: 'apiTokens',
     },
 ] as const;
 
 export function SettingsSidebar() {
+    const { t } = useTranslation(['settings', 'common']);
     const location = useLocation();
     const [returnUrl] = useState(() =>
         getSafeReturnUrl((location.state as null | { from?: string })?.from ?? null, routes.flows),
@@ -71,7 +75,7 @@ export function SettingsSidebar() {
                             <SettingsIcon className="size-6" />
                         </div>
                         <div className="grid flex-1 text-left leading-tight">
-                            <span className="truncate font-semibold">Settings</span>
+                            <span className="truncate font-semibold">{t('nav.title')}</span>
                         </div>
                     </SidebarMenuItem>
                 </SidebarMenu>
@@ -94,7 +98,7 @@ export function SettingsSidebar() {
                 <SidebarMenuButton asChild>
                     <NavLink to={returnUrl}>
                         <ArrowLeft />
-                        Back to App
+                        {t('nav.backToApp')}
                     </NavLink>
                 </SidebarMenuButton>
             </SidebarFooter>
@@ -103,6 +107,7 @@ export function SettingsSidebar() {
 }
 
 function SettingsSidebarMenuItem({ item }: SettingsSidebarMenuItemProps) {
+    const { t } = useTranslation(['settings', 'common']);
     const location = useLocation();
     const isActive = location.pathname.startsWith(item.path);
 
@@ -114,7 +119,7 @@ function SettingsSidebarMenuItem({ item }: SettingsSidebarMenuItemProps) {
             >
                 <NavLink to={item.path}>
                     {item.icon}
-                    {item.title}
+                    {t(`nav.items.${item.titleKey}`)}
                 </NavLink>
             </SidebarMenuButton>
         </SidebarMenuItem>

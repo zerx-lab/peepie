@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import i18n from '@/i18n';
+
 import type { OverwriteConflict } from './overwrite-dialog';
 
 /**
@@ -25,10 +27,10 @@ export type OverwriteOutcome =
  * back to the count-based copy ("N items already exist...") in
  * `OverwriteDialog`.
  */
-const ANONYMOUS_FALLBACK_CONFLICT: OverwriteConflict = {
+const createAnonymousFallbackConflict = (): OverwriteConflict => ({
     destination: '',
-    destinationName: 'an item',
-};
+    destinationName: i18n.t('ui:overwrite.anonymousItem'),
+});
 
 interface UseOverwriteOptions<TPlan> {
     /**
@@ -153,7 +155,7 @@ export function useOverwrite<TPlan>(options: UseOverwriteOptions<TPlan>): UseOve
             } else if (synthesized.length > 0) {
                 final = synthesized;
             } else {
-                final = [ANONYMOUS_FALLBACK_CONFLICT];
+                final = [createAnonymousFallbackConflict()];
             }
 
             setConflicts(final);

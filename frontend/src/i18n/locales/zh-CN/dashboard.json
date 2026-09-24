@@ -1,0 +1,116 @@
+{
+    "title": "仪表盘",
+    "tabs": {
+        "analytics": "分析",
+        "overview": "概览"
+    },
+    "periods": {
+        "week": "周",
+        "month": "月",
+        "quarter": "季度"
+    },
+    "periodsShort": {
+        "week": "周",
+        "month": "月",
+        "quarter": "季"
+    },
+    "states": {
+        "loadFailed": "加载失败",
+        "noDataForPeriod": "该时间段内暂无数据"
+    },
+    "analytics": {
+        "flowsActivity": {
+            "title": "流程活动趋势",
+            "description": "每天创建的流程、任务和子任务数量"
+        },
+        "toolCalls": {
+            "title": "工具调用趋势",
+            "description": "每天的工具执行次数"
+        },
+        "tokenUsage": {
+            "title": "Token 用量趋势",
+            "description": "每天处理的输入和输出 Token"
+        },
+        "cost": {
+            "title": "费用趋势",
+            "description": "每天的 LLM 花费。使用本地引擎时可能接近于零，这是正常现象。"
+        },
+        "series": {
+            "flows": "流程",
+            "tasks": "任务",
+            "subtasks": "子任务",
+            "toolCalls": "工具调用",
+            "tokensIn": "输入 Token",
+            "tokensOut": "输出 Token",
+            "costIn": "输入费用",
+            "costOut": "输出费用"
+        },
+        "execution": {
+            "title": "流程执行详情",
+            "description": "按流程统计的执行时间和工具调用明细",
+            "empty": "该时间段内没有流程执行记录",
+            "flowFallback": "流程 #{{id}}",
+            "taskFallback": "任务 #{{id}}",
+            "subtaskFallback": "子任务 #{{id}}",
+            "taskCount_other": "{{count}} 个任务",
+            "subtaskCount_other": "{{count}} 个子任务",
+            "assistantCount_other": "{{count}} 个助手"
+        }
+    },
+    "overview": {
+        "metrics": {
+            "totalFlows": {
+                "title": "流程总数",
+                "description": "任务：{{tasks}} · 子任务：{{subtasks}} · 助手：{{assistants}}"
+            },
+            "toolCalls": {
+                "title": "工具调用",
+                "description": "总耗时：{{duration}}"
+            },
+            "totalTokens": {
+                "title": "Token 总量",
+                "description": "已处理的输入 + 输出 Token"
+            },
+            "totalCost": {
+                "title": "总费用",
+                "description": "所有提供商的 LLM 总花费"
+            }
+        },
+        "byProvider": {
+            "title": "按提供商统计用量",
+            "description": "按提供商分组的 LLM Token 用量和费用"
+        },
+        "byModel": {
+            "title": "按模型统计用量",
+            "description": "按模型分组的 LLM Token 用量和费用"
+        },
+        "byAgentType": {
+            "title": "按智能体类型统计用量",
+            "description": "按智能体类型分组的 LLM Token 用量和费用"
+        },
+        "byFunction": {
+            "title": "按函数统计工具调用",
+            "description": "各工具函数的执行统计"
+        },
+        "modelLabel": "{{model}}（{{provider}}）",
+        "functionTypes": {
+            "agent": "智能体",
+            "tool": "工具"
+        },
+        "columns": {
+            "function": "函数",
+            "type": "类型",
+            "count": "次数",
+            "totalDuration": "总耗时",
+            "avgDuration": "平均耗时",
+            "name": "名称",
+            "tokensIn": "输入 Token",
+            "tokensOut": "输出 Token",
+            "cacheIn": "缓存输入",
+            "cacheOut": "缓存输出",
+            "costIn": "输入费用",
+            "costOut": "输出费用",
+            "totalCost": "总费用"
+        }
+    }
+}

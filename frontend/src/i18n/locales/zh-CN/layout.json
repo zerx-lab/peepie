@@ -1,0 +1,54 @@
+{
+    "sidebar": {
+        "newFlow": "新建流程",
+        "dashboard": "仪表盘",
+        "flows": "流程",
+        "newFlowAction": "新建流程",
+        "templates": "模板",
+        "newTemplate": "新建模板",
+        "resources": "资源",
+        "uploadFile": "上传文件",
+        "knowledges": "知识库",
+        "newKnowledge": "新建知识条目",
+        "recentFlows": "最近的流程",
+        "favoriteFlows": "收藏的流程",
+        "settings": "设置",
+        "toggleFavorite": "切换收藏"
+    },
+    "userMenu": {
+        "userType": {
+            "local": "本地账户",
+            "oauth": "OAuth 账户"
+        },
+        "theme": "主题",
+        "themeSystem": "跟随系统",
+        "themeLight": "浅色主题",
+        "themeDark": "深色主题",
+        "profile": "个人资料",
+        "logout": "退出登录"
+    },
+    "titles": {
+        "account": "账户",
+        "apiTokens": "API 令牌",
+        "dashboard": "仪表盘",
+        "flow": "流程",
+        "flowWithTitle": "流程 #{{id}} — {{title}}",
+        "flowReport": "流程报告",
+        "flows": "流程",
+        "newKnowledge": "新建知识条目",
+        "knowledge": "知识条目",
+        "knowledges": "知识库",
+        "login": "登录",
+        "newFlow": "新建流程",
+        "oauth": "OAuth",
+        "prompt": "提示词",
+        "prompts": "提示词",
+        "newProvider": "新建提供商",
+        "provider": "提供商",
+        "providers": "提供商",
+        "resources": "资源",
+        "newTemplate": "新建模板",
+        "template": "模板",
+        "templates": "模板"
+    }
+}

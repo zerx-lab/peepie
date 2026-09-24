@@ -1,5 +1,6 @@
 import { Search, X } from 'lucide-react';
 import { type ReactNode, startTransition, useCallback, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Badge } from '@/components/ui/badge';
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
@@ -43,10 +44,12 @@ export function DetailNavigationSheet<T extends { id: string }>({
     controller,
     hasSearch = true,
     renderItem,
-    searchPlaceholder = 'Search…',
+    searchPlaceholder: searchPlaceholderProp,
     sheetIcon,
     sheetTitle,
 }: DetailNavigationSheetProps<T>) {
+    const { t } = useTranslation('editor');
+    const searchPlaceholder = searchPlaceholderProp ?? t('detailNavigation.searchPlaceholder');
     const {
         clearSearchQuery,
         currentId,
@@ -407,7 +410,7 @@ export function DetailNavigationSheet<T extends { id: string }>({
                             {hasClearButton ? (
                                 <InputGroupAddon align="inline-end">
                                     <InputGroupButton
-                                        aria-label="Clear search"
+                                        aria-label={t('detailNavigation.clearSearch')}
                                         onClick={handleSearchClear}
                                         size="icon-sm"
                                         type="button"
@@ -471,8 +474,8 @@ export function DetailNavigationSheet<T extends { id: string }>({
                 ) : (
                     <div className="text-muted-foreground flex flex-1 items-center justify-center px-4 text-center text-sm">
                         {trimmedQuery.length > 0
-                            ? `No items match "${trimmedQuery}".`
-                            : 'No items match the current filter.'}
+                            ? t('detailNavigation.noItemsMatchQuery', { query: trimmedQuery })
+                            : t('detailNavigation.noItemsMatchFilter')}
                     </div>
                 )}
             </SheetContent>

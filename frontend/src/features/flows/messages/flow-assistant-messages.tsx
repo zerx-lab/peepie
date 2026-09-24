@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Check, ChevronDown, ListFilter, Plus, Search, Trash2, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { useDebouncedCallback } from 'use-debounce';
 import { z } from 'zod';
 
@@ -17,11 +18,11 @@ import { Form, FormControl, FormField } from '@/components/ui/form';
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Spinner } from '@/components/ui/spinner';
+import { statusLabelKeys } from '@/features/flows/tasks/flow-task-status-icon';
 import { StatusType } from '@/graphql/types';
 import { useAutoScroll } from '@/hooks/use-auto-scroll';
 import { Log } from '@/lib/log';
 import { cn } from '@/lib/utils';
-import { formatName } from '@/lib/utils/format';
 import { isProviderValid } from '@/models/provider';
 import { useFlow } from '@/providers/flow-provider';
 import { useProviders } from '@/providers/providers-provider';
@@ -55,6 +56,7 @@ function AssistantsDropdown({
     providers,
     selectedAssistantId,
 }: AssistantsDropdownProps) {
+    const { t } = useTranslation(['flowDetails', 'common']);
     const [isOpen, setIsOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [currentAssistant, setCurrentAssistant] = useState<AssistantFragmentFragment | null>(null);
@@ -133,7 +135,7 @@ function AssistantsDropdown({
             >
                 <FlowStatusIcon
                     status={assistant.status}
-                    tooltip={formatName(assistant.status)}
+                    tooltip={t(statusLabelKeys[assistant.status])}
                 />
 
                 <ProviderIcon
@@ -147,7 +149,9 @@ function AssistantsDropdown({
 
                 <div className="flex flex-1 items-center gap-2 overflow-hidden">
                     <span className="truncate text-sm">{assistant.title}</span>
-                    {!isValid && <span className="text-destructive shrink-0 text-xs">(unavailable)</span>}
+                    {!isValid && (
+                        <span className="text-destructive shrink-0 text-xs">{t('assistants.unavailable')}</span>
+                    )}
                 </div>
 
                 <Check
@@ -159,7 +163,7 @@ function AssistantsDropdown({
 
                 {!isDisabled && (
                     <Button
-                        aria-label={`Delete ${assistant.title}`}
+                        aria-label={t('assistants.deleteAriaLabel', { title: assistant.title })}
                         className="text-muted-foreground hover:text-destructive absolute top-1/2 right-0.5 shrink-0 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100"
                         onClick={(event) => {
                             event.stopPropagation();
@@ -183,7 +187,7 @@ function AssistantsDropdown({
             >
                 <PopoverTrigger asChild>
                     <Button
-                        aria-label="Select assistant"
+                        aria-label={t('assistants.select')}
                         className="px-2"
                         disabled={isAssistantCreating}
                         variant="outline"
@@ -192,7 +196,7 @@ function AssistantsDropdown({
                             <>
                                 <FlowStatusIcon
                                     status={selectedAssistant.status}
-                                    tooltip={formatName(selectedAssistant.status)}
+                                    tooltip={t(statusLabelKeys[selectedAssistant.status])}
                                 />
                                 <ProviderIcon provider={selectedAssistant.provider} />
                                 <span className="bg-muted text-muted-foreground flex size-5 shrink-0 items-center justify-center rounded text-xs font-medium">
@@ -201,7 +205,7 @@ function AssistantsDropdown({
                             </>
                         ) : (
                             <span className="bg-muted text-muted-foreground flex h-5 shrink-0 items-center justify-center rounded px-1 text-xs font-medium">
-                                New
+                                {t('assistants.new')}
                             </span>
                         )}
                         <ChevronDown className="opacity-50" />
@@ -212,9 +216,9 @@ function AssistantsDropdown({
                     className="w-[400px] p-0"
                 >
                     <Command>
-                        <CommandInput placeholder="Search assistants..." />
+                        <CommandInput placeholder={t('assistants.searchPlaceholder')} />
                         <CommandList>
-                            <CommandEmpty>No assistants found.</CommandEmpty>
+                            <CommandEmpty>{t('assistants.notFound')}</CommandEmpty>
 
                             {!isDisabled && (
                                 <CommandGroup>
@@ -227,13 +231,15 @@ function AssistantsDropdown({
                                         value="create-new-assistant"
                                     >
                                         <Plus />
-                                        Create new assistant
+                                        {t('assistants.create')}
                                     </CommandItem>
                                 </CommandGroup>
                             )}
 
                             {assistantsGroup.active.length > 0 && (
-                                <CommandGroup heading={`Active (${assistantsGroup.active.length})`}>
+                                <CommandGroup
+                                    heading={t('assistants.groups.active', { total: assistantsGroup.active.length })}
+                                >
                                     {assistantsGroup.active.map(({ assistant, index }) =>
                                         renderAssistantItem(assistant, index),
                                     )}
@@ -241,7 +247,11 @@ function AssistantsDropdown({
                             )}
 
                             {assistantsGroup.finished.length > 0 && (
-                                <CommandGroup heading={`Finished (${assistantsGroup.finished.length})`}>
+                                <CommandGroup
+                                    heading={t('assistants.groups.finished', {
+                                        total: assistantsGroup.finished.length,
+                                    })}
+                                >
                                     {assistantsGroup.finished.map(({ assistant, index }) =>
                                         renderAssistantItem(assistant, index),
                                     )}
@@ -249,7 +259,9 @@ function AssistantsDropdown({
                             )}
 
                             {assistantsGroup.failed.length > 0 && (
-                                <CommandGroup heading={`Failed (${assistantsGroup.failed.length})`}>
+                                <CommandGroup
+                                    heading={t('assistants.groups.failed', { total: assistantsGroup.failed.length })}
+                                >
                                     {assistantsGroup.failed.map(({ assistant, index }) =>
                                         renderAssistantItem(assistant, index),
                                     )}
@@ -261,14 +273,14 @@ function AssistantsDropdown({
             </Popover>
 
             <ConfirmationDialog
-                cancelText="Cancel"
-                confirmText="Delete"
+                cancelText={t('common:actions.cancel')}
+                confirmText={t('common:actions.delete')}
                 handleConfirm={handleConfirmDelete}
                 handleOpenChange={setDeleteDialogOpen}
                 isOpen={deleteDialogOpen}
                 itemName={currentAssistant?.title}
-                itemType="assistant"
-                title="Delete Assistant"
+                itemType={t('assistants.itemType')}
+                title={t('assistants.deleteTitle')}
             />
         </>
     );
@@ -279,6 +291,7 @@ const searchFormSchema = z.object({
 });
 
 function FlowAssistantMessages({ className }: FlowAssistantMessagesProps) {
+    const { t } = useTranslation('flowDetails');
     const { providers } = useProviders();
 
     const {
@@ -447,40 +460,40 @@ function FlowAssistantMessages({ className }: FlowAssistantMessagesProps) {
 
     const placeholder = useMemo(() => {
         if (!flowId) {
-            return 'Select a flow...';
+            return t('messages.placeholders.selectFlow');
         }
 
         if (isAssistantCreating) {
-            return 'Creating assistant...';
+            return t('messages.placeholders.assistantCreating');
         }
 
         if (!selectedAssistant?.status) {
-            return 'Type a message to create a new assistant...';
+            return t('messages.placeholders.assistantNew');
         }
 
         switch (selectedAssistant.status) {
             case StatusType.Created: {
-                return 'Assistant is starting...';
+                return t('messages.placeholders.assistantStarting');
             }
 
             case StatusType.Failed:
             case StatusType.Finished: {
-                return 'This assistant session has ended. Create a new one to continue.';
+                return t('messages.placeholders.assistantEnded');
             }
 
             case StatusType.Running: {
-                return 'Assistant is running... Click Stop to interrupt';
+                return t('messages.placeholders.assistantRunning');
             }
 
             case StatusType.Waiting: {
-                return 'Continue the conversation...';
+                return t('messages.placeholders.assistantWaiting');
             }
 
             default: {
-                return 'Type your message...';
+                return t('messages.placeholders.default');
             }
         }
-    }, [flowId, isAssistantCreating, selectedAssistant?.status]);
+    }, [flowId, isAssistantCreating, selectedAssistant?.status, t]);
 
     const assistantStatus = selectedAssistant?.status;
     const isFormDisabled =
@@ -521,13 +534,13 @@ function FlowAssistantMessages({ className }: FlowAssistantMessagesProps) {
                                                 {...field}
                                                 autoComplete="off"
                                                 disabled={isAssistantCreating}
-                                                placeholder="Search messages..."
+                                                placeholder={t('messages.searchPlaceholder')}
                                                 type="text"
                                             />
                                             {field.value && (
                                                 <InputGroupAddon align="inline-end">
                                                     <InputGroupButton
-                                                        aria-label="Clear message search"
+                                                        aria-label={t('messages.clearSearch')}
                                                         disabled={isAssistantCreating}
                                                         onClick={() => {
                                                             form.reset({ search: '' });
@@ -555,8 +568,8 @@ function FlowAssistantMessages({ className }: FlowAssistantMessagesProps) {
                         <EmptyMedia variant="icon">
                             <Spinner variant="circle" />
                         </EmptyMedia>
-                        <EmptyTitle>Creating assistant...</EmptyTitle>
-                        <EmptyDescription>Please wait while we set up your new assistant</EmptyDescription>
+                        <EmptyTitle>{t('assistants.creating.title')}</EmptyTitle>
+                        <EmptyDescription>{t('assistants.creating.description')}</EmptyDescription>
                     </EmptyHeader>
                 </Empty>
             ) : selectedAssistantId ? (
@@ -578,7 +591,7 @@ function FlowAssistantMessages({ className }: FlowAssistantMessagesProps) {
 
                         {!isScrolledToBottom && (
                             <Button
-                                aria-label="Scroll to latest message"
+                                aria-label={t('messages.scrollToLatest')}
                                 className="absolute right-4 bottom-4 z-10 shadow-md hover:shadow-lg"
                                 onClick={() => scrollToEnd()}
                                 size="icon-sm"
@@ -598,8 +611,8 @@ function FlowAssistantMessages({ className }: FlowAssistantMessagesProps) {
                             <EmptyMedia variant="icon">
                                 <ListFilter />
                             </EmptyMedia>
-                            <EmptyTitle>No messages found</EmptyTitle>
-                            <EmptyDescription>Try adjusting your search or filter parameters</EmptyDescription>
+                            <EmptyTitle>{t('messages.notFound')}</EmptyTitle>
+                            <EmptyDescription>{t('filters.adjustHint')}</EmptyDescription>
                         </EmptyHeader>
                         <EmptyContent>
                             <Button
@@ -607,7 +620,7 @@ function FlowAssistantMessages({ className }: FlowAssistantMessagesProps) {
                                 variant="outline"
                             >
                                 <X />
-                                Reset filters
+                                {t('filters.reset')}
                             </Button>
                         </EmptyContent>
                     </Empty>
@@ -617,8 +630,8 @@ function FlowAssistantMessages({ className }: FlowAssistantMessagesProps) {
                             <EmptyMedia variant="icon">
                                 <Plus />
                             </EmptyMedia>
-                            <EmptyTitle>No messages</EmptyTitle>
-                            <EmptyDescription>No messages found for this assistant</EmptyDescription>
+                            <EmptyTitle>{t('assistants.noMessages.title')}</EmptyTitle>
+                            <EmptyDescription>{t('assistants.noMessages.description')}</EmptyDescription>
                         </EmptyHeader>
                     </Empty>
                 )
@@ -628,8 +641,8 @@ function FlowAssistantMessages({ className }: FlowAssistantMessagesProps) {
                         <EmptyMedia variant="icon">
                             <Plus />
                         </EmptyMedia>
-                        <EmptyTitle>New assistant</EmptyTitle>
-                        <EmptyDescription>Type a message below to create a new assistant...</EmptyDescription>
+                        <EmptyTitle>{t('assistants.newEmpty.title')}</EmptyTitle>
+                        <EmptyDescription>{t('assistants.newEmpty.description')}</EmptyDescription>
                     </EmptyHeader>
                 </Empty>
             )}

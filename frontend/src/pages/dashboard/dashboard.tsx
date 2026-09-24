@@ -1,5 +1,6 @@
 import { LayoutDashboard } from 'lucide-react';
 import { useState, useTransition } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { AppHeader, AppHeaderContent, AppHeaderTitle } from '@/components/layouts/app/app-header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -9,11 +10,11 @@ import { cn } from '@/lib/utils';
 import { DashboardAnalytics } from '@/pages/dashboard/dashboard-analytics';
 import { DashboardOverview } from '@/pages/dashboard/dashboard-overview';
 
-const periodOptions: { label: string; value: UsageStatsPeriod }[] = [
-    { label: 'Week', value: UsageStatsPeriod.Week },
-    { label: 'Month', value: UsageStatsPeriod.Month },
-    { label: 'Quarter', value: UsageStatsPeriod.Quarter },
-];
+const periodOptions = [
+    { key: 'week', value: UsageStatsPeriod.Week },
+    { key: 'month', value: UsageStatsPeriod.Month },
+    { key: 'quarter', value: UsageStatsPeriod.Quarter },
+] as const satisfies ReadonlyArray<{ key: string; value: UsageStatsPeriod }>;
 
 const VALID_PERIODS = new Set<string>(Object.values(UsageStatsPeriod));
 
@@ -40,6 +41,7 @@ const savePeriod = (storageKey: string, value: UsageStatsPeriod): void => {
 };
 
 function Dashboard() {
+    const { t } = useTranslation('dashboard');
     const { period: periodStorageKey } = usePageStorageKeys();
     const [activeTab, setActiveTab] = useState('analytics');
     const [period, setPeriod] = useState<UsageStatsPeriod>(() => loadPeriod(periodStorageKey));
@@ -74,7 +76,7 @@ function Dashboard() {
         <>
             <AppHeader>
                 <AppHeaderContent>
-                    <AppHeaderTitle icon={<LayoutDashboard className="size-4 shrink-0" />}>Dashboard</AppHeaderTitle>
+                    <AppHeaderTitle icon={<LayoutDashboard className="size-4 shrink-0" />}>{t('title')}</AppHeaderTitle>
                 </AppHeaderContent>
             </AppHeader>
 
@@ -86,8 +88,8 @@ function Dashboard() {
                 >
                     <div className="flex items-center justify-between">
                         <TabsList>
-                            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-                            <TabsTrigger value="overview">Overview</TabsTrigger>
+                            <TabsTrigger value="analytics">{t('tabs.analytics')}</TabsTrigger>
+                            <TabsTrigger value="overview">{t('tabs.overview')}</TabsTrigger>
                         </TabsList>
 
                         {activeTab === 'analytics' && (
@@ -96,9 +98,9 @@ function Dashboard() {
                                 value={period}
                             >
                                 <TabsList>
-                                    {periodOptions.map(({ label, value }) => (
+                                    {periodOptions.map(({ key, value }) => (
                                         <TabsTrigger
-                                            aria-label={label}
+                                            aria-label={t(`periods.${key}`)}
                                             className="size-7 px-0 sm:size-auto sm:px-3"
                                             key={value}
                                             value={value}
@@ -107,9 +109,9 @@ function Dashboard() {
                                                 aria-hidden="true"
                                                 className="sm:hidden"
                                             >
-                                                {label[0]}
+                                                {t(`periodsShort.${key}`)}
                                             </span>
-                                            <span className="hidden sm:inline">{label}</span>
+                                            <span className="hidden sm:inline">{t(`periods.${key}`)}</span>
                                         </TabsTrigger>
                                     ))}
                                 </TabsList>

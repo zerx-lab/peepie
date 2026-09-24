@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import type { AuthInfo } from '@/models/info';
 import type { User } from '@/models/user';
 
+import i18n from '@/i18n';
 import { api } from '@/lib/axios';
 import { routes } from '@/lib/routes';
 import { getReturnUrlParam } from '@/lib/utils/auth';
@@ -161,9 +162,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
             try {
                 await api.get('/auth/logout');
-                toast.success('Successfully logged out');
+                toast.success(i18n.t('auth:toasts.loggedOut'));
             } catch {
-                toast.error('Logout failed, but clearing local session');
+                toast.error(i18n.t('auth:toasts.logoutFailed'));
             } finally {
                 clearAuth();
                 window.location.href = `${routes.login()}${finalReturnUrl}`;
@@ -178,7 +179,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
                 const loginResponse = await api.post<unknown>('/auth/login', credentials);
 
                 if (loginResponse?.status !== 'success') {
-                    const errorMessage = 'Invalid login or password';
+                    const errorMessage = i18n.t('auth:errors.invalidCredentials');
                     toast.error(errorMessage);
 
                     return { error: errorMessage, success: false };
@@ -188,7 +189,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
                 const infoResponse = await api.get<AuthInfo>('/info');
 
                 if (infoResponse?.status !== 'success' || !infoResponse.data) {
-                    const errorMessage = 'Failed to load user information';
+                    const errorMessage = i18n.t('auth:errors.loadUserInfoFailed');
                     toast.error(errorMessage);
 
                     return { error: errorMessage, success: false };
@@ -197,14 +198,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
                 setAuth(infoResponse.data);
 
                 if (infoResponse.data.user?.type === 'local' && infoResponse.data.user.password_change_required) {
-                    toast.warning('Password change required');
+                    toast.warning(i18n.t('auth:toasts.passwordChangeRequired'));
 
                     return { passwordChangeRequired: true, success: true };
                 }
 
                 return { success: true };
             } catch {
-                const errorMessage = 'Login failed. Please try again.';
+                const errorMessage = i18n.t('auth:errors.loginFailed');
                 toast.error(errorMessage);
 
                 return { error: errorMessage, success: false };
@@ -228,7 +229,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
             );
 
             if (!popup) {
-                const errorMessage = 'Popup blocked. Please allow popups for this site.';
+                const errorMessage = i18n.t('auth:errors.popupBlocked');
                 toast.error(errorMessage);
 
                 return {
@@ -248,7 +249,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
                         clearInterval(popupCheck);
                         clearTimeout(timeoutId);
                         window.removeEventListener('message', messageHandler);
-                        const errorMessage = 'Authentication cancelled';
+                        const errorMessage = i18n.t('auth:errors.authCancelled');
                         toast.info(errorMessage);
                         resolve({
                             error: errorMessage,
@@ -267,7 +268,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
                             popup.close();
                         }
 
-                        const errorMessage = 'Authentication timeout';
+                        const errorMessage = i18n.t('auth:errors.authTimeout');
                         toast.error(errorMessage);
                         resolve({
                             error: errorMessage,
@@ -313,7 +314,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
                     }
 
                     cleanup();
-                    const errorMessage = event.data.error || 'Authentication failed';
+                    const errorMessage = event.data.error || i18n.t('auth:errors.authFailed');
                     toast.error(errorMessage);
                     resolve({
                         error: errorMessage,
@@ -350,7 +351,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
                     setAuth(info.data);
                 } else {
                     clearAuth();
-                    toast.error('Session expired. Please login again.');
+                    toast.error(i18n.t('auth:toasts.sessionExpired'));
                     navigate(routes.login(location.pathname));
                 }
             } catch {

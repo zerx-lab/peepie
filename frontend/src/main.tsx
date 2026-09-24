@@ -4,6 +4,7 @@ import * as React from 'react';
 import ReactDOM from 'react-dom/client';
 
 import App from '@/app';
+import { i18nReady } from '@/i18n';
 import { reloadOnce } from '@/lib/chunk-reload';
 
 // Vite fires this when a code-split chunk fails to load — almost always a redeploy
@@ -14,8 +15,11 @@ window.addEventListener('vite:preloadError', () => {
     reloadOnce();
 });
 
-ReactDOM.createRoot(document.querySelector('#root')!).render(
-    <React.StrictMode>
-        <App />
-    </React.StrictMode>,
-);
+// Wait for the active language's translations so a non-English UI never flashes English.
+void i18nReady.then(() => {
+    ReactDOM.createRoot(document.querySelector('#root')!).render(
+        <React.StrictMode>
+            <App />
+        </React.StrictMode>,
+    );
+});

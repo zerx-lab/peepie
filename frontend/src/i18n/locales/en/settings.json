@@ -1,0 +1,232 @@
+{
+    "nav": {
+        "title": "Settings",
+        "backToApp": "Back to App",
+        "items": {
+            "account": "Account",
+            "providers": "Providers",
+            "prompts": "Prompts",
+            "apiTokens": "API Tokens"
+        }
+    },
+    "account": {
+        "title": "Account",
+        "localAccount": "Local account",
+        "oauthAccount": "OAuth account",
+        "memberSince": "Member since {{date}}",
+        "change": "Change",
+        "displayName": {
+            "title": "Display name",
+            "description": "The name shown across the app."
+        },
+        "email": {
+            "title": "Email address",
+            "descriptionLocal": "The email you use to sign in.",
+            "descriptionLinked": "Linked from your {{account}}."
+        },
+        "password": {
+            "title": "Password",
+            "description": "Change your account password."
+        }
+    },
+    "apiTokens": {
+        "title": "API Tokens",
+        "validation": {
+            "nameTooLong": "Token name must be {{max}} characters or less",
+            "expiresAtRequired": "Expiration date is required"
+        },
+        "status": {
+            "active": "active",
+            "revoked": "revoked",
+            "expired": "expired"
+        },
+        "actions": {
+            "submitting": "Submitting…",
+            "create": "Create Token",
+            "copyToken": "Copy Token",
+            "copyTokenId": "Copy Token ID",
+            "copyTokenIdAria": "Copy token ID",
+            "deleting": "Deleting...",
+            "openMenu": "Open menu",
+            "developerTools": "Developer tools"
+        },
+        "toasts": {
+            "updateFailed": "Failed to update token",
+            "createFailed": "Failed to create token",
+            "deleteFailed": "Failed to delete token",
+            "tokenIdCopied": "Token ID copied to clipboard",
+            "tokenIdCopyFailed": "Failed to copy token ID to clipboard",
+            "tokenCopied": "Token copied to clipboard",
+            "tokenCopyFailed": "Failed to copy token to clipboard"
+        },
+        "form": {
+            "namePlaceholder": "Token name (optional)",
+            "pickDate": "Pick date"
+        },
+        "list": {
+            "unnamed": "(unnamed)",
+            "entityName": "API tokens",
+            "filterPlaceholder": "Filter tokens...",
+            "columns": {
+                "tokenId": "Token ID",
+                "expires": "Expires"
+            }
+        },
+        "loading": {
+            "title": "Loading tokens...",
+            "description": "Please wait while we fetch your API tokens"
+        },
+        "loadError": "Error loading tokens",
+        "empty": {
+            "title": "No API tokens configured",
+            "description": "Create your first API token to access Peepie programmatically"
+        },
+        "createdDialog": {
+            "title": "API Token Created",
+            "description": "Copy this token now. You won't be able to see it again for security reasons."
+        },
+        "deleteDialog": {
+            "itemType": "token"
+        },
+        "links": {
+            "graphqlPlayground": "GraphQL Playground",
+            "swaggerUi": "Swagger UI"
+        }
+    },
+    "prompts": {
+        "title": "Prompts",
+        "subtitle": "Manage system and custom prompt templates",
+        "status": {
+            "custom": "Custom",
+            "default": "Default",
+            "notAvailable": "N/A"
+        },
+        "toasts": {
+            "resetFailed": "Failed to reset prompt"
+        },
+        "actions": {
+            "openMenu": "Open menu",
+            "resetting": "Resetting...",
+            "resetSystem": "Reset System",
+            "resetHuman": "Reset Human",
+            "resetAll": "Reset All",
+            "reset": "Reset"
+        },
+        "agents": {
+            "title": "Agent Prompts",
+            "description": "System and human prompts for AI agents",
+            "entityName": "agent prompts",
+            "filterPlaceholder": "Filter agents...",
+            "columns": {
+                "name": "Agent Name",
+                "systemPrompt": "System Prompt",
+                "humanPrompt": "Human Prompt"
+            }
+        },
+        "tools": {
+            "title": "Tool Prompts",
+            "description": "Prompt templates for system tools and utilities",
+            "entityName": "tool prompts",
+            "filterPlaceholder": "Filter tools...",
+            "columns": {
+                "name": "Tool Name",
+                "prompt": "Prompt"
+            }
+        },
+        "details": {
+            "templates": "Prompt Templates",
+            "template": "Template"
+        },
+        "loading": {
+            "title": "Loading prompts...",
+            "description": "Please wait while we fetch your prompt templates"
+        },
+        "loadError": "Error loading prompts",
+        "empty": {
+            "title": "No prompts available",
+            "description": "Prompt templates could not be loaded"
+        },
+        "resetDialog": {
+            "title": "Reset {{name}}",
+            "titleFallback": "Reset Prompt",
+            "descriptionSystem": "Are you sure you want to reset the system prompt for \"{{name}}\"? This will revert it to the default template and cannot be undone.",
+            "descriptionHuman": "Are you sure you want to reset the human prompt for \"{{name}}\"? This will revert it to the default template and cannot be undone.",
+            "descriptionAll": "Are you sure you want to reset all prompts for \"{{name}}\"? This will revert both system and human prompts to their default templates and cannot be undone.",
+            "description": "Are you sure you want to reset the prompt for \"{{name}}\"? This will revert it to the default template and cannot be undone."
+        }
+    },
+    "prompt": {
+        "title": "Edit Prompt",
+        "validation": {
+            "systemRequired": "System template is required",
+            "humanRequired": "Human template is required"
+        },
+        "errors": {
+            "reset": "An error occurred while resetting",
+            "validate": "An error occurred while validating",
+            "save": "An error occurred while saving",
+            "humanTypeNotFound": "Human prompt type not found"
+        },
+        "actions": {
+            "validate": "Validate",
+            "validating": "Validating...",
+            "menu": "Prompt actions",
+            "diff": "Diff",
+            "resetting": "Resetting...",
+            "view": "View"
+        },
+        "loading": {
+            "title": "Loading prompt data...",
+            "description": "Please wait while we fetch prompt information"
+        },
+        "loadError": "Error loading prompt data",
+        "notFound": {
+            "title": "Prompt not found",
+            "description": "The prompt \"{{id}}\" could not be found or is not supported for editing."
+        },
+        "panel": {
+            "title": "Edit prompt",
+            "subtitleAgent": "Customize the templates this agent uses",
+            "subtitleTool": "Customize the template this tool uses",
+            "descriptionAgent": "Configure prompts for this AI agent",
+            "descriptionTool": "Configure the prompt for this tool"
+        },
+        "tabs": {
+            "system": "System Prompt",
+            "human": "Human Prompt"
+        },
+        "editor": {
+            "rawTooltip": "Edit the raw prompt template",
+            "systemPlaceholder": "Enter the system prompt template...",
+            "toolPlaceholder": "Enter the tool template...",
+            "humanPlaceholder": "Enter the human prompt template...",
+            "systemAria": "System prompt template",
+            "humanAria": "Human prompt template"
+        },
+        "resetDialog": {
+            "title": "Reset Prompt",
+            "description": "Are you sure you want to reset this prompt to its default value? This action cannot be undone."
+        },
+        "validationDialog": {
+            "title": "Validation Results",
+            "descriptionSystem": "The validation result for the system prompt template.",
+            "descriptionHuman": "The validation result for the human prompt template.",
+            "valid": "Valid Template",
+            "invalid": "Validation Error",
+            "details": "Details:",
+            "line": "Line:"
+        },
+        "diffDialog": {
+            "title": "Diff",
+            "description": "Changes between current value and default template."
+        },
+        "variables": {
+            "title": "Available variables",
+            "hint": "Click to insert at the cursor, or cycle through existing uses.",
+            "insert": "Insert {{token}} at the cursor",
+            "goToNext": "Go to next {{token}} in the template",
+            "goToNextWithUses_one": "Go to next {{token}} in the template ({{count}} use)",
+            "goToNextWithUses_other": "Go to next {{token}} in the template ({{count}} uses)"
+        }
+    }
+}

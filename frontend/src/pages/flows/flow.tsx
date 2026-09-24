@@ -16,6 +16,7 @@ import {
     Trash,
 } from 'lucide-react';
 import { startTransition, useCallback, useEffect, useOptimistic, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -44,6 +45,7 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/componen
 import { Spinner } from '@/components/ui/spinner';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import FlowCentralTabs from '@/features/flows/flow-central-tabs';
+import { flowStatusLabelKeys } from '@/features/flows/flow-status';
 import FlowTabs from '@/features/flows/flow-tabs';
 import { useFlowDetailNavigation } from '@/features/flows/use-flow-detail-navigation';
 import { RenameFlowDocument, ResultType, StatusType } from '@/graphql/types';
@@ -58,25 +60,37 @@ import { useFavorites } from '@/providers/favorites-provider';
 import { useFlow } from '@/providers/flow-provider';
 import { type Flow as FlowItem, useFlows } from '@/providers/flows-provider';
 
+function FlowNavigationItem({ isCurrent, item }: { isCurrent: boolean; item: FlowItem }) {
+    const { t } = useTranslation(['flows', 'common']);
+
+    return (
+        <>
+            <FlowStatusIcon
+                className="size-3 shrink-0"
+                status={item.status}
+            />
+            <span className={cn('min-w-0 flex-1 truncate', isCurrent && 'font-medium')}>
+                {item.title || t('untitled', { id: item.id })}
+            </span>
+            <Badge
+                className="ml-auto shrink-0 font-mono text-[10px]"
+                variant="outline"
+            >
+                #{item.id}
+            </Badge>
+        </>
+    );
+}
+
 const renderFlowItem = (item: FlowItem, isCurrent: boolean): ReactNode => (
-    <>
-        <FlowStatusIcon
-            className="size-3 shrink-0"
-            status={item.status}
-        />
-        <span className={cn('min-w-0 flex-1 truncate', isCurrent && 'font-medium')}>
-            {item.title || `Flow #${item.id}`}
-        </span>
-        <Badge
-            className="ml-auto shrink-0 font-mono text-[10px]"
-            variant="outline"
-        >
-            #{item.id}
-        </Badge>
-    </>
+    <FlowNavigationItem
+        isCurrent={isCurrent}
+        item={item}
+    />
 );
 
 function Flow() {
+    const { t } = useTranslation(['flows', 'common']);
     const { isDesktop, isMobile } = useBreakpoint();
     const navigate = useNavigate();
 
@@ -129,15 +143,15 @@ function Flow() {
                 });
 
                 if (data?.renameFlow === ResultType.Success) {
-                    toast.success('Flow renamed successfully');
+                    toast.success(t('toasts.renamed'));
                     handleFlowRenameCancel();
                 }
             } catch (error) {
-                const errorMessage = error instanceof Error ? error.message : 'Failed to rename flow';
+                const errorMessage = error instanceof Error ? error.message : t('toasts.renameFailed');
                 toast.error(errorMessage);
             }
         });
-    }, [editingInputRef, flowId, handleFlowRenameCancel, renameFlowMutation, setOptimisticFlowTitle]);
+    }, [editingInputRef, flowId, handleFlowRenameCancel, renameFlowMutation, setOptimisticFlowTitle, t]);
 
     const handleFlowFinish = useCallback(async () => {
         if (!flow) {
@@ -186,7 +200,7 @@ function Flow() {
                         <Breadcrumb className="min-w-0 flex-1">
                             <BreadcrumbList className="min-w-0 flex-nowrap">
                                 <BreadcrumbItem className="min-w-0">
-                                    <BreadcrumbPage>Flow</BreadcrumbPage>
+                                    <BreadcrumbPage>{t('entityTitle')}</BreadcrumbPage>
                                 </BreadcrumbItem>
                             </BreadcrumbList>
                         </Breadcrumb>
@@ -196,7 +210,7 @@ function Flow() {
                     <ErrorState
                         message={flowLoadError.message}
                         onRetry={refetchFlow}
-                        title="Error loading flow"
+                        title={t('detail.loadError')}
                     />
                 </div>
             </>
@@ -225,7 +239,7 @@ function Flow() {
                                     <>
                                         <FlowStatusIcon
                                             status={flow.status}
-                                            tooltip={formatName(flow.status)}
+                                            tooltip={t(flowStatusLabelKeys[flow.status])}
                                         />
 
                                         <ProviderIcon
@@ -242,7 +256,7 @@ function Flow() {
                                         inputRef={editingInputRef}
                                         onCancel={handleFlowRenameCancel}
                                         onSave={handleFlowRenameSave}
-                                        placeholder="Flow title"
+                                        placeholder={t('titlePlaceholder')}
                                     />
                                 ) : flow ? (
                                     <Tooltip>
@@ -251,14 +265,14 @@ function Flow() {
                                                 className="max-w-64 min-w-0 cursor-text truncate select-none"
                                                 onDoubleClick={handleFlowRenameStart}
                                             >
-                                                {flowTitle || 'Select a flow'}
+                                                {flowTitle || t('detail.selectFlow')}
                                             </BreadcrumbPage>
                                         </TooltipTrigger>
-                                        <TooltipContent>Double-click to rename</TooltipContent>
+                                        <TooltipContent>{t('detail.doubleClickToRename')}</TooltipContent>
                                     </Tooltip>
                                 ) : (
                                     <BreadcrumbPage className="min-w-0 truncate">
-                                        {flowTitle || 'Select a flow'}
+                                        {flowTitle || t('detail.selectFlow')}
                                     </BreadcrumbPage>
                                 )}
                             </BreadcrumbItem>
@@ -272,12 +286,12 @@ function Flow() {
                             controller={flowNav}
                             renderItem={renderFlowItem}
                             sheetIcon={<GitFork className="size-4" />}
-                            sheetTitle="Flows"
+                            sheetTitle={t('pageTitle')}
                         />
                     )}
                     {flowId && !isMobile && (
                         <Button
-                            aria-label="Toggle favorite"
+                            aria-label={t('actions.toggleFavorite')}
                             aria-pressed={isFavoriteFlow(flowId)}
                             className="shrink-0"
                             disabled={isFlowLoading}
@@ -291,7 +305,7 @@ function Flow() {
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button
-                                aria-label="Flow actions"
+                                aria-label={t('detail.flowActions')}
                                 className="size-8 p-0"
                                 variant="ghost"
                             >
@@ -312,11 +326,11 @@ function Flow() {
                                         onSelect={(event) => event.preventDefault()}
                                     >
                                         <GitFork />
-                                        Flows
+                                        {t('pageTitle')}
                                         <div className="-my-1.5 -mr-2 ml-auto flex items-center">
                                             <DetailNavigationButtons<FlowItem>
                                                 controller={flowNav}
-                                                sheetTitle="Flows"
+                                                sheetTitle={t('pageTitle')}
                                                 size="sm"
                                             />
                                         </div>
@@ -333,7 +347,9 @@ function Flow() {
                                                         : 'size-4'
                                                 }
                                             />
-                                            {isFavoriteFlow(flowId) ? 'Remove from favorites' : 'Add to favorites'}
+                                            {isFavoriteFlow(flowId)
+                                                ? t('actions.removeFromFavorites')
+                                                : t('actions.addToFavorites')}
                                         </DropdownMenuItem>
                                     )}
                                     <DropdownMenuSeparator />
@@ -344,7 +360,7 @@ function Flow() {
                                 onClick={handleFlowRenameStart}
                             >
                                 <PencilLine className="size-3" />
-                                Rename
+                                {t('common:actions.rename')}
                             </DropdownMenuItem>
                             {isFlowRunning && (
                                 <DropdownMenuItem
@@ -354,12 +370,12 @@ function Flow() {
                                     {isFinishing ? (
                                         <>
                                             <Spinner variant="circle" />
-                                            Finishing...
+                                            {t('actions.finishing')}
                                         </>
                                     ) : (
                                         <>
                                             <Pause />
-                                            Finish
+                                            {t('actions.finish')}
                                         </>
                                     )}
                                 </DropdownMenuItem>
@@ -372,12 +388,12 @@ function Flow() {
                                 {isDeleting ? (
                                     <>
                                         <Spinner variant="circle" />
-                                        Deleting...
+                                        {t('actions.deleting')}
                                     </>
                                 ) : (
                                     <>
                                         <Trash />
-                                        Delete
+                                        {t('common:actions.delete')}
                                     </>
                                 )}
                             </DropdownMenuItem>
@@ -390,7 +406,7 @@ function Flow() {
                     controller={flowNav}
                     renderItem={renderFlowItem}
                     sheetIcon={<GitFork className="size-4" />}
-                    sheetTitle="Flows"
+                    sheetTitle={t('pageTitle')}
                 />
             )}
             <div className="relative flex h-[calc(100dvh-3rem)] w-full max-w-full flex-1">
@@ -432,19 +448,20 @@ function Flow() {
                 )}
             </div>
             <ConfirmationDialog
-                cancelText="Cancel"
-                confirmText="Delete"
+                cancelText={t('common:actions.cancel')}
+                confirmText={t('common:actions.delete')}
                 handleConfirm={handleFlowDelete}
                 handleOpenChange={setIsDeleteDialogOpen}
                 isOpen={isDeleteDialogOpen}
                 itemName={flow?.title}
-                itemType="flow"
+                itemType={t('entity')}
             />
         </>
     );
 }
 
 function FlowReportDropdown() {
+    const { t } = useTranslation(['flows', 'common']);
     const { flowData, flowId } = useFlow();
     const flow = flowData?.flow;
     const tasks = flowData?.tasks ?? [];
@@ -460,10 +477,10 @@ function FlowReportDropdown() {
         const success = await copyToClipboard(reportContent);
 
         if (success) {
-            toast.success('Report copied to clipboard');
+            toast.success(t('report.copied'));
         } else {
             Log.error('Failed to copy report to clipboard');
-            toast.error('Failed to copy report to clipboard');
+            toast.error(t('report.copyFailed'));
         }
     };
 
@@ -510,7 +527,7 @@ function FlowReportDropdown() {
                     disabled={isReportDisabled}
                     endIcon={<ChevronDown className="opacity-50" />}
                     icon={<NotepadText />}
-                    label="Report"
+                    label={t('report.label')}
                     variant="ghost"
                 />
             </DropdownMenuTrigger>
@@ -521,7 +538,7 @@ function FlowReportDropdown() {
                     onClick={handleOpenWebView}
                 >
                     <ExternalLink />
-                    Open web view
+                    {t('report.openWebView')}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                     className="flex items-center gap-2"
@@ -529,7 +546,7 @@ function FlowReportDropdown() {
                     onClick={handleCopyToClipboard}
                 >
                     <Copy />
-                    Copy to clipboard
+                    {t('report.copyToClipboard')}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                     className="flex items-center gap-2"
@@ -537,7 +554,7 @@ function FlowReportDropdown() {
                     onClick={handleDownloadMD}
                 >
                     <Download />
-                    Download MD
+                    {t('report.downloadMarkdown')}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                     className="flex items-center gap-2"
@@ -545,7 +562,7 @@ function FlowReportDropdown() {
                     onClick={handleDownloadPDF}
                 >
                     <Download />
-                    Download PDF
+                    {t('report.downloadPdf')}
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

@@ -4,6 +4,7 @@ import * as SheetPrimitive from '@radix-ui/react-dialog';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { X } from 'lucide-react';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { FocusReturn } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
@@ -81,6 +82,8 @@ interface SheetContentProps
 }
 
 function SheetContent({ children, className, container, overlay = true, side = 'right', ...props }: SheetContentProps) {
+    const { t } = useTranslation('ui');
+
     return (
         <SheetPortal container={container ?? undefined}>
             {overlay && <SheetOverlay />}
@@ -94,7 +97,7 @@ function SheetContent({ children, className, container, overlay = true, side = '
                     <X className="h-4 w-4" />
                     {/* Not "Close": a sheet with its own footer Close button would
                         produce two identically named controls. */}
-                    <span className="sr-only">Dismiss sheet</span>
+                    <span className="sr-only">{t('sheet.dismiss')}</span>
                 </SheetPrimitive.Close>
                 {children}
             </SheetPrimitive.Content>

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { AlertCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -22,6 +23,8 @@ export function MetricCard({
     title: ReactNode;
     value: ReactNode;
 }) {
+    const { t } = useTranslation('dashboard');
+
     return (
         <Card className={className}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -48,7 +51,7 @@ export function MetricCard({
                     (loading ? (
                         <Skeleton className="mt-1 h-3 w-32" />
                     ) : (
-                        <p className="text-muted-foreground text-xs">{error ? "Couldn't load" : description}</p>
+                        <p className="text-muted-foreground text-xs">{error ? t('states.loadFailed') : description}</p>
                     ))}
             </CardContent>
         </Card>

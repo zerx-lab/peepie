@@ -1,10 +1,21 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Logo from '@/components/icons/logo';
 import { routes } from '@/lib/routes';
 
+type OAuthResultStatus = 'complete' | 'directOpen' | 'inProgress' | 'parentError';
+
+const STATUS_MESSAGE_KEYS = {
+    complete: 'oauthResult.complete',
+    directOpen: 'oauthResult.directOpen',
+    inProgress: 'oauthResult.inProgress',
+    parentError: 'oauthResult.parentError',
+} as const satisfies Record<OAuthResultStatus, string>;
+
 function OAuthResult() {
-    const [statusMessage, setStatusMessage] = useState('Authentication in progress...');
+    const { t } = useTranslation('auth');
+    const [resultStatus, setResultStatus] = useState<OAuthResultStatus>('inProgress');
 
     const successDelay = 2000;
     const errorDelay = 5000;
@@ -18,8 +29,8 @@ function OAuthResult() {
         let cleanupTimer: null | ReturnType<typeof setTimeout> = null;
         let closeTimer: null | ReturnType<typeof setTimeout> = null;
 
-        const updateMessage = (message: string) => {
-            setStatusMessage(message);
+        const updateStatus = (next: OAuthResultStatus) => {
+            setResultStatus(next);
         };
 
         const handleClose = (delay: number) => {
@@ -62,15 +73,15 @@ function OAuthResult() {
                     window.location.origin,
                 );
 
-                updateMessage('Authentication complete, closing window...');
+                updateStatus('complete');
                 handleClose(successDelay);
             } catch (e) {
                 console.error('Failed to send message to opener:', e);
-                updateMessage('Error communicating with parent window. Closing in a few seconds...');
+                updateStatus('parentError');
                 handleClose(errorDelay);
             }
         } else {
-            updateMessage('Authentication window opened directly. Redirecting to login page...');
+            updateStatus('directOpen');
             handleRedirect(routes.login(), errorDelay / 2);
             handleClose(errorDelay);
         }
@@ -93,7 +104,7 @@ function OAuthResult() {
     return (
         <div className="flex h-screen w-full items-center justify-center bg-linear-to-r from-slate-800 to-slate-950">
             <Logo className="animate-logo-spin m-auto size-32 text-white delay-10000" />
-            <div className="fixed bottom-4 text-sm text-white">{statusMessage}</div>
+            <div className="fixed bottom-4 text-sm text-white">{t(STATUS_MESSAGE_KEYS[resultStatus])}</div>
         </div>
     );
 }

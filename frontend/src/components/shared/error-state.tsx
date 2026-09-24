@@ -1,4 +1,5 @@
 import { AlertCircle, RefreshCw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
@@ -10,6 +11,8 @@ interface ErrorStateProps {
 }
 
 export function ErrorState({ message, onRetry, title }: ErrorStateProps) {
+    const { t } = useTranslation('ui');
+
     return (
         <Empty role="alert">
             <EmptyHeader>
@@ -26,7 +29,7 @@ export function ErrorState({ message, onRetry, title }: ErrorStateProps) {
                         variant="secondary"
                     >
                         <RefreshCw />
-                        Try again
+                        {t('errorState.tryAgain')}
                     </Button>
                 </EmptyContent>
             ) : null}

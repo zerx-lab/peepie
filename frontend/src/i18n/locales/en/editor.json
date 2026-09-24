@@ -1,0 +1,100 @@
+{
+    "placeholder": "Write something…",
+    "toolbar": {
+        "label": "Formatting",
+        "bold": "Bold",
+        "italic": "Italic",
+        "strikethrough": "Strikethrough",
+        "inlineCode": "Inline code",
+        "blockquote": "Blockquote",
+        "codeBlock": "Code block",
+        "horizontalRule": "Horizontal rule",
+        "clearFormatting": "Clear formatting",
+        "undo": "Undo",
+        "redo": "Redo"
+    },
+    "heading": {
+        "tooltip": "Text style",
+        "triggerLabel": "Text style: {{style}}",
+        "h1": "Heading 1",
+        "h2": "Heading 2",
+        "h3": "Heading 3",
+        "h4": "Heading 4",
+        "h5": "Heading 5",
+        "h6": "Heading 6",
+        "text": "Text"
+    },
+    "list": {
+        "tooltip": "Lists",
+        "triggerLabel": "List: {{list}}",
+        "none": "None",
+        "bullet": "Bullet list",
+        "ordered": "Ordered list",
+        "task": "Task list"
+    },
+    "table": {
+        "label": "Table",
+        "headerRow": "Header row",
+        "insertRowAbove": "Insert row above",
+        "insertRowBelow": "Insert row below",
+        "insertColumnLeft": "Insert column left",
+        "insertColumnRight": "Insert column right",
+        "alignColumn": "Align column",
+        "align": {
+            "left": "Left",
+            "center": "Center",
+            "right": "Right"
+        },
+        "deleteRow": "Delete row",
+        "deleteColumn": "Delete column",
+        "deleteTable": "Delete table",
+        "insertTable": "Insert table",
+        "columnActions": "Column actions",
+        "rowActions": "Row actions",
+        "insertLeft": "Insert left",
+        "insertRight": "Insert right",
+        "insertAbove": "Insert above",
+        "insertBelow": "Insert below",
+        "clearContents": "Clear contents"
+    },
+    "link": {
+        "label": "Link",
+        "urlLabel": "Link URL",
+        "urlPlaceholder": "https://example.com",
+        "apply": "Apply link",
+        "openInNewTab": "Open link in new tab",
+        "remove": "Remove link",
+        "invalidUrl": "Only http, https, mailto and tel links are allowed."
+    },
+    "image": {
+        "insert": "Insert image",
+        "apply": "Apply image",
+        "remove": "Remove image",
+        "urlLabel": "Image URL",
+        "urlPlaceholder": "https://example.com/image.png",
+        "altLabel": "Alt text (optional)",
+        "altPlaceholder": "Describe the image",
+        "invalidUrl": "Only http(s) or base64 raster image URLs are allowed."
+    },
+    "viewMode": {
+        "rich": "Rich editor",
+        "raw": "Raw source"
+    },
+    "taskItem": {
+        "checkboxLabel": "Task item checkbox for {{item}}",
+        "emptyItem": "empty task item"
+    },
+    "terminal": {
+        "openLinkHint": "{{modifier}}+Click to open"
+    },
+    "detailNavigation": {
+        "previous": "Previous",
+        "next": "Next",
+        "openList": "Open {{title}} list ({{position}})",
+        "showAllMatching": "Show all matching {{title}}",
+        "searchPlaceholder": "Search…",
+        "clearSearch": "Clear search",
+        "noItemsMatchQuery": "No items match \"{{query}}\".",
+        "noItemsMatchFilter": "No items match the current filter."
+    }
+}

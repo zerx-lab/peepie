@@ -1,6 +1,6 @@
 # Frontend E2E tests (Playwright)
 
-End-to-end tests for the PentAGI UI. The default tier runs fully offline against
+End-to-end tests for the Peepie UI. The default tier runs fully offline against
 network mocks — **no backend, no secrets, no VPN, no LLM keys** — so anyone
 (including fork-PR authors) can run it, and CI runs it on every pull request.
 

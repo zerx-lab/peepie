@@ -2,6 +2,7 @@ import type { AxiosError, AxiosRequestConfig } from 'axios';
 
 import Axios from 'axios';
 
+import i18n, { translateRuntimeKey } from '@/i18n';
 import { AUTH_STORAGE_KEY } from '@/providers/user-provider';
 
 import { Log } from './log';
@@ -93,7 +94,7 @@ axios.interceptors.response.use(
                     if (err.response?.data) {
                         Log.warn(err.response.data);
                         const warns = err.response.data as Record<string, string[]>;
-                        const globalMessage = warns[''] || ['Please confirm your input.'];
+                        const globalMessage = warns[''] || [i18n.t('errors:confirmInput')];
                         error.message = globalMessage[0] as string;
                     }
 
@@ -179,12 +180,21 @@ export const api = {
 export const isApiSuccess = <T>(response: ApiResponse<T>): response is ApiSuccessResponse<T> =>
     response.status === 'success';
 
+/**
+ * Localized message for a backend error code (`Auth.InvalidCredentials`, see
+ * `backend/pkg/server/response/errors.go`), or `undefined` when the code is unknown.
+ */
+export const translateApiErrorCode = (code: string | undefined): string | undefined =>
+    code ? translateRuntimeKey('apiErrors', code, { flat: true }) : undefined;
+
 /** Returns `response.data`, or throws if the API marked the response as an error. */
 export const unwrapApiResponse = <T>(response: ApiResponse<T>): T => {
     if (!isApiSuccess(response) || response.data == null) {
-        const message = !isApiSuccess(response) ? (response.msg ?? response.error) : undefined;
+        const message = !isApiSuccess(response)
+            ? (translateApiErrorCode(response.code) ?? response.msg ?? response.error)
+            : undefined;
 
-        throw new Error(message ?? 'Unexpected response from server');
+        throw new Error(message ?? i18n.t('errors:unexpectedResponse'));
     }
 
     return response.data;
@@ -194,10 +204,11 @@ export const unwrapApiResponse = <T>(response: ApiResponse<T>): T => {
  * Extracts a human-readable message from an unknown error thrown by axios calls.
  *
  * Lookup order:
- *   1. `response.data.msg` — backend-provided message,
- *   2. `statusFallbacks[status]` — caller-provided defaults per HTTP status,
- *   3. `error.message` — generic axios/network message,
- *   4. `fallback` — last-resort string.
+ *   1. `apiErrors:<code>` — localized text for the backend's stable error code,
+ *   2. `response.data.msg` — backend-provided (English) message,
+ *   3. `statusFallbacks[status]` — caller-provided defaults per HTTP status,
+ *   4. `error.message` — generic axios/network message,
+ *   5. `fallback` — last-resort string.
  */
 export const getApiErrorMessage = (
     error: unknown,
@@ -213,6 +224,11 @@ export const getApiErrorMessage = (
     const responseData = err.response?.data;
     const responseMsg =
         responseData && typeof responseData === 'object' ? (responseData as ApiErrorResponse).msg : undefined;
+    const translated = translateApiErrorCode(getApiErrorCode(error));
+
+    if (translated) {
+        return translated;
+    }
 
     if (responseMsg) {
         return responseMsg;

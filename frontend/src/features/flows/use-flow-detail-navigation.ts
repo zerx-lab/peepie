@@ -1,8 +1,10 @@
+import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { useDetailNavigation } from '@/components/shared/detail-navigation';
 import { routes } from '@/lib/routes';
 import { type Flow, useFlows } from '@/providers/flows-provider';
 
-const getLabel = (item: Flow) => item.title || `Flow #${item.id}`;
 const getSearchableText = (item: Flow) => item.title;
 const getId = (item: Flow) => String(item.id);
 const getHref = (item: Flow) => routes.flow(item.id);
@@ -17,7 +19,9 @@ const getHref = (item: Flow) => routes.flow(item.id);
  * (e.g. `/flows/new`) so the controller reports an unmatched current item.
  */
 export function useFlowDetailNavigation(currentId: null | string | undefined) {
+    const { t } = useTranslation('flows');
     const { flows } = useFlows();
+    const getLabel = useCallback((item: Flow) => item.title || t('untitled', { id: item.id }), [t]);
 
     return useDetailNavigation<Flow>({
         currentId,

@@ -1,4 +1,4 @@
-export const APP_NAME = 'PentAGI';
+export const APP_NAME = 'Peepie';
 
 export type RouteParams = Record<string, string | undefined>;
 

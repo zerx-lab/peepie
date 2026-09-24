@@ -1,12 +1,23 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { DayPicker, type DayPickerProps } from 'react-day-picker';
+import { DayPicker, type DayPickerLocale, type DayPickerProps } from 'react-day-picker';
+import { enUS, zhCN } from 'react-day-picker/locale';
 
 import { buttonVariants } from '@/components/ui/button';
+import { useLanguage } from '@/hooks/use-language';
+import { type Language } from '@/i18n/languages';
 import { cn } from '@/lib/utils';
 
 export type CalendarProps = DayPickerProps;
 
+// DayPicker locales carry month/weekday names plus the calendar's own aria labels.
+const DAY_PICKER_LOCALES: Record<Language, Partial<DayPickerLocale>> = {
+    en: enUS,
+    'zh-CN': zhCN,
+};
+
 function Calendar({ className, classNames, showOutsideDays = true, ...props }: CalendarProps) {
+    const { language } = useLanguage();
+
     return (
         <DayPicker
             className={cn('p-3', className)}
@@ -48,6 +59,7 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
                 Chevron: ({ orientation }) =>
                     orientation === 'left' ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />,
             }}
+            locale={DAY_PICKER_LOCALES[language]}
             showOutsideDays={showOutsideDays}
             {...props}
         />

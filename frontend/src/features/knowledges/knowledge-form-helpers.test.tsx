@@ -3,10 +3,18 @@ import { describe, expect, it } from 'vitest';
 import type { KnowledgeDocumentFragmentFragment } from '@/graphql/types';
 
 import { KnowledgeAnswerType, KnowledgeDocType, KnowledgeGuideType } from '@/graphql/types';
+import i18n from '@/i18n';
 
 import type { DirtyFlags, FormValues } from './knowledge-form';
 
-import { documentToFormValues, formSchema, formValuesToCreateInput, formValuesToUpdateInput } from './knowledge-form';
+import {
+    createFormSchema,
+    documentToFormValues,
+    formValuesToCreateInput,
+    formValuesToUpdateInput,
+} from './knowledge-form';
+
+const formSchema = createFormSchema(i18n.getFixedT('en', 'knowledges'));
 
 const baseValues: FormValues = {
     answerType: KnowledgeAnswerType.Other,
@@ -171,6 +179,17 @@ describe('formSchema', () => {
         expect(result.error?.issues.find((i) => i.path[0] === 'description')?.message).toBe(
             'Description must be 1000 characters or fewer',
         );
+    });
+
+    it('validates with the active language without changing the submitted enum values', async () => {
+        await i18n.loadLanguages('zh-CN');
+        const chineseSchema = createFormSchema(i18n.getFixedT('zh-CN', 'knowledges'));
+        const result = chineseSchema.safeParse({ ...valid, description: 'x'.repeat(1001) });
+
+        expect(result.error?.issues.find((issue) => issue.path[0] === 'description')?.message).toBe(
+            '描述不得超过 1000 个字符',
+        );
+        expect(chineseSchema.parse(valid).docType).toBe(KnowledgeDocType.Answer);
     });
 
     it.each<[KnowledgeDocType, keyof FormValues, string]>([

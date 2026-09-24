@@ -1,5 +1,6 @@
 import { Ellipsis, X } from 'lucide-react';
 import { type ComponentType, useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ConfirmationDialog from '@/components/shared/confirmation-dialog';
 import { Button } from '@/components/ui/button';
@@ -14,7 +15,7 @@ import { cn } from '@/lib/utils';
 
 import type { FileManagerBulkAction, FileManagerLabels, FileNode } from './file-manager-types';
 
-import { dedupeOverlappingPaths, formatFileSize, pluralizeItemsEnglish } from './file-manager-utils';
+import { dedupeOverlappingPaths, formatFileSize, formatItemCount } from './file-manager-utils';
 
 interface BulkActionButtonProps {
     action: FileManagerBulkAction;
@@ -58,6 +59,7 @@ export function FileManagerBulkActionsBar({
     selectedPaths,
     selectionTotalBytes,
 }: FileManagerBulkActionsBarProps) {
+    const { t } = useTranslation(['fileManager', 'common']);
     const [pendingAction, setPendingAction] = useState<FileManagerBulkAction | null>(null);
 
     const dedupedFiles = useMemo(() => {
@@ -126,13 +128,16 @@ export function FileManagerBulkActionsBar({
         return null;
     }
 
-    const pluralize = labels.pluralizeItems ?? pluralizeItemsEnglish;
+    const pluralize = labels.pluralizeItems ?? formatItemCount;
     const countLabel = pluralize(selectedPaths.size);
-    const baseSelectedText = labels.selectedLabel?.(selectedPaths.size) ?? `${selectedPaths.size} selected`;
+    const baseSelectedText =
+        labels.selectedLabel?.(selectedPaths.size) ?? t('bulk.selected', { count: selectedPaths.size });
     const sizeSuffix = (labels.formatSelectionSize ?? formatFileSize)(selectionTotalBytes);
-    const selectedText = sizeSuffix ? `${baseSelectedText} · ${sizeSuffix}` : baseSelectedText;
-    const cancelText = labels.bulkCancel ?? 'Cancel';
-    const moreActionsText = labels.bulkMoreActions ?? 'More actions';
+    const selectedText = sizeSuffix
+        ? t('bulk.selectedWithSize', { selected: baseSelectedText, size: sizeSuffix })
+        : baseSelectedText;
+    const cancelText = labels.bulkCancel ?? t('common:actions.cancel');
+    const moreActionsText = labels.bulkMoreActions ?? t('bulk.moreActions');
 
     return (
         <>

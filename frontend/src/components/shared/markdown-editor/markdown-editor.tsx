@@ -166,7 +166,7 @@ function useMarkdownEditor({
     id,
     onBlur,
     onChange,
-    placeholder = 'Write something…',
+    placeholder,
     value,
 }: UseMarkdownEditorOptions): Editor | null {
     // Suppress echoes of our own output: the markdown round-trip re-serializes slightly (whitespace/list
