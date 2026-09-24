@@ -24,6 +24,8 @@ peepie 是基于 PentAGI（`vxcontrol/pentagi`）的二开项目，GitHub 仓库
 - 界面固定文案、日期数字格式、可访问性文案和用户可见错误消息是国际化范围；优先在集中词条和语言配置中维护，英文作为缺失译文回退。不要用浏览器/DOM 自动翻译替代应用内国际化。
 - 优先按稳定错误码翻译已知服务端错误，不把英文 `msg` 文本当作稳定标识；日志、API 字段、提示词、命令、用户输入和 Agent 生成内容不能作为界面文案批量翻译。
 - 新增界面功能时同时考虑两种语言、动态参数、长文本布局和缺失译文；不为追求少改文件而采用不可验证的全量源码转换。报告/PDF 等生成内容若要求双语，应作为独立的产品需求明确范围。
+- Web 前端按 `frontend/docs/i18n.md`（i18next 命名空间、类型化键、`i18next/no-literal-string` lint、词条一致性测试、中文术语表）实现；安装器 TUI 按 `backend/docs/installer_i18n.md`（`locale.go` 英文 `var` + `catalog_zh_cn_*.go` 中文词条、`TestEveryTextIsTranslated`）实现。新增或修改界面文案必须在同一变更中补齐全部语言。
+- 同步上游后，上游新增的前端硬编码文案会被 lint 拦截、新增的安装器文案会被 `TestEveryTextIsTranslated` 拦截，需在合并时补齐迁移与翻译；上游新增的 REST 错误码同步到 `frontend/src/i18n/locales/*/apiErrors.json`。
 
 ## 交付与验证
 
