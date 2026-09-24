@@ -1073,6 +1073,17 @@ type Subtask struct {
 	Context     string        `json:"context"`
 }
 
+type SystemSetting struct {
+	ID        int64         `json:"id"`
+	Category  string        `json:"category"`
+	Key       string        `json:"key"`
+	Value     string        `json:"value"`
+	IsSecret  bool          `json:"is_secret"`
+	UpdatedBy sql.NullInt64 `json:"updated_by"`
+	CreatedAt sql.NullTime  `json:"created_at"`
+	UpdatedAt sql.NullTime  `json:"updated_at"`
+}
+
 type Task struct {
 	ID        int64        `json:"id"`
 	Status    TaskStatus   `json:"status"`

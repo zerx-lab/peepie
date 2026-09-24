@@ -94,6 +94,8 @@ export const routeTitles = {
 
     resources: { title: () => i18n.t('layout:titles.resources') },
 
+    system: { title: () => i18n.t('layout:titles.system') },
+
     template: {
         title: apolloTitle({
             document: FlowTemplateDocument,
@@ -104,6 +106,5 @@ export const routeTitles = {
             variables: ({ templateId }) => (!templateId || templateId === 'new' ? null : { templateId }),
         }),
     },
-
     templates: { title: () => i18n.t('layout:titles.templates') },
 } as const satisfies Record<string, RouteTitleHandle>;

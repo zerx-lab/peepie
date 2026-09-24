@@ -165,6 +165,33 @@ func main() {
 
 	logrus.Info("Database schema updated successfully")
 
+	if overrides, err := database.LoadSystemSettingsOverrides(ctx, queries); err != nil {
+		logrus.WithError(err).Warn("Runtime settings load failed, falling back to environment defaults")
+	} else {
+		cfg.Overrides.Load(overrides)
+	}
+
+	// Refresh periodically so that in a multi-replica deployment every
+	// instance converges on settings changes made through another instance's
+	// Web UI within one interval, without requiring a restart.
+	go func() {
+		ticker := time.NewTicker(15 * time.Second)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				overrides, err := database.LoadSystemSettingsOverrides(ctx, queries)
+				if err != nil {
+					logrus.WithError(err).Debug("Runtime settings refresh failed")
+					continue
+				}
+				cfg.Overrides.Load(overrides)
+			}
+		}
+	}()
+
 	if cfg.PprofAddr != "" {
 		go profiling.Start(cfg.PprofAddr)
 	}

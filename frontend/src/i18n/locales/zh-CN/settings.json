@@ -6,7 +6,8 @@
             "account": "账户",
             "providers": "提供商",
             "prompts": "提示词",
-            "apiTokens": "API 令牌"
+            "apiTokens": "API 令牌",
+            "system": "系统设置"
         }
     },
     "account": {
@@ -226,6 +227,58 @@
             "insert": "在光标处插入 {{token}}",
             "goToNext": "跳转到模板中下一个 {{token}}",
             "goToNextWithUses_other": "跳转到模板中下一个 {{token}}（共 {{count}} 处）"
+        }
+    },
+    "system": {
+        "title": "系统设置",
+        "save": "保存",
+        "saved": "设置已保存",
+        "saveFailed": "保存设置失败",
+        "enabled": "已启用",
+        "searchEngines": {
+            "title": "搜索引擎",
+            "description": "配置 web_search 工具可使用的搜索引擎，修改后立即生效，无需重启。",
+            "loading": "正在加载搜索引擎设置…",
+            "errorTitle": "加载搜索引擎设置失败",
+            "enabled": "启用",
+            "duckduckgo": "DuckDuckGo",
+            "region": "地区",
+            "safeSearch": "安全搜索",
+            "timeRange": "时间范围",
+            "sploitus": "Sploitus（漏洞利用聚合）",
+            "google": "Google 自定义搜索",
+            "apiKey": "API 密钥",
+            "googleCxKey": "自定义搜索引擎 ID（CX）",
+            "googleLrKey": "语言限制（LR）",
+            "traversaal": "Traversaal API 密钥",
+            "tavily": "Tavily API 密钥",
+            "firecrawl": "Firecrawl",
+            "apiUrl": "API 地址",
+            "perplexity": "Perplexity",
+            "model": "模型",
+            "contextSize": "上下文大小",
+            "searxng": "SearXNG（自托管）",
+            "categories": "分类",
+            "language": "语言",
+            "timeoutSeconds": "超时时间（秒）",
+            "webSearchInternal": "内置分析引擎（备用）",
+            "maxSites": "单次查询最大站点数",
+            "maxSiteBytes": "单站点最大字节数",
+            "secretConfigured": "已配置 — 留空则保持不变",
+            "secretEmpty": "未配置"
+        },
+        "execution": {
+            "title": "执行控制",
+            "description": "Agent 执行限制与安全监控，修改后作用于下一次流程、任务或助手对话，无需重启。",
+            "loading": "正在加载执行设置…",
+            "errorTitle": "加载执行设置失败",
+            "assistantUseAgents": "新建助手默认使用 Agent 模式",
+            "agentPlanningStepEnabled": "启用 Agent 规划步骤",
+            "maxGeneralAgentToolCalls": "通用 Agent 最大工具调用次数",
+            "maxLimitedAgentToolCalls": "受限 Agent 最大工具调用次数",
+            "monitorEnabled": "启用执行监控",
+            "sameToolLimit": "同一工具重复调用上限",
+            "totalToolLimit": "工具调用总次数上限"
         }
     }
 }

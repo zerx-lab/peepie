@@ -9,6 +9,43 @@ fragment settingsFragment on Settings {
     assistantUseAgents
 }
 
+fragment searchEngineSettingsFragment on SearchEngineSettings {
+    duckduckgoEnabled
+    duckduckgoRegion
+    duckduckgoSafesearch
+    duckduckgoTimeRange
+    sploitusEnabled
+    googleApiKeySet
+    googleCxKey
+    googleLrKey
+    traversaalApiKeySet
+    tavilyApiKeySet
+    firecrawlApiKeySet
+    firecrawlApiUrl
+    perplexityApiKeySet
+    perplexityModel
+    perplexityContextSize
+    searxngUrl
+    searxngCategories
+    searxngLanguage
+    searxngSafesearch
+    searxngTimeRange
+    searxngTimeout
+    webSearchInternalEnabled
+    webSearchInternalMaxSites
+    webSearchInternalMaxSiteBytes
+}
+
+fragment executionSettingsFragment on ExecutionSettings {
+    executionMonitorEnabled
+    executionMonitorSameToolLimit
+    executionMonitorTotalToolLimit
+    maxGeneralAgentToolCalls
+    maxLimitedAgentToolCalls
+    agentPlanningStepEnabled
+    assistantUseAgents
+}
+
 fragment flowFragment on Flow {
     id
     title
@@ -646,6 +683,18 @@ query settingsProviders {
     }
 }
 
+query settingsSearchEngines {
+    settingsSearchEngines {
+        ...searchEngineSettingsFragment
+    }
+}
+
+query settingsExecution {
+    settingsExecution {
+        ...executionSettingsFragment
+    }
+}
+
 query settingsPrompts {
     settingsPrompts {
         default {
@@ -1143,6 +1192,18 @@ mutation updateProvider($providerId: ID!, $name: String!, $agents: AgentsConfigI
 
 mutation deleteProvider($providerId: ID!) {
     deleteProvider(providerId: $providerId)
+}
+
+mutation updateSearchEngineSettings($input: SearchEngineSettingsInput!) {
+    updateSearchEngineSettings(input: $input) {
+        ...searchEngineSettingsFragment
+    }
+}
+
+mutation updateExecutionSettings($input: ExecutionSettingsInput!) {
+    updateExecutionSettings(input: $input) {
+        ...executionSettingsFragment
+    }
 }
 
 mutation validatePrompt($type: PromptType!, $template: String!) {

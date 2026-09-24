@@ -189,7 +189,7 @@ func (s *searxng) baseURL() string {
 		return ""
 	}
 
-	return s.cfg.SearxngURL
+	return s.cfg.Overrides.GetString(config.CategorySearchEngines, config.KeySearxngURL, s.cfg.SearxngURL)
 }
 
 func (s *searxng) categories() string {
@@ -197,7 +197,7 @@ func (s *searxng) categories() string {
 		return ""
 	}
 
-	return s.cfg.SearxngCategories
+	return s.cfg.Overrides.GetString(config.CategorySearchEngines, config.KeySearxngCategories, s.cfg.SearxngCategories)
 }
 
 func (s *searxng) language() string {
@@ -205,7 +205,7 @@ func (s *searxng) language() string {
 		return ""
 	}
 
-	return s.cfg.SearxngLanguage
+	return s.cfg.Overrides.GetString(config.CategorySearchEngines, config.KeySearxngLanguage, s.cfg.SearxngLanguage)
 }
 
 func (s *searxng) safeSearch() string {
@@ -213,7 +213,7 @@ func (s *searxng) safeSearch() string {
 		return ""
 	}
 
-	return s.cfg.SearxngSafeSearch
+	return s.cfg.Overrides.GetString(config.CategorySearchEngines, config.KeySearxngSafeSearch, s.cfg.SearxngSafeSearch)
 }
 
 func (s *searxng) timeRange() string {
@@ -221,15 +221,19 @@ func (s *searxng) timeRange() string {
 		return ""
 	}
 
-	return s.cfg.SearxngTimeRange
+	return s.cfg.Overrides.GetString(config.CategorySearchEngines, config.KeySearxngTimeRange, s.cfg.SearxngTimeRange)
 }
 
 func (s *searxng) timeout() time.Duration {
-	if s.cfg == nil || s.cfg.SearxngTimeout <= 0 {
+	if s.cfg == nil {
+		return defaultSearxngTimeout
+	}
+	seconds := s.cfg.Overrides.GetInt(config.CategorySearchEngines, config.KeySearxngTimeout, s.cfg.SearxngTimeout)
+	if seconds <= 0 {
 		return defaultSearxngTimeout
 	}
 
-	return time.Duration(s.cfg.SearxngTimeout) * time.Second
+	return time.Duration(seconds) * time.Second
 }
 
 // SearxngResult represents a single result from Searxng

@@ -284,5 +284,5 @@ func (t *tavily) apiKey() string {
 		return ""
 	}
 
-	return t.cfg.TavilyAPIKey
+	return t.cfg.Overrides.GetString(config.CategorySearchEngines, config.KeyTavilyAPIKey, t.cfg.TavilyAPIKey)
 }

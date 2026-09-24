@@ -184,7 +184,7 @@ func (s *sploitus) IsAvailable() bool {
 }
 
 func (s *sploitus) enabled() bool {
-	return s.cfg != nil && s.cfg.SploitusEnabled
+	return s.cfg != nil && s.cfg.Overrides.GetBool(config.CategorySearchEngines, config.KeySploitusEnabled, s.cfg.SploitusEnabled)
 }
 
 // sploitusRequest is the JSON body sent to the Sploitus search API

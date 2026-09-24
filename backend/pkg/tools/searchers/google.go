@@ -166,7 +166,7 @@ func (g *google) apiKey() string {
 		return ""
 	}
 
-	return g.cfg.GoogleAPIKey
+	return g.cfg.Overrides.GetString(config.CategorySearchEngines, config.KeyGoogleAPIKey, g.cfg.GoogleAPIKey)
 }
 
 func (g *google) cxKey() string {
@@ -174,7 +174,7 @@ func (g *google) cxKey() string {
 		return ""
 	}
 
-	return g.cfg.GoogleCXKey
+	return g.cfg.Overrides.GetString(config.CategorySearchEngines, config.KeyGoogleCXKey, g.cfg.GoogleCXKey)
 }
 
 func (g *google) lrKey() string {
@@ -182,5 +182,5 @@ func (g *google) lrKey() string {
 		return ""
 	}
 
-	return g.cfg.GoogleLRKey
+	return g.cfg.Overrides.GetString(config.CategorySearchEngines, config.KeyGoogleLRKey, g.cfg.GoogleLRKey)
 }

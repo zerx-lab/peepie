@@ -284,6 +284,40 @@ func NewProviderController(
 	return pc, nil
 }
 
+// newExecutionMonitor builds an executionMonitor from the live (override-aware)
+// execution settings. Called fresh at the start of every agent chain iteration,
+// so a Web UI change to these fields takes effect on the very next iteration
+// without restarting the process or the flow.
+func (pc *providerController) newExecutionMonitor() *executionMonitor {
+	return &executionMonitor{
+		enabled: pc.cfg.Overrides.GetBool(
+			config.CategoryExecution, config.KeyExecutionMonitorEnabled, pc.cfg.ExecutionMonitorEnabled),
+		sameThreshold: pc.cfg.Overrides.GetInt(
+			config.CategoryExecution, config.KeyExecutionSameToolLimit, pc.cfg.ExecutionMonitorSameToolLimit),
+		totalThreshold: pc.cfg.Overrides.GetInt(
+			config.CategoryExecution, config.KeyExecutionTotalToolLimit, pc.cfg.ExecutionMonitorTotalToolLimit),
+	}
+}
+
+// planningEnabled, maxGeneralAgentToolCalls and maxLimitedAgentToolCalls are
+// read at FlowProvider/AssistantProvider construction time (i.e. once per
+// flow/task/assistant), so a Web UI change takes effect for the next one
+// created without a restart.
+func (pc *providerController) planningEnabled() bool {
+	return pc.cfg.Overrides.GetBool(
+		config.CategoryExecution, config.KeyAgentPlanningStepEnabled, pc.cfg.AgentPlanningStepEnabled)
+}
+
+func (pc *providerController) maxGeneralAgentToolCalls() int {
+	return pc.cfg.Overrides.GetInt(
+		config.CategoryExecution, config.KeyMaxGeneralAgentToolCalls, pc.cfg.MaxGeneralAgentToolCalls)
+}
+
+func (pc *providerController) maxLimitedAgentToolCalls() int {
+	return pc.cfg.Overrides.GetInt(
+		config.CategoryExecution, config.KeyMaxLimitedAgentToolCalls, pc.cfg.MaxLimitedAgentToolCalls)
+}
+
 func (pc *providerController) NewFlowProvider(
 	ctx context.Context,
 	prvname provider.ProviderName,
@@ -362,22 +396,16 @@ func (pc *providerController) NewFlowProvider(
 		title:           title,
 		language:        language,
 		askUser:         askUser,
-		planning:        pc.cfg.AgentPlanningStepEnabled,
+		planning:        pc.planningEnabled(),
 		tcIDTemplate:    tcIDTemplate,
 		prompter:        prompter,
 		executor:        executor,
 		summarizer:      pc.summarizerAgent,
 		summarizerCache: newSummarizerCache(),
 		Provider:        prv,
-		maxGACallsLimit: pc.cfg.MaxGeneralAgentToolCalls,
-		maxLACallsLimit: pc.cfg.MaxLimitedAgentToolCalls,
-		buildMonitor: func() *executionMonitor {
-			return &executionMonitor{
-				enabled:        pc.cfg.ExecutionMonitorEnabled,
-				sameThreshold:  pc.cfg.ExecutionMonitorSameToolLimit,
-				totalThreshold: pc.cfg.ExecutionMonitorTotalToolLimit,
-			}
-		},
+		maxGACallsLimit: pc.maxGeneralAgentToolCalls(),
+		maxLACallsLimit: pc.maxLimitedAgentToolCalls(),
+		buildMonitor:    pc.newExecutionMonitor,
 	}
 
 	return fp, nil
@@ -412,22 +440,16 @@ func (pc *providerController) LoadFlowProvider(
 		title:           title,
 		language:        language,
 		askUser:         askUser,
-		planning:        pc.cfg.AgentPlanningStepEnabled,
+		planning:        pc.planningEnabled(),
 		tcIDTemplate:    tcIDTemplate,
 		prompter:        prompter,
 		executor:        executor,
 		summarizer:      pc.summarizerAgent,
 		summarizerCache: newSummarizerCache(),
 		Provider:        prv,
-		maxGACallsLimit: pc.cfg.MaxGeneralAgentToolCalls,
-		maxLACallsLimit: pc.cfg.MaxLimitedAgentToolCalls,
-		buildMonitor: func() *executionMonitor {
-			return &executionMonitor{
-				enabled:        pc.cfg.ExecutionMonitorEnabled,
-				sameThreshold:  pc.cfg.ExecutionMonitorSameToolLimit,
-				totalThreshold: pc.cfg.ExecutionMonitorTotalToolLimit,
-			}
-		},
+		maxGACallsLimit: pc.maxGeneralAgentToolCalls(),
+		maxLACallsLimit: pc.maxLimitedAgentToolCalls(),
+		buildMonitor:    pc.newExecutionMonitor,
 	}
 
 	return fp, nil
@@ -513,15 +535,9 @@ func (pc *providerController) NewAssistantProvider(
 			summarizer:      pc.summarizerAgent,
 			summarizerCache: newSummarizerCache(),
 			Provider:        prv,
-			maxGACallsLimit: pc.cfg.MaxGeneralAgentToolCalls,
-			maxLACallsLimit: pc.cfg.MaxLimitedAgentToolCalls,
-			buildMonitor: func() *executionMonitor {
-				return &executionMonitor{
-					enabled:        pc.cfg.ExecutionMonitorEnabled,
-					sameThreshold:  pc.cfg.ExecutionMonitorSameToolLimit,
-					totalThreshold: pc.cfg.ExecutionMonitorTotalToolLimit,
-				}
-			},
+			maxGACallsLimit: pc.maxGeneralAgentToolCalls(),
+			maxLACallsLimit: pc.maxLimitedAgentToolCalls(),
+			buildMonitor:    pc.newExecutionMonitor,
 		},
 	}
 
@@ -566,15 +582,9 @@ func (pc *providerController) LoadAssistantProvider(
 			summarizer:      pc.summarizerAgent,
 			summarizerCache: newSummarizerCache(),
 			Provider:        prv,
-			maxGACallsLimit: pc.cfg.MaxGeneralAgentToolCalls,
-			maxLACallsLimit: pc.cfg.MaxLimitedAgentToolCalls,
-			buildMonitor: func() *executionMonitor {
-				return &executionMonitor{
-					enabled:        pc.cfg.ExecutionMonitorEnabled,
-					sameThreshold:  pc.cfg.ExecutionMonitorSameToolLimit,
-					totalThreshold: pc.cfg.ExecutionMonitorTotalToolLimit,
-				}
-			},
+			maxGACallsLimit: pc.maxGeneralAgentToolCalls(),
+			maxLACallsLimit: pc.maxLimitedAgentToolCalls(),
+			buildMonitor:    pc.newExecutionMonitor,
 		},
 	}
 

@@ -223,6 +223,16 @@ type ComplexityRoot struct {
 		Qwen      func(childComplexity int) int
 	}
 
+	ExecutionSettings struct {
+		AgentPlanningStepEnabled       func(childComplexity int) int
+		AssistantUseAgents             func(childComplexity int) int
+		ExecutionMonitorEnabled        func(childComplexity int) int
+		ExecutionMonitorSameToolLimit  func(childComplexity int) int
+		ExecutionMonitorTotalToolLimit func(childComplexity int) int
+		MaxGeneralAgentToolCalls       func(childComplexity int) int
+		MaxLimitedAgentToolCalls       func(childComplexity int) int
+	}
+
 	Flow struct {
 		CreatedAt func(childComplexity int) int
 		ID        func(childComplexity int) int
@@ -360,38 +370,40 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AddFavoriteFlow         func(childComplexity int, flowID int64) int
-		AnonymizeText           func(childComplexity int, text string) int
-		CallAssistant           func(childComplexity int, flowID int64, assistantID int64, input string, useAgents bool, resourceIds []int64) int
-		CreateAPIToken          func(childComplexity int, input model.CreateAPITokenInput) int
-		CreateAssistant         func(childComplexity int, flowID int64, modelProvider string, input string, useAgents bool, resourceIds []int64) int
-		CreateFlow              func(childComplexity int, modelProvider string, input string, resourceIds []int64) int
-		CreateFlowTemplate      func(childComplexity int, input model.CreateFlowTemplateInput) int
-		CreateKnowledgeDocument func(childComplexity int, input model.CreateKnowledgeDocumentInput) int
-		CreatePrompt            func(childComplexity int, typeArg model.PromptType, template string) int
-		CreateProvider          func(childComplexity int, name string, typeArg model.ProviderType, agents model.AgentsConfig) int
-		DeleteAPIToken          func(childComplexity int, tokenID string) int
-		DeleteAssistant         func(childComplexity int, flowID int64, assistantID int64) int
-		DeleteFavoriteFlow      func(childComplexity int, flowID int64) int
-		DeleteFlow              func(childComplexity int, flowID int64) int
-		DeleteFlowTemplate      func(childComplexity int, templateID int64) int
-		DeleteKnowledgeDocument func(childComplexity int, id string) int
-		DeletePrompt            func(childComplexity int, promptID int64) int
-		DeleteProvider          func(childComplexity int, providerID int64) int
-		FinishFlow              func(childComplexity int, flowID int64) int
-		PutUserInput            func(childComplexity int, flowID int64, input string, modelProvider *string, resourceIds []int64) int
-		RenameFlow              func(childComplexity int, flowID int64, title string) int
-		RenameKnowledgeDocument func(childComplexity int, id string, question string) int
-		StopAssistant           func(childComplexity int, flowID int64, assistantID int64) int
-		StopFlow                func(childComplexity int, flowID int64) int
-		TestAgent               func(childComplexity int, typeArg model.ProviderType, agentType model.AgentConfigType, agent model.AgentConfig) int
-		TestProvider            func(childComplexity int, typeArg model.ProviderType, agents model.AgentsConfig) int
-		UpdateAPIToken          func(childComplexity int, tokenID string, input model.UpdateAPITokenInput) int
-		UpdateFlowTemplate      func(childComplexity int, templateID int64, input model.UpdateFlowTemplateInput) int
-		UpdateKnowledgeDocument func(childComplexity int, id string, input model.UpdateKnowledgeDocumentInput) int
-		UpdatePrompt            func(childComplexity int, promptID int64, template string) int
-		UpdateProvider          func(childComplexity int, providerID int64, name string, agents model.AgentsConfig) int
-		ValidatePrompt          func(childComplexity int, typeArg model.PromptType, template string) int
+		AddFavoriteFlow            func(childComplexity int, flowID int64) int
+		AnonymizeText              func(childComplexity int, text string) int
+		CallAssistant              func(childComplexity int, flowID int64, assistantID int64, input string, useAgents bool, resourceIds []int64) int
+		CreateAPIToken             func(childComplexity int, input model.CreateAPITokenInput) int
+		CreateAssistant            func(childComplexity int, flowID int64, modelProvider string, input string, useAgents bool, resourceIds []int64) int
+		CreateFlow                 func(childComplexity int, modelProvider string, input string, resourceIds []int64) int
+		CreateFlowTemplate         func(childComplexity int, input model.CreateFlowTemplateInput) int
+		CreateKnowledgeDocument    func(childComplexity int, input model.CreateKnowledgeDocumentInput) int
+		CreatePrompt               func(childComplexity int, typeArg model.PromptType, template string) int
+		CreateProvider             func(childComplexity int, name string, typeArg model.ProviderType, agents model.AgentsConfig) int
+		DeleteAPIToken             func(childComplexity int, tokenID string) int
+		DeleteAssistant            func(childComplexity int, flowID int64, assistantID int64) int
+		DeleteFavoriteFlow         func(childComplexity int, flowID int64) int
+		DeleteFlow                 func(childComplexity int, flowID int64) int
+		DeleteFlowTemplate         func(childComplexity int, templateID int64) int
+		DeleteKnowledgeDocument    func(childComplexity int, id string) int
+		DeletePrompt               func(childComplexity int, promptID int64) int
+		DeleteProvider             func(childComplexity int, providerID int64) int
+		FinishFlow                 func(childComplexity int, flowID int64) int
+		PutUserInput               func(childComplexity int, flowID int64, input string, modelProvider *string, resourceIds []int64) int
+		RenameFlow                 func(childComplexity int, flowID int64, title string) int
+		RenameKnowledgeDocument    func(childComplexity int, id string, question string) int
+		StopAssistant              func(childComplexity int, flowID int64, assistantID int64) int
+		StopFlow                   func(childComplexity int, flowID int64) int
+		TestAgent                  func(childComplexity int, typeArg model.ProviderType, agentType model.AgentConfigType, agent model.AgentConfig) int
+		TestProvider               func(childComplexity int, typeArg model.ProviderType, agents model.AgentsConfig) int
+		UpdateAPIToken             func(childComplexity int, tokenID string, input model.UpdateAPITokenInput) int
+		UpdateExecutionSettings    func(childComplexity int, input model.ExecutionSettingsInput) int
+		UpdateFlowTemplate         func(childComplexity int, templateID int64, input model.UpdateFlowTemplateInput) int
+		UpdateKnowledgeDocument    func(childComplexity int, id string, input model.UpdateKnowledgeDocumentInput) int
+		UpdatePrompt               func(childComplexity int, promptID int64, template string) int
+		UpdateProvider             func(childComplexity int, providerID int64, name string, agents model.AgentsConfig) int
+		UpdateSearchEngineSettings func(childComplexity int, input model.SearchEngineSettingsInput) int
+		ValidatePrompt             func(childComplexity int, typeArg model.PromptType, template string) int
 	}
 
 	PromptValidationResult struct {
@@ -501,8 +513,10 @@ type ComplexityRoot struct {
 		SearchKnowledge                 func(childComplexity int, query string, filter *model.KnowledgeFilter, limit *int) int
 		SearchLogs                      func(childComplexity int, flowID int64) int
 		Settings                        func(childComplexity int) int
+		SettingsExecution               func(childComplexity int) int
 		SettingsPrompts                 func(childComplexity int) int
 		SettingsProviders               func(childComplexity int) int
+		SettingsSearchEngines           func(childComplexity int) int
 		SettingsUser                    func(childComplexity int) int
 		Tasks                           func(childComplexity int, flowID int64) int
 		TerminalLogs                    func(childComplexity int, flowID int64) int
@@ -537,6 +551,33 @@ type ComplexityRoot struct {
 		SubtaskID func(childComplexity int) int
 		TaskID    func(childComplexity int) int
 		URL       func(childComplexity int) int
+	}
+
+	SearchEngineSettings struct {
+		DuckduckgoEnabled             func(childComplexity int) int
+		DuckduckgoRegion              func(childComplexity int) int
+		DuckduckgoSafesearch          func(childComplexity int) int
+		DuckduckgoTimeRange           func(childComplexity int) int
+		FirecrawlAPIKeySet            func(childComplexity int) int
+		FirecrawlAPIURL               func(childComplexity int) int
+		GoogleAPIKeySet               func(childComplexity int) int
+		GoogleCxKey                   func(childComplexity int) int
+		GoogleLrKey                   func(childComplexity int) int
+		PerplexityAPIKeySet           func(childComplexity int) int
+		PerplexityContextSize         func(childComplexity int) int
+		PerplexityModel               func(childComplexity int) int
+		SearxngCategories             func(childComplexity int) int
+		SearxngLanguage               func(childComplexity int) int
+		SearxngSafesearch             func(childComplexity int) int
+		SearxngTimeRange              func(childComplexity int) int
+		SearxngTimeout                func(childComplexity int) int
+		SearxngURL                    func(childComplexity int) int
+		SploitusEnabled               func(childComplexity int) int
+		TavilyAPIKeySet               func(childComplexity int) int
+		TraversaalAPIKeySet           func(childComplexity int) int
+		WebSearchInternalEnabled      func(childComplexity int) int
+		WebSearchInternalMaxSiteBytes func(childComplexity int) int
+		WebSearchInternalMaxSites     func(childComplexity int) int
 	}
 
 	SearchLog struct {
@@ -773,6 +814,8 @@ type MutationResolver interface {
 	CreatePrompt(ctx context.Context, typeArg model.PromptType, template string) (*model.UserPrompt, error)
 	UpdatePrompt(ctx context.Context, promptID int64, template string) (*model.UserPrompt, error)
 	DeletePrompt(ctx context.Context, promptID int64) (model.ResultType, error)
+	UpdateSearchEngineSettings(ctx context.Context, input model.SearchEngineSettingsInput) (*model.SearchEngineSettings, error)
+	UpdateExecutionSettings(ctx context.Context, input model.ExecutionSettingsInput) (*model.ExecutionSettings, error)
 	CreateAPIToken(ctx context.Context, input model.CreateAPITokenInput) (*model.APITokenWithSecret, error)
 	UpdateAPIToken(ctx context.Context, tokenID string, input model.UpdateAPITokenInput) (*model.APIToken, error)
 	DeleteAPIToken(ctx context.Context, tokenID string) (bool, error)
@@ -823,6 +866,8 @@ type QueryResolver interface {
 	SettingsProviders(ctx context.Context) (*model.ProvidersConfig, error)
 	SettingsPrompts(ctx context.Context) (*model.PromptsConfig, error)
 	SettingsUser(ctx context.Context) (*model.UserPreferences, error)
+	SettingsSearchEngines(ctx context.Context) (*model.SearchEngineSettings, error)
+	SettingsExecution(ctx context.Context) (*model.ExecutionSettings, error)
 	APIToken(ctx context.Context, tokenID string) (*model.APIToken, error)
 	APITokens(ctx context.Context) ([]*model.APIToken, error)
 	FlowTemplate(ctx context.Context, templateID int64) (*model.FlowTemplate, error)
@@ -1724,6 +1769,55 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.DefaultProvidersConfig.Qwen(childComplexity), true
+
+	case "ExecutionSettings.agentPlanningStepEnabled":
+		if e.complexity.ExecutionSettings.AgentPlanningStepEnabled == nil {
+			break
+		}
+
+		return e.complexity.ExecutionSettings.AgentPlanningStepEnabled(childComplexity), true
+
+	case "ExecutionSettings.assistantUseAgents":
+		if e.complexity.ExecutionSettings.AssistantUseAgents == nil {
+			break
+		}
+
+		return e.complexity.ExecutionSettings.AssistantUseAgents(childComplexity), true
+
+	case "ExecutionSettings.executionMonitorEnabled":
+		if e.complexity.ExecutionSettings.ExecutionMonitorEnabled == nil {
+			break
+		}
+
+		return e.complexity.ExecutionSettings.ExecutionMonitorEnabled(childComplexity), true
+
+	case "ExecutionSettings.executionMonitorSameToolLimit":
+		if e.complexity.ExecutionSettings.ExecutionMonitorSameToolLimit == nil {
+			break
+		}
+
+		return e.complexity.ExecutionSettings.ExecutionMonitorSameToolLimit(childComplexity), true
+
+	case "ExecutionSettings.executionMonitorTotalToolLimit":
+		if e.complexity.ExecutionSettings.ExecutionMonitorTotalToolLimit == nil {
+			break
+		}
+
+		return e.complexity.ExecutionSettings.ExecutionMonitorTotalToolLimit(childComplexity), true
+
+	case "ExecutionSettings.maxGeneralAgentToolCalls":
+		if e.complexity.ExecutionSettings.MaxGeneralAgentToolCalls == nil {
+			break
+		}
+
+		return e.complexity.ExecutionSettings.MaxGeneralAgentToolCalls(childComplexity), true
+
+	case "ExecutionSettings.maxLimitedAgentToolCalls":
+		if e.complexity.ExecutionSettings.MaxLimitedAgentToolCalls == nil {
+			break
+		}
+
+		return e.complexity.ExecutionSettings.MaxLimitedAgentToolCalls(childComplexity), true
 
 	case "Flow.createdAt":
 		if e.complexity.Flow.CreatedAt == nil {
@@ -2665,6 +2759,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateAPIToken(childComplexity, args["tokenId"].(string), args["input"].(model.UpdateAPITokenInput)), true
 
+	case "Mutation.updateExecutionSettings":
+		if e.complexity.Mutation.UpdateExecutionSettings == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateExecutionSettings_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateExecutionSettings(childComplexity, args["input"].(model.ExecutionSettingsInput)), true
+
 	case "Mutation.updateFlowTemplate":
 		if e.complexity.Mutation.UpdateFlowTemplate == nil {
 			break
@@ -2712,6 +2818,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateProvider(childComplexity, args["providerId"].(int64), args["name"].(string), args["agents"].(model.AgentsConfig)), true
+
+	case "Mutation.updateSearchEngineSettings":
+		if e.complexity.Mutation.UpdateSearchEngineSettings == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateSearchEngineSettings_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateSearchEngineSettings(childComplexity, args["input"].(model.SearchEngineSettingsInput)), true
 
 	case "Mutation.validatePrompt":
 		if e.complexity.Mutation.ValidatePrompt == nil {
@@ -3363,6 +3481,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Settings(childComplexity), true
 
+	case "Query.settingsExecution":
+		if e.complexity.Query.SettingsExecution == nil {
+			break
+		}
+
+		return e.complexity.Query.SettingsExecution(childComplexity), true
+
 	case "Query.settingsPrompts":
 		if e.complexity.Query.SettingsPrompts == nil {
 			break
@@ -3376,6 +3501,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.SettingsProviders(childComplexity), true
+
+	case "Query.settingsSearchEngines":
+		if e.complexity.Query.SettingsSearchEngines == nil {
+			break
+		}
+
+		return e.complexity.Query.SettingsSearchEngines(childComplexity), true
 
 	case "Query.settingsUser":
 		if e.complexity.Query.SettingsUser == nil {
@@ -3627,6 +3759,174 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Screenshot.URL(childComplexity), true
+
+	case "SearchEngineSettings.duckduckgoEnabled":
+		if e.complexity.SearchEngineSettings.DuckduckgoEnabled == nil {
+			break
+		}
+
+		return e.complexity.SearchEngineSettings.DuckduckgoEnabled(childComplexity), true
+
+	case "SearchEngineSettings.duckduckgoRegion":
+		if e.complexity.SearchEngineSettings.DuckduckgoRegion == nil {
+			break
+		}
+
+		return e.complexity.SearchEngineSettings.DuckduckgoRegion(childComplexity), true
+
+	case "SearchEngineSettings.duckduckgoSafesearch":
+		if e.complexity.SearchEngineSettings.DuckduckgoSafesearch == nil {
+			break
+		}
+
+		return e.complexity.SearchEngineSettings.DuckduckgoSafesearch(childComplexity), true
+
+	case "SearchEngineSettings.duckduckgoTimeRange":
+		if e.complexity.SearchEngineSettings.DuckduckgoTimeRange == nil {
+			break
+		}
+
+		return e.complexity.SearchEngineSettings.DuckduckgoTimeRange(childComplexity), true
+
+	case "SearchEngineSettings.firecrawlApiKeySet":
+		if e.complexity.SearchEngineSettings.FirecrawlAPIKeySet == nil {
+			break
+		}
+
+		return e.complexity.SearchEngineSettings.FirecrawlAPIKeySet(childComplexity), true
+
+	case "SearchEngineSettings.firecrawlApiUrl":
+		if e.complexity.SearchEngineSettings.FirecrawlAPIURL == nil {
+			break
+		}
+
+		return e.complexity.SearchEngineSettings.FirecrawlAPIURL(childComplexity), true
+
+	case "SearchEngineSettings.googleApiKeySet":
+		if e.complexity.SearchEngineSettings.GoogleAPIKeySet == nil {
+			break
+		}
+
+		return e.complexity.SearchEngineSettings.GoogleAPIKeySet(childComplexity), true
+
+	case "SearchEngineSettings.googleCxKey":
+		if e.complexity.SearchEngineSettings.GoogleCxKey == nil {
+			break
+		}
+
+		return e.complexity.SearchEngineSettings.GoogleCxKey(childComplexity), true
+
+	case "SearchEngineSettings.googleLrKey":
+		if e.complexity.SearchEngineSettings.GoogleLrKey == nil {
+			break
+		}
+
+		return e.complexity.SearchEngineSettings.GoogleLrKey(childComplexity), true
+
+	case "SearchEngineSettings.perplexityApiKeySet":
+		if e.complexity.SearchEngineSettings.PerplexityAPIKeySet == nil {
+			break
+		}
+
+		return e.complexity.SearchEngineSettings.PerplexityAPIKeySet(childComplexity), true
+
+	case "SearchEngineSettings.perplexityContextSize":
+		if e.complexity.SearchEngineSettings.PerplexityContextSize == nil {
+			break
+		}
+
+		return e.complexity.SearchEngineSettings.PerplexityContextSize(childComplexity), true
+
+	case "SearchEngineSettings.perplexityModel":
+		if e.complexity.SearchEngineSettings.PerplexityModel == nil {
+			break
+		}
+
+		return e.complexity.SearchEngineSettings.PerplexityModel(childComplexity), true
+
+	case "SearchEngineSettings.searxngCategories":
+		if e.complexity.SearchEngineSettings.SearxngCategories == nil {
+			break
+		}
+
+		return e.complexity.SearchEngineSettings.SearxngCategories(childComplexity), true
+
+	case "SearchEngineSettings.searxngLanguage":
+		if e.complexity.SearchEngineSettings.SearxngLanguage == nil {
+			break
+		}
+
+		return e.complexity.SearchEngineSettings.SearxngLanguage(childComplexity), true
+
+	case "SearchEngineSettings.searxngSafesearch":
+		if e.complexity.SearchEngineSettings.SearxngSafesearch == nil {
+			break
+		}
+
+		return e.complexity.SearchEngineSettings.SearxngSafesearch(childComplexity), true
+
+	case "SearchEngineSettings.searxngTimeRange":
+		if e.complexity.SearchEngineSettings.SearxngTimeRange == nil {
+			break
+		}
+
+		return e.complexity.SearchEngineSettings.SearxngTimeRange(childComplexity), true
+
+	case "SearchEngineSettings.searxngTimeout":
+		if e.complexity.SearchEngineSettings.SearxngTimeout == nil {
+			break
+		}
+
+		return e.complexity.SearchEngineSettings.SearxngTimeout(childComplexity), true
+
+	case "SearchEngineSettings.searxngUrl":
+		if e.complexity.SearchEngineSettings.SearxngURL == nil {
+			break
+		}
+
+		return e.complexity.SearchEngineSettings.SearxngURL(childComplexity), true
+
+	case "SearchEngineSettings.sploitusEnabled":
+		if e.complexity.SearchEngineSettings.SploitusEnabled == nil {
+			break
+		}
+
+		return e.complexity.SearchEngineSettings.SploitusEnabled(childComplexity), true
+
+	case "SearchEngineSettings.tavilyApiKeySet":
+		if e.complexity.SearchEngineSettings.TavilyAPIKeySet == nil {
+			break
+		}
+
+		return e.complexity.SearchEngineSettings.TavilyAPIKeySet(childComplexity), true
+
+	case "SearchEngineSettings.traversaalApiKeySet":
+		if e.complexity.SearchEngineSettings.TraversaalAPIKeySet == nil {
+			break
+		}
+
+		return e.complexity.SearchEngineSettings.TraversaalAPIKeySet(childComplexity), true
+
+	case "SearchEngineSettings.webSearchInternalEnabled":
+		if e.complexity.SearchEngineSettings.WebSearchInternalEnabled == nil {
+			break
+		}
+
+		return e.complexity.SearchEngineSettings.WebSearchInternalEnabled(childComplexity), true
+
+	case "SearchEngineSettings.webSearchInternalMaxSiteBytes":
+		if e.complexity.SearchEngineSettings.WebSearchInternalMaxSiteBytes == nil {
+			break
+		}
+
+		return e.complexity.SearchEngineSettings.WebSearchInternalMaxSiteBytes(childComplexity), true
+
+	case "SearchEngineSettings.webSearchInternalMaxSites":
+		if e.complexity.SearchEngineSettings.WebSearchInternalMaxSites == nil {
+			break
+		}
+
+		return e.complexity.SearchEngineSettings.WebSearchInternalMaxSites(childComplexity), true
 
 	case "SearchLog.createdAt":
 		if e.complexity.SearchLog.CreatedAt == nil {
@@ -4849,9 +5149,11 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCreateAPITokenInput,
 		ec.unmarshalInputCreateFlowTemplateInput,
 		ec.unmarshalInputCreateKnowledgeDocumentInput,
+		ec.unmarshalInputExecutionSettingsInput,
 		ec.unmarshalInputKnowledgeFilter,
 		ec.unmarshalInputModelPriceInput,
 		ec.unmarshalInputReasoningConfigInput,
+		ec.unmarshalInputSearchEngineSettingsInput,
 		ec.unmarshalInputUpdateAPITokenInput,
 		ec.unmarshalInputUpdateFlowTemplateInput,
 		ec.unmarshalInputUpdateKnowledgeDocumentInput,
@@ -6500,6 +6802,38 @@ func (ec *executionContext) field_Mutation_updateAPIToken_argsInput(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_updateExecutionSettings_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	arg0, err := ec.field_Mutation_updateExecutionSettings_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updateExecutionSettings_argsInput(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (model.ExecutionSettingsInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["input"]
+	if !ok {
+		var zeroVal model.ExecutionSettingsInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNExecutionSettingsInput2pentagiᚋpkgᚋgraphᚋmodelᚐExecutionSettingsInput(ctx, tmp)
+	}
+
+	var zeroVal model.ExecutionSettingsInput
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_updateFlowTemplate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -6760,6 +7094,38 @@ func (ec *executionContext) field_Mutation_updateProvider_argsAgents(
 	}
 
 	var zeroVal model.AgentsConfig
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateSearchEngineSettings_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	arg0, err := ec.field_Mutation_updateSearchEngineSettings_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updateSearchEngineSettings_argsInput(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (model.SearchEngineSettingsInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["input"]
+	if !ok {
+		var zeroVal model.SearchEngineSettingsInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNSearchEngineSettingsInput2pentagiᚋpkgᚋgraphᚋmodelᚐSearchEngineSettingsInput(ctx, tmp)
+	}
+
+	var zeroVal model.SearchEngineSettingsInput
 	return zeroVal, nil
 }
 
@@ -14583,6 +14949,314 @@ func (ec *executionContext) fieldContext_DefaultProvidersConfig_minimax(_ contex
 	return fc, nil
 }
 
+func (ec *executionContext) _ExecutionSettings_executionMonitorEnabled(ctx context.Context, field graphql.CollectedField, obj *model.ExecutionSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExecutionSettings_executionMonitorEnabled(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ExecutionMonitorEnabled, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ExecutionSettings_executionMonitorEnabled(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ExecutionSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ExecutionSettings_executionMonitorSameToolLimit(ctx context.Context, field graphql.CollectedField, obj *model.ExecutionSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExecutionSettings_executionMonitorSameToolLimit(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ExecutionMonitorSameToolLimit, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ExecutionSettings_executionMonitorSameToolLimit(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ExecutionSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ExecutionSettings_executionMonitorTotalToolLimit(ctx context.Context, field graphql.CollectedField, obj *model.ExecutionSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExecutionSettings_executionMonitorTotalToolLimit(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ExecutionMonitorTotalToolLimit, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ExecutionSettings_executionMonitorTotalToolLimit(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ExecutionSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ExecutionSettings_maxGeneralAgentToolCalls(ctx context.Context, field graphql.CollectedField, obj *model.ExecutionSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExecutionSettings_maxGeneralAgentToolCalls(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MaxGeneralAgentToolCalls, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ExecutionSettings_maxGeneralAgentToolCalls(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ExecutionSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ExecutionSettings_maxLimitedAgentToolCalls(ctx context.Context, field graphql.CollectedField, obj *model.ExecutionSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExecutionSettings_maxLimitedAgentToolCalls(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MaxLimitedAgentToolCalls, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ExecutionSettings_maxLimitedAgentToolCalls(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ExecutionSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ExecutionSettings_agentPlanningStepEnabled(ctx context.Context, field graphql.CollectedField, obj *model.ExecutionSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExecutionSettings_agentPlanningStepEnabled(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AgentPlanningStepEnabled, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ExecutionSettings_agentPlanningStepEnabled(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ExecutionSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ExecutionSettings_assistantUseAgents(ctx context.Context, field graphql.CollectedField, obj *model.ExecutionSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExecutionSettings_assistantUseAgents(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AssistantUseAgents, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ExecutionSettings_assistantUseAgents(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ExecutionSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Flow_id(ctx context.Context, field graphql.CollectedField, obj *model.Flow) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Flow_id(ctx, field)
 	if err != nil {
@@ -19715,6 +20389,182 @@ func (ec *executionContext) fieldContext_Mutation_deletePrompt(ctx context.Conte
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deletePrompt_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateSearchEngineSettings(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateSearchEngineSettings(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateSearchEngineSettings(rctx, fc.Args["input"].(model.SearchEngineSettingsInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.SearchEngineSettings)
+	fc.Result = res
+	return ec.marshalNSearchEngineSettings2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐSearchEngineSettings(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateSearchEngineSettings(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "duckduckgoEnabled":
+				return ec.fieldContext_SearchEngineSettings_duckduckgoEnabled(ctx, field)
+			case "duckduckgoRegion":
+				return ec.fieldContext_SearchEngineSettings_duckduckgoRegion(ctx, field)
+			case "duckduckgoSafesearch":
+				return ec.fieldContext_SearchEngineSettings_duckduckgoSafesearch(ctx, field)
+			case "duckduckgoTimeRange":
+				return ec.fieldContext_SearchEngineSettings_duckduckgoTimeRange(ctx, field)
+			case "sploitusEnabled":
+				return ec.fieldContext_SearchEngineSettings_sploitusEnabled(ctx, field)
+			case "googleApiKeySet":
+				return ec.fieldContext_SearchEngineSettings_googleApiKeySet(ctx, field)
+			case "googleCxKey":
+				return ec.fieldContext_SearchEngineSettings_googleCxKey(ctx, field)
+			case "googleLrKey":
+				return ec.fieldContext_SearchEngineSettings_googleLrKey(ctx, field)
+			case "traversaalApiKeySet":
+				return ec.fieldContext_SearchEngineSettings_traversaalApiKeySet(ctx, field)
+			case "tavilyApiKeySet":
+				return ec.fieldContext_SearchEngineSettings_tavilyApiKeySet(ctx, field)
+			case "firecrawlApiKeySet":
+				return ec.fieldContext_SearchEngineSettings_firecrawlApiKeySet(ctx, field)
+			case "firecrawlApiUrl":
+				return ec.fieldContext_SearchEngineSettings_firecrawlApiUrl(ctx, field)
+			case "perplexityApiKeySet":
+				return ec.fieldContext_SearchEngineSettings_perplexityApiKeySet(ctx, field)
+			case "perplexityModel":
+				return ec.fieldContext_SearchEngineSettings_perplexityModel(ctx, field)
+			case "perplexityContextSize":
+				return ec.fieldContext_SearchEngineSettings_perplexityContextSize(ctx, field)
+			case "searxngUrl":
+				return ec.fieldContext_SearchEngineSettings_searxngUrl(ctx, field)
+			case "searxngCategories":
+				return ec.fieldContext_SearchEngineSettings_searxngCategories(ctx, field)
+			case "searxngLanguage":
+				return ec.fieldContext_SearchEngineSettings_searxngLanguage(ctx, field)
+			case "searxngSafesearch":
+				return ec.fieldContext_SearchEngineSettings_searxngSafesearch(ctx, field)
+			case "searxngTimeRange":
+				return ec.fieldContext_SearchEngineSettings_searxngTimeRange(ctx, field)
+			case "searxngTimeout":
+				return ec.fieldContext_SearchEngineSettings_searxngTimeout(ctx, field)
+			case "webSearchInternalEnabled":
+				return ec.fieldContext_SearchEngineSettings_webSearchInternalEnabled(ctx, field)
+			case "webSearchInternalMaxSites":
+				return ec.fieldContext_SearchEngineSettings_webSearchInternalMaxSites(ctx, field)
+			case "webSearchInternalMaxSiteBytes":
+				return ec.fieldContext_SearchEngineSettings_webSearchInternalMaxSiteBytes(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type SearchEngineSettings", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateSearchEngineSettings_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateExecutionSettings(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateExecutionSettings(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateExecutionSettings(rctx, fc.Args["input"].(model.ExecutionSettingsInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ExecutionSettings)
+	fc.Result = res
+	return ec.marshalNExecutionSettings2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐExecutionSettings(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateExecutionSettings(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "executionMonitorEnabled":
+				return ec.fieldContext_ExecutionSettings_executionMonitorEnabled(ctx, field)
+			case "executionMonitorSameToolLimit":
+				return ec.fieldContext_ExecutionSettings_executionMonitorSameToolLimit(ctx, field)
+			case "executionMonitorTotalToolLimit":
+				return ec.fieldContext_ExecutionSettings_executionMonitorTotalToolLimit(ctx, field)
+			case "maxGeneralAgentToolCalls":
+				return ec.fieldContext_ExecutionSettings_maxGeneralAgentToolCalls(ctx, field)
+			case "maxLimitedAgentToolCalls":
+				return ec.fieldContext_ExecutionSettings_maxLimitedAgentToolCalls(ctx, field)
+			case "agentPlanningStepEnabled":
+				return ec.fieldContext_ExecutionSettings_agentPlanningStepEnabled(ctx, field)
+			case "assistantUseAgents":
+				return ec.fieldContext_ExecutionSettings_assistantUseAgents(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ExecutionSettings", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateExecutionSettings_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -25571,6 +26421,160 @@ func (ec *executionContext) fieldContext_Query_settingsUser(_ context.Context, f
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_settingsSearchEngines(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_settingsSearchEngines(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().SettingsSearchEngines(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.SearchEngineSettings)
+	fc.Result = res
+	return ec.marshalNSearchEngineSettings2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐSearchEngineSettings(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_settingsSearchEngines(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "duckduckgoEnabled":
+				return ec.fieldContext_SearchEngineSettings_duckduckgoEnabled(ctx, field)
+			case "duckduckgoRegion":
+				return ec.fieldContext_SearchEngineSettings_duckduckgoRegion(ctx, field)
+			case "duckduckgoSafesearch":
+				return ec.fieldContext_SearchEngineSettings_duckduckgoSafesearch(ctx, field)
+			case "duckduckgoTimeRange":
+				return ec.fieldContext_SearchEngineSettings_duckduckgoTimeRange(ctx, field)
+			case "sploitusEnabled":
+				return ec.fieldContext_SearchEngineSettings_sploitusEnabled(ctx, field)
+			case "googleApiKeySet":
+				return ec.fieldContext_SearchEngineSettings_googleApiKeySet(ctx, field)
+			case "googleCxKey":
+				return ec.fieldContext_SearchEngineSettings_googleCxKey(ctx, field)
+			case "googleLrKey":
+				return ec.fieldContext_SearchEngineSettings_googleLrKey(ctx, field)
+			case "traversaalApiKeySet":
+				return ec.fieldContext_SearchEngineSettings_traversaalApiKeySet(ctx, field)
+			case "tavilyApiKeySet":
+				return ec.fieldContext_SearchEngineSettings_tavilyApiKeySet(ctx, field)
+			case "firecrawlApiKeySet":
+				return ec.fieldContext_SearchEngineSettings_firecrawlApiKeySet(ctx, field)
+			case "firecrawlApiUrl":
+				return ec.fieldContext_SearchEngineSettings_firecrawlApiUrl(ctx, field)
+			case "perplexityApiKeySet":
+				return ec.fieldContext_SearchEngineSettings_perplexityApiKeySet(ctx, field)
+			case "perplexityModel":
+				return ec.fieldContext_SearchEngineSettings_perplexityModel(ctx, field)
+			case "perplexityContextSize":
+				return ec.fieldContext_SearchEngineSettings_perplexityContextSize(ctx, field)
+			case "searxngUrl":
+				return ec.fieldContext_SearchEngineSettings_searxngUrl(ctx, field)
+			case "searxngCategories":
+				return ec.fieldContext_SearchEngineSettings_searxngCategories(ctx, field)
+			case "searxngLanguage":
+				return ec.fieldContext_SearchEngineSettings_searxngLanguage(ctx, field)
+			case "searxngSafesearch":
+				return ec.fieldContext_SearchEngineSettings_searxngSafesearch(ctx, field)
+			case "searxngTimeRange":
+				return ec.fieldContext_SearchEngineSettings_searxngTimeRange(ctx, field)
+			case "searxngTimeout":
+				return ec.fieldContext_SearchEngineSettings_searxngTimeout(ctx, field)
+			case "webSearchInternalEnabled":
+				return ec.fieldContext_SearchEngineSettings_webSearchInternalEnabled(ctx, field)
+			case "webSearchInternalMaxSites":
+				return ec.fieldContext_SearchEngineSettings_webSearchInternalMaxSites(ctx, field)
+			case "webSearchInternalMaxSiteBytes":
+				return ec.fieldContext_SearchEngineSettings_webSearchInternalMaxSiteBytes(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type SearchEngineSettings", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_settingsExecution(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_settingsExecution(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().SettingsExecution(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ExecutionSettings)
+	fc.Result = res
+	return ec.marshalNExecutionSettings2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐExecutionSettings(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_settingsExecution(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "executionMonitorEnabled":
+				return ec.fieldContext_ExecutionSettings_executionMonitorEnabled(ctx, field)
+			case "executionMonitorSameToolLimit":
+				return ec.fieldContext_ExecutionSettings_executionMonitorSameToolLimit(ctx, field)
+			case "executionMonitorTotalToolLimit":
+				return ec.fieldContext_ExecutionSettings_executionMonitorTotalToolLimit(ctx, field)
+			case "maxGeneralAgentToolCalls":
+				return ec.fieldContext_ExecutionSettings_maxGeneralAgentToolCalls(ctx, field)
+			case "maxLimitedAgentToolCalls":
+				return ec.fieldContext_ExecutionSettings_maxLimitedAgentToolCalls(ctx, field)
+			case "agentPlanningStepEnabled":
+				return ec.fieldContext_ExecutionSettings_agentPlanningStepEnabled(ctx, field)
+			case "assistantUseAgents":
+				return ec.fieldContext_ExecutionSettings_assistantUseAgents(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ExecutionSettings", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_apiToken(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_apiToken(ctx, field)
 	if err != nil {
@@ -26688,6 +27692,1062 @@ func (ec *executionContext) fieldContext_Screenshot_createdAt(_ context.Context,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchEngineSettings_duckduckgoEnabled(ctx context.Context, field graphql.CollectedField, obj *model.SearchEngineSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchEngineSettings_duckduckgoEnabled(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DuckduckgoEnabled, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchEngineSettings_duckduckgoEnabled(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchEngineSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchEngineSettings_duckduckgoRegion(ctx context.Context, field graphql.CollectedField, obj *model.SearchEngineSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchEngineSettings_duckduckgoRegion(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DuckduckgoRegion, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchEngineSettings_duckduckgoRegion(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchEngineSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchEngineSettings_duckduckgoSafesearch(ctx context.Context, field graphql.CollectedField, obj *model.SearchEngineSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchEngineSettings_duckduckgoSafesearch(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DuckduckgoSafesearch, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchEngineSettings_duckduckgoSafesearch(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchEngineSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchEngineSettings_duckduckgoTimeRange(ctx context.Context, field graphql.CollectedField, obj *model.SearchEngineSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchEngineSettings_duckduckgoTimeRange(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DuckduckgoTimeRange, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchEngineSettings_duckduckgoTimeRange(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchEngineSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchEngineSettings_sploitusEnabled(ctx context.Context, field graphql.CollectedField, obj *model.SearchEngineSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchEngineSettings_sploitusEnabled(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SploitusEnabled, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchEngineSettings_sploitusEnabled(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchEngineSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchEngineSettings_googleApiKeySet(ctx context.Context, field graphql.CollectedField, obj *model.SearchEngineSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchEngineSettings_googleApiKeySet(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.GoogleAPIKeySet, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchEngineSettings_googleApiKeySet(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchEngineSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchEngineSettings_googleCxKey(ctx context.Context, field graphql.CollectedField, obj *model.SearchEngineSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchEngineSettings_googleCxKey(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.GoogleCxKey, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchEngineSettings_googleCxKey(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchEngineSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchEngineSettings_googleLrKey(ctx context.Context, field graphql.CollectedField, obj *model.SearchEngineSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchEngineSettings_googleLrKey(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.GoogleLrKey, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchEngineSettings_googleLrKey(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchEngineSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchEngineSettings_traversaalApiKeySet(ctx context.Context, field graphql.CollectedField, obj *model.SearchEngineSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchEngineSettings_traversaalApiKeySet(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TraversaalAPIKeySet, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchEngineSettings_traversaalApiKeySet(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchEngineSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchEngineSettings_tavilyApiKeySet(ctx context.Context, field graphql.CollectedField, obj *model.SearchEngineSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchEngineSettings_tavilyApiKeySet(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TavilyAPIKeySet, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchEngineSettings_tavilyApiKeySet(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchEngineSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchEngineSettings_firecrawlApiKeySet(ctx context.Context, field graphql.CollectedField, obj *model.SearchEngineSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchEngineSettings_firecrawlApiKeySet(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FirecrawlAPIKeySet, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchEngineSettings_firecrawlApiKeySet(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchEngineSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchEngineSettings_firecrawlApiUrl(ctx context.Context, field graphql.CollectedField, obj *model.SearchEngineSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchEngineSettings_firecrawlApiUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FirecrawlAPIURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchEngineSettings_firecrawlApiUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchEngineSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchEngineSettings_perplexityApiKeySet(ctx context.Context, field graphql.CollectedField, obj *model.SearchEngineSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchEngineSettings_perplexityApiKeySet(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PerplexityAPIKeySet, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchEngineSettings_perplexityApiKeySet(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchEngineSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchEngineSettings_perplexityModel(ctx context.Context, field graphql.CollectedField, obj *model.SearchEngineSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchEngineSettings_perplexityModel(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PerplexityModel, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchEngineSettings_perplexityModel(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchEngineSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchEngineSettings_perplexityContextSize(ctx context.Context, field graphql.CollectedField, obj *model.SearchEngineSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchEngineSettings_perplexityContextSize(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PerplexityContextSize, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchEngineSettings_perplexityContextSize(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchEngineSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchEngineSettings_searxngUrl(ctx context.Context, field graphql.CollectedField, obj *model.SearchEngineSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchEngineSettings_searxngUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SearxngURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchEngineSettings_searxngUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchEngineSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchEngineSettings_searxngCategories(ctx context.Context, field graphql.CollectedField, obj *model.SearchEngineSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchEngineSettings_searxngCategories(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SearxngCategories, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchEngineSettings_searxngCategories(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchEngineSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchEngineSettings_searxngLanguage(ctx context.Context, field graphql.CollectedField, obj *model.SearchEngineSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchEngineSettings_searxngLanguage(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SearxngLanguage, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchEngineSettings_searxngLanguage(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchEngineSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchEngineSettings_searxngSafesearch(ctx context.Context, field graphql.CollectedField, obj *model.SearchEngineSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchEngineSettings_searxngSafesearch(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SearxngSafesearch, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchEngineSettings_searxngSafesearch(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchEngineSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchEngineSettings_searxngTimeRange(ctx context.Context, field graphql.CollectedField, obj *model.SearchEngineSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchEngineSettings_searxngTimeRange(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SearxngTimeRange, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchEngineSettings_searxngTimeRange(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchEngineSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchEngineSettings_searxngTimeout(ctx context.Context, field graphql.CollectedField, obj *model.SearchEngineSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchEngineSettings_searxngTimeout(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SearxngTimeout, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchEngineSettings_searxngTimeout(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchEngineSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchEngineSettings_webSearchInternalEnabled(ctx context.Context, field graphql.CollectedField, obj *model.SearchEngineSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchEngineSettings_webSearchInternalEnabled(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.WebSearchInternalEnabled, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchEngineSettings_webSearchInternalEnabled(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchEngineSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchEngineSettings_webSearchInternalMaxSites(ctx context.Context, field graphql.CollectedField, obj *model.SearchEngineSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchEngineSettings_webSearchInternalMaxSites(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.WebSearchInternalMaxSites, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchEngineSettings_webSearchInternalMaxSites(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchEngineSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchEngineSettings_webSearchInternalMaxSiteBytes(ctx context.Context, field graphql.CollectedField, obj *model.SearchEngineSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchEngineSettings_webSearchInternalMaxSiteBytes(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.WebSearchInternalMaxSiteBytes, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchEngineSettings_webSearchInternalMaxSiteBytes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchEngineSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -37405,6 +39465,75 @@ func (ec *executionContext) unmarshalInputCreateKnowledgeDocumentInput(ctx conte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputExecutionSettingsInput(ctx context.Context, obj interface{}) (model.ExecutionSettingsInput, error) {
+	var it model.ExecutionSettingsInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"executionMonitorEnabled", "executionMonitorSameToolLimit", "executionMonitorTotalToolLimit", "maxGeneralAgentToolCalls", "maxLimitedAgentToolCalls", "agentPlanningStepEnabled", "assistantUseAgents"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "executionMonitorEnabled":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("executionMonitorEnabled"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExecutionMonitorEnabled = data
+		case "executionMonitorSameToolLimit":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("executionMonitorSameToolLimit"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExecutionMonitorSameToolLimit = data
+		case "executionMonitorTotalToolLimit":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("executionMonitorTotalToolLimit"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExecutionMonitorTotalToolLimit = data
+		case "maxGeneralAgentToolCalls":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("maxGeneralAgentToolCalls"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MaxGeneralAgentToolCalls = data
+		case "maxLimitedAgentToolCalls":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("maxLimitedAgentToolCalls"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MaxLimitedAgentToolCalls = data
+		case "agentPlanningStepEnabled":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("agentPlanningStepEnabled"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AgentPlanningStepEnabled = data
+		case "assistantUseAgents":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assistantUseAgents"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AssistantUseAgents = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputKnowledgeFilter(ctx context.Context, obj interface{}) (model.KnowledgeFilter, error) {
 	var it model.KnowledgeFilter
 	asMap := map[string]interface{}{}
@@ -37550,6 +39679,194 @@ func (ec *executionContext) unmarshalInputReasoningConfigInput(ctx context.Conte
 				return it, err
 			}
 			it.MaxTokens = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputSearchEngineSettingsInput(ctx context.Context, obj interface{}) (model.SearchEngineSettingsInput, error) {
+	var it model.SearchEngineSettingsInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"duckduckgoEnabled", "duckduckgoRegion", "duckduckgoSafesearch", "duckduckgoTimeRange", "sploitusEnabled", "googleApiKey", "googleCxKey", "googleLrKey", "traversaalApiKey", "tavilyApiKey", "firecrawlApiKey", "firecrawlApiUrl", "perplexityApiKey", "perplexityModel", "perplexityContextSize", "searxngUrl", "searxngCategories", "searxngLanguage", "searxngSafesearch", "searxngTimeRange", "searxngTimeout", "webSearchInternalEnabled", "webSearchInternalMaxSites", "webSearchInternalMaxSiteBytes"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "duckduckgoEnabled":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("duckduckgoEnabled"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DuckduckgoEnabled = data
+		case "duckduckgoRegion":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("duckduckgoRegion"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DuckduckgoRegion = data
+		case "duckduckgoSafesearch":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("duckduckgoSafesearch"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DuckduckgoSafesearch = data
+		case "duckduckgoTimeRange":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("duckduckgoTimeRange"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DuckduckgoTimeRange = data
+		case "sploitusEnabled":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sploitusEnabled"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SploitusEnabled = data
+		case "googleApiKey":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("googleApiKey"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.GoogleAPIKey = data
+		case "googleCxKey":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("googleCxKey"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.GoogleCxKey = data
+		case "googleLrKey":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("googleLrKey"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.GoogleLrKey = data
+		case "traversaalApiKey":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("traversaalApiKey"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TraversaalAPIKey = data
+		case "tavilyApiKey":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tavilyApiKey"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TavilyAPIKey = data
+		case "firecrawlApiKey":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("firecrawlApiKey"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.FirecrawlAPIKey = data
+		case "firecrawlApiUrl":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("firecrawlApiUrl"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.FirecrawlAPIURL = data
+		case "perplexityApiKey":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("perplexityApiKey"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PerplexityAPIKey = data
+		case "perplexityModel":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("perplexityModel"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PerplexityModel = data
+		case "perplexityContextSize":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("perplexityContextSize"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PerplexityContextSize = data
+		case "searxngUrl":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("searxngUrl"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SearxngURL = data
+		case "searxngCategories":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("searxngCategories"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SearxngCategories = data
+		case "searxngLanguage":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("searxngLanguage"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SearxngLanguage = data
+		case "searxngSafesearch":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("searxngSafesearch"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SearxngSafesearch = data
+		case "searxngTimeRange":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("searxngTimeRange"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SearxngTimeRange = data
+		case "searxngTimeout":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("searxngTimeout"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SearxngTimeout = data
+		case "webSearchInternalEnabled":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("webSearchInternalEnabled"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.WebSearchInternalEnabled = data
+		case "webSearchInternalMaxSites":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("webSearchInternalMaxSites"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.WebSearchInternalMaxSites = data
+		case "webSearchInternalMaxSiteBytes":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("webSearchInternalMaxSiteBytes"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.WebSearchInternalMaxSiteBytes = data
 		}
 	}
 
@@ -38818,6 +41135,75 @@ func (ec *executionContext) _DefaultProvidersConfig(ctx context.Context, sel ast
 	return out
 }
 
+var executionSettingsImplementors = []string{"ExecutionSettings"}
+
+func (ec *executionContext) _ExecutionSettings(ctx context.Context, sel ast.SelectionSet, obj *model.ExecutionSettings) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, executionSettingsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ExecutionSettings")
+		case "executionMonitorEnabled":
+			out.Values[i] = ec._ExecutionSettings_executionMonitorEnabled(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "executionMonitorSameToolLimit":
+			out.Values[i] = ec._ExecutionSettings_executionMonitorSameToolLimit(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "executionMonitorTotalToolLimit":
+			out.Values[i] = ec._ExecutionSettings_executionMonitorTotalToolLimit(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "maxGeneralAgentToolCalls":
+			out.Values[i] = ec._ExecutionSettings_maxGeneralAgentToolCalls(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "maxLimitedAgentToolCalls":
+			out.Values[i] = ec._ExecutionSettings_maxLimitedAgentToolCalls(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "agentPlanningStepEnabled":
+			out.Values[i] = ec._ExecutionSettings_agentPlanningStepEnabled(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "assistantUseAgents":
+			out.Values[i] = ec._ExecutionSettings_assistantUseAgents(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var flowImplementors = []string{"Flow"}
 
 func (ec *executionContext) _Flow(ctx context.Context, sel ast.SelectionSet, obj *model.Flow) graphql.Marshaler {
@@ -39887,6 +42273,20 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "deletePrompt":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deletePrompt(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateSearchEngineSettings":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateSearchEngineSettings(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateExecutionSettings":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateExecutionSettings(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -41305,6 +43705,50 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "settingsSearchEngines":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_settingsSearchEngines(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "settingsExecution":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_settingsExecution(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "apiToken":
 			field := field
 
@@ -41583,6 +44027,160 @@ func (ec *executionContext) _Screenshot(ctx context.Context, sel ast.SelectionSe
 			}
 		case "createdAt":
 			out.Values[i] = ec._Screenshot_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var searchEngineSettingsImplementors = []string{"SearchEngineSettings"}
+
+func (ec *executionContext) _SearchEngineSettings(ctx context.Context, sel ast.SelectionSet, obj *model.SearchEngineSettings) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, searchEngineSettingsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SearchEngineSettings")
+		case "duckduckgoEnabled":
+			out.Values[i] = ec._SearchEngineSettings_duckduckgoEnabled(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "duckduckgoRegion":
+			out.Values[i] = ec._SearchEngineSettings_duckduckgoRegion(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "duckduckgoSafesearch":
+			out.Values[i] = ec._SearchEngineSettings_duckduckgoSafesearch(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "duckduckgoTimeRange":
+			out.Values[i] = ec._SearchEngineSettings_duckduckgoTimeRange(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "sploitusEnabled":
+			out.Values[i] = ec._SearchEngineSettings_sploitusEnabled(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "googleApiKeySet":
+			out.Values[i] = ec._SearchEngineSettings_googleApiKeySet(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "googleCxKey":
+			out.Values[i] = ec._SearchEngineSettings_googleCxKey(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "googleLrKey":
+			out.Values[i] = ec._SearchEngineSettings_googleLrKey(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "traversaalApiKeySet":
+			out.Values[i] = ec._SearchEngineSettings_traversaalApiKeySet(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "tavilyApiKeySet":
+			out.Values[i] = ec._SearchEngineSettings_tavilyApiKeySet(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "firecrawlApiKeySet":
+			out.Values[i] = ec._SearchEngineSettings_firecrawlApiKeySet(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "firecrawlApiUrl":
+			out.Values[i] = ec._SearchEngineSettings_firecrawlApiUrl(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "perplexityApiKeySet":
+			out.Values[i] = ec._SearchEngineSettings_perplexityApiKeySet(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "perplexityModel":
+			out.Values[i] = ec._SearchEngineSettings_perplexityModel(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "perplexityContextSize":
+			out.Values[i] = ec._SearchEngineSettings_perplexityContextSize(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "searxngUrl":
+			out.Values[i] = ec._SearchEngineSettings_searxngUrl(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "searxngCategories":
+			out.Values[i] = ec._SearchEngineSettings_searxngCategories(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "searxngLanguage":
+			out.Values[i] = ec._SearchEngineSettings_searxngLanguage(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "searxngSafesearch":
+			out.Values[i] = ec._SearchEngineSettings_searxngSafesearch(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "searxngTimeRange":
+			out.Values[i] = ec._SearchEngineSettings_searxngTimeRange(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "searxngTimeout":
+			out.Values[i] = ec._SearchEngineSettings_searxngTimeout(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "webSearchInternalEnabled":
+			out.Values[i] = ec._SearchEngineSettings_webSearchInternalEnabled(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "webSearchInternalMaxSites":
+			out.Values[i] = ec._SearchEngineSettings_webSearchInternalMaxSites(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "webSearchInternalMaxSiteBytes":
+			out.Values[i] = ec._SearchEngineSettings_webSearchInternalMaxSiteBytes(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -43729,6 +46327,25 @@ func (ec *executionContext) marshalNDefaultProvidersConfig2ᚖpentagiᚋpkgᚋgr
 	return ec._DefaultProvidersConfig(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNExecutionSettings2pentagiᚋpkgᚋgraphᚋmodelᚐExecutionSettings(ctx context.Context, sel ast.SelectionSet, v model.ExecutionSettings) graphql.Marshaler {
+	return ec._ExecutionSettings(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNExecutionSettings2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐExecutionSettings(ctx context.Context, sel ast.SelectionSet, v *model.ExecutionSettings) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ExecutionSettings(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNExecutionSettingsInput2pentagiᚋpkgᚋgraphᚋmodelᚐExecutionSettingsInput(ctx context.Context, v interface{}) (model.ExecutionSettingsInput, error) {
+	res, err := ec.unmarshalInputExecutionSettingsInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
 	res, err := graphql.UnmarshalFloatContext(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -44674,6 +47291,25 @@ func (ec *executionContext) marshalNScreenshot2ᚖpentagiᚋpkgᚋgraphᚋmodel�
 		return graphql.Null
 	}
 	return ec._Screenshot(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNSearchEngineSettings2pentagiᚋpkgᚋgraphᚋmodelᚐSearchEngineSettings(ctx context.Context, sel ast.SelectionSet, v model.SearchEngineSettings) graphql.Marshaler {
+	return ec._SearchEngineSettings(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNSearchEngineSettings2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐSearchEngineSettings(ctx context.Context, sel ast.SelectionSet, v *model.SearchEngineSettings) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._SearchEngineSettings(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNSearchEngineSettingsInput2pentagiᚋpkgᚋgraphᚋmodelᚐSearchEngineSettingsInput(ctx context.Context, v interface{}) (model.SearchEngineSettingsInput, error) {
+	res, err := ec.unmarshalInputSearchEngineSettingsInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNSearchLog2pentagiᚋpkgᚋgraphᚋmodelᚐSearchLog(ctx context.Context, sel ast.SelectionSet, v model.SearchLog) graphql.Marshaler {

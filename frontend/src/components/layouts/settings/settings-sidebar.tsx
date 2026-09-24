@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { ArrowLeft, FileText, Key, Plug, Settings as SettingsIcon, User } from 'lucide-react';
+import { ArrowLeft, FileText, Key, Plug, Settings as SettingsIcon, SlidersHorizontal, User } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, useLocation } from 'react-router-dom';
@@ -26,7 +26,7 @@ interface MenuItem {
     titleKey: SettingsNavKey;
 }
 
-type SettingsNavKey = 'account' | 'apiTokens' | 'prompts' | 'providers';
+type SettingsNavKey = 'account' | 'apiTokens' | 'prompts' | 'providers' | 'system';
 
 interface SettingsSidebarMenuItemProps {
     item: MenuItem;
@@ -56,6 +56,12 @@ const menuItems: readonly MenuItem[] = [
         id: 'api-tokens',
         path: routes.settings.apiTokens,
         titleKey: 'apiTokens',
+    },
+    {
+        icon: <SlidersHorizontal className="size-4" />,
+        id: 'system',
+        path: routes.settings.system,
+        titleKey: 'system',
     },
 ] as const;
 

@@ -360,15 +360,19 @@ func (p *perplexity) apiKey() string {
 		return ""
 	}
 
-	return p.cfg.PerplexityAPIKey
+	return p.cfg.Overrides.GetString(config.CategorySearchEngines, config.KeyPerplexityAPIKey, p.cfg.PerplexityAPIKey)
 }
 
 func (p *perplexity) model() string {
-	if p.cfg == nil || p.cfg.PerplexityModel == "" {
+	if p.cfg == nil {
+		return perplexityModel
+	}
+	value := p.cfg.Overrides.GetString(config.CategorySearchEngines, config.KeyPerplexityModel, p.cfg.PerplexityModel)
+	if value == "" {
 		return perplexityModel
 	}
 
-	return p.cfg.PerplexityModel
+	return value
 }
 
 func (p *perplexity) contextSize() string {
@@ -376,7 +380,7 @@ func (p *perplexity) contextSize() string {
 		return ""
 	}
 
-	return p.cfg.PerplexityContextSize
+	return p.cfg.Overrides.GetString(config.CategorySearchEngines, config.KeyPerplexityContext, p.cfg.PerplexityContextSize)
 }
 
 func (p *perplexity) temperature() float64 {

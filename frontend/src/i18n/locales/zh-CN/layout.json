@@ -48,6 +48,7 @@
         "providers": "提供商",
         "resources": "资源",
         "newTemplate": "新建模板",
+        "system": "系统设置",
         "template": "模板",
         "templates": "模板"
     }

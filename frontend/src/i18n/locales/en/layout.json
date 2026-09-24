@@ -48,6 +48,7 @@
         "providers": "Providers",
         "resources": "Resources",
         "newTemplate": "New template",
+        "system": "System",
         "template": "Template",
         "templates": "Templates"
     }

@@ -8,6 +8,7 @@ This document serves as a comprehensive guide to the configuration system in Pen
   - [Table of Contents](#table-of-contents)
   - [Configuration Basics](#configuration-basics)
     - [Current Web Settings Coverage](#current-web-settings-coverage)
+      - [Settings -> System (hot-reloadable, no restart)](#settings---system-hot-reloadable-no-restart)
     - [Still Server-Managed](#still-server-managed)
   - [General Settings](#general-settings)
     - [Multi-Instance Deployment (`TENANT_ID`)](#multi-instance-deployment-tenant_id)
@@ -124,17 +125,30 @@ The running PentAGI instance already exposes several settings areas in the web U
 - **Settings -> Providers**: Manage user-defined provider profiles, per-agent model and runtime options, and provider test actions for provider types supported by the running server.
 - **Settings -> Prompts**: Manage system, human, and tool prompt templates.
 - **Settings -> PentAGI API**: Create, revoke, and delete PentAGI API tokens.
+- **Settings -> System**: Hot-reloadable runtime configuration — see below.
 - **Other UI-managed preferences**: Favorite flows are stored as user preferences, and theme selection is handled client-side from the main sidebar/profile controls.
 
-These web-console features do not replace the environment variables in this guide for provider credentials, endpoints, or external integrations.
+These web-console features do not replace the environment variables in this guide for provider credentials, endpoints, or external integrations that are still installer/env-managed (see below).
+
+#### Settings -> System (hot-reloadable, no restart)
+
+`Settings -> System` edits a subset of the fields below directly from the browser. A save persists a row per changed key to the `system_settings` table and immediately applies it in-process via `pkg/config.Config.Overrides` (`backend/pkg/config/overrides.go`); other replicas pick it up within 15s (`cmd/pentagi/main.go` periodic refresh). Nothing here requires `docker compose up` or a process restart, and the installer TUI is unaffected — it keeps writing `.env` unconditionally, which remains the fallback whenever no override row exists for a given key.
+
+- **Search Engines**: `DUCKDUCKGO_*`, `SPLOITUS_ENABLED`, `GOOGLE_*`, `TRAVERSAAL_API_KEY`, `TAVILY_API_KEY`, `FIRECRAWL_*`, `PERPLEXITY_*`, `SEARXNG_*`, `WEB_SEARCH_INTERNAL_*`.
+- **Execution**: `EXECUTION_MONITOR_*`, `MAX_GENERAL_AGENT_TOOL_CALLS`, `MAX_LIMITED_AGENT_TOOL_CALLS`, `AGENT_PLANNING_STEP_ENABLED`, `ASSISTANT_USE_AGENTS`.
+
+Read access requires the `settings.system.view` privilege and edits require `settings.system.edit` (Admin role by default; see the `20260924_120000_system_settings.sql` migration). Field-level key names and the DB-backed store live in `backend/pkg/config/keys.go` and `backend/pkg/config/overrides.go`.
+
+Categories intentionally **not** included in this pass — LLM provider credentials, Embedder, OAuth, Observability (Langfuse/Graphiti/OTel), Docker sandbox runtime, and Server network settings — remain installer/env-managed. Some (LLM provider keys, Embedder) are architecturally hot-reloadable in principle but require rebuilding long-lived objects (the provider registry, summarizer, embedder client) that `pkg/providers.ProviderController` currently only constructs once at boot; others (OAuth, Server network, Observability container topology) genuinely cannot be changed without rebuilding the HTTP router or the docker-compose stack, matching the "Still Server-Managed" list below.
 
 ### Still Server-Managed
 
 The environment variables documented below remain the source of truth for configuration that is not currently editable from the web console:
 
 - **LLM credentials and connection settings**: API keys, base URLs, auth modes, and provider-specific connection settings for OpenAI, Anthropic, Bedrock, Ollama, custom providers, and similar backends; config-path settings apply only where supported, such as `OLLAMA_SERVER_CONFIG_PATH`, `LLM_SERVER_CONFIG_PATH`, and `BEDROCK_CONFIG_PATH`.
-- **Search provider credentials and options**: DuckDuckGo, Google, Tavily, Traversaal, Perplexity, Searxng, Sploitus, and related search configuration.
-- **Third-party integrations**: Langfuse, Graphiti, and other external observability or knowledge services.
+- **Embedding settings**: `EMBEDDING_*`.
+- **OAuth and server network settings**: OAuth client credentials, listen address/port, TLS, CORS, `PUBLIC_URL`.
+- **Third-party integrations**: Langfuse, Graphiti, and other external observability or knowledge services (these also gate docker-compose service topology via the installer TUI).
 - **MCP server management**: MCP settings are not currently exposed as a live web-console feature.
 
 ## General Settings

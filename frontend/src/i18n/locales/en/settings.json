@@ -6,7 +6,8 @@
             "account": "Account",
             "providers": "Providers",
             "prompts": "Prompts",
-            "apiTokens": "API Tokens"
+            "apiTokens": "API Tokens",
+            "system": "System"
         }
     },
     "account": {
@@ -227,6 +228,58 @@
             "goToNext": "Go to next {{token}} in the template",
             "goToNextWithUses_one": "Go to next {{token}} in the template ({{count}} use)",
             "goToNextWithUses_other": "Go to next {{token}} in the template ({{count}} uses)"
+        }
+    },
+    "system": {
+        "title": "System",
+        "save": "Save",
+        "saved": "Settings saved",
+        "saveFailed": "Failed to save settings",
+        "enabled": "Enabled",
+        "searchEngines": {
+            "title": "Search Engines",
+            "description": "Configure the search engines the web_search tool can use. Changes take effect immediately, no restart required.",
+            "loading": "Loading search engine settings…",
+            "errorTitle": "Failed to load search engine settings",
+            "enabled": "Enabled",
+            "duckduckgo": "DuckDuckGo",
+            "region": "Region",
+            "safeSearch": "Safe search",
+            "timeRange": "Time range",
+            "sploitus": "Sploitus (exploit aggregator)",
+            "google": "Google Custom Search",
+            "apiKey": "API key",
+            "googleCxKey": "Custom search engine ID (CX)",
+            "googleLrKey": "Language restrict (LR)",
+            "traversaal": "Traversaal API key",
+            "tavily": "Tavily API key",
+            "firecrawl": "Firecrawl",
+            "apiUrl": "API URL",
+            "perplexity": "Perplexity",
+            "model": "Model",
+            "contextSize": "Context size",
+            "searxng": "SearXNG (self-hosted)",
+            "categories": "Categories",
+            "language": "Language",
+            "timeoutSeconds": "Timeout (seconds)",
+            "webSearchInternal": "Internal analytics engine (fallback)",
+            "maxSites": "Max sites per query",
+            "maxSiteBytes": "Max bytes per site",
+            "secretConfigured": "Configured — leave blank to keep",
+            "secretEmpty": "Not configured"
+        },
+        "execution": {
+            "title": "Execution",
+            "description": "Agent execution limits and safety monitor. Changes apply to the next flow, task or assistant turn, no restart required.",
+            "loading": "Loading execution settings…",
+            "errorTitle": "Failed to load execution settings",
+            "assistantUseAgents": "New assistants use agents by default",
+            "agentPlanningStepEnabled": "Enable agent planning step",
+            "maxGeneralAgentToolCalls": "Max tool calls — general agents",
+            "maxLimitedAgentToolCalls": "Max tool calls — limited agents",
+            "monitorEnabled": "Enable execution monitor",
+            "sameToolLimit": "Same-tool repetition limit",
+            "totalToolLimit": "Total tool-call limit"
         }
     }
 }

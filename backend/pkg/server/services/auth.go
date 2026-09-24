@@ -875,7 +875,8 @@ func (s *AuthService) Info(c *gin.Context) {
 			return strings.HasPrefix(priv, "users.") ||
 				strings.HasPrefix(priv, "roles.") ||
 				strings.HasPrefix(priv, "settings.user.") ||
-				strings.HasPrefix(priv, "settings.tokens.")
+				strings.HasPrefix(priv, "settings.tokens.") ||
+				strings.HasPrefix(priv, "settings.system.")
 		})
 		resp.Privs = privs
 		response.Success(c, http.StatusOK, resp)

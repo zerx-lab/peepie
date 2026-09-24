@@ -285,6 +285,14 @@ type Config struct {
 	// PgxPool is the shared pgxpool.Pool for all pgvector stores. Populated by
 	// main after pool creation; NOT sourced from environment variables.
 	PgxPool *pgxpool.Pool `env:"-"`
+
+	// Overrides holds runtime configuration values applied through the Web UI
+	// (Settings) and persisted in the system_settings table. It is populated by
+	// main after the database queries are available, and mutated in place by
+	// GraphQL settings resolvers, so every holder of this *Config pointer sees
+	// hot-reloaded values without a restart. See pkg/config/overrides.go and
+	// pkg/config/registry.go for the field catalogue that reads through it.
+	Overrides *Overrides `env:"-"`
 }
 
 func NewConfig() (*Config, error) {
@@ -311,6 +319,7 @@ func NewConfig() (*Config, error) {
 
 	ensureInstallationID(&config)
 	ensureLicenseKey(&config)
+	config.Overrides = NewOverrides()
 
 	return &config, nil
 }

@@ -498,19 +498,27 @@ func (d *duckduckgo) IsAvailable() bool {
 }
 
 func (d *duckduckgo) enabled() bool {
-	return d.cfg != nil && d.cfg.DuckDuckGoEnabled
+	return d.cfg != nil && d.cfg.Overrides.GetBool(config.CategorySearchEngines, config.KeyDuckDuckGoEnabled, d.cfg.DuckDuckGoEnabled)
 }
 
 func (d *duckduckgo) region() string {
-	if d.cfg == nil || d.cfg.DuckDuckGoRegion == "" {
+	if d.cfg == nil {
+		return RegionUS
+	}
+	region := d.cfg.Overrides.GetString(config.CategorySearchEngines, config.KeyDuckDuckGoRegion, d.cfg.DuckDuckGoRegion)
+	if region == "" {
 		return RegionUS
 	}
 
-	return d.cfg.DuckDuckGoRegion
+	return region
 }
 
 func (d *duckduckgo) safeSearch() string {
-	switch d.cfg.DuckDuckGoSafeSearch {
+	if d.cfg == nil {
+		return ""
+	}
+	value := d.cfg.Overrides.GetString(config.CategorySearchEngines, config.KeyDuckDuckGoSafeSearch, d.cfg.DuckDuckGoSafeSearch)
+	switch value {
 	case DuckDuckGoSafeSearchStrict:
 		return "1"
 	case DuckDuckGoSafeSearchModerate:
@@ -523,9 +531,9 @@ func (d *duckduckgo) safeSearch() string {
 }
 
 func (d *duckduckgo) timeRange() string {
-	if d.cfg == nil || d.cfg.DuckDuckGoTimeRange == "" {
+	if d.cfg == nil {
 		return ""
 	}
 
-	return d.cfg.DuckDuckGoTimeRange
+	return d.cfg.Overrides.GetString(config.CategorySearchEngines, config.KeyDuckDuckGoTimeRange, d.cfg.DuckDuckGoTimeRange)
 }

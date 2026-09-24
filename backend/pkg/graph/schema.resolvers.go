@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"pentagi/pkg/config"
 	"pentagi/pkg/controller"
 	"pentagi/pkg/database"
 	"pentagi/pkg/database/converter"
@@ -31,6 +32,7 @@ import (
 	"pentagi/pkg/templates"
 	"pentagi/pkg/templates/validator"
 	"pentagi/pkg/version"
+	"strconv"
 	"strings"
 	"time"
 
@@ -770,6 +772,92 @@ func (r *mutationResolver) DeletePrompt(ctx context.Context, promptID int64) (mo
 	}
 
 	return model.ResultTypeSuccess, nil
+}
+
+// UpdateSearchEngineSettings is the resolver for the updateSearchEngineSettings field.
+func (r *mutationResolver) UpdateSearchEngineSettings(ctx context.Context, input model.SearchEngineSettingsInput) (*model.SearchEngineSettings, error) {
+	uid, _, err := validatePermission(ctx, "settings.system.edit")
+	if err != nil {
+		return nil, err
+	}
+
+	cat := config.CategorySearchEngines
+	sets := []struct {
+		key   string
+		value string
+	}{
+		{config.KeyDuckDuckGoEnabled, strconv.FormatBool(input.DuckduckgoEnabled)},
+		{config.KeyDuckDuckGoRegion, input.DuckduckgoRegion},
+		{config.KeyDuckDuckGoSafeSearch, input.DuckduckgoSafesearch},
+		{config.KeyDuckDuckGoTimeRange, input.DuckduckgoTimeRange},
+		{config.KeySploitusEnabled, strconv.FormatBool(input.SploitusEnabled)},
+		{config.KeyGoogleCXKey, input.GoogleCxKey},
+		{config.KeyGoogleLRKey, input.GoogleLrKey},
+		{config.KeyFirecrawlAPIURL, input.FirecrawlAPIURL},
+		{config.KeyPerplexityModel, input.PerplexityModel},
+		{config.KeyPerplexityContext, input.PerplexityContextSize},
+		{config.KeySearxngURL, input.SearxngURL},
+		{config.KeySearxngCategories, input.SearxngCategories},
+		{config.KeySearxngLanguage, input.SearxngLanguage},
+		{config.KeySearxngSafeSearch, input.SearxngSafesearch},
+		{config.KeySearxngTimeRange, input.SearxngTimeRange},
+		{config.KeySearxngTimeout, strconv.Itoa(input.SearxngTimeout)},
+		{config.KeyWebSearchIntEnabled, strconv.FormatBool(input.WebSearchInternalEnabled)},
+		{config.KeyWebSearchIntMaxSites, strconv.Itoa(input.WebSearchInternalMaxSites)},
+		{config.KeyWebSearchIntMaxBytes, strconv.Itoa(input.WebSearchInternalMaxSiteBytes)},
+	}
+	for _, s := range sets {
+		if err := applySetting(ctx, r.DB, r.Config, uid, cat, s.key, s.value, false); err != nil {
+			return nil, err
+		}
+	}
+
+	secrets := []struct {
+		key   string
+		value *string
+	}{
+		{config.KeyGoogleAPIKey, input.GoogleAPIKey},
+		{config.KeyTraversaalAPIKey, input.TraversaalAPIKey},
+		{config.KeyTavilyAPIKey, input.TavilyAPIKey},
+		{config.KeyFirecrawlAPIKey, input.FirecrawlAPIKey},
+		{config.KeyPerplexityAPIKey, input.PerplexityAPIKey},
+	}
+	for _, s := range secrets {
+		if err := applySecretSetting(ctx, r.DB, r.Config, uid, cat, s.key, s.value); err != nil {
+			return nil, err
+		}
+	}
+
+	return r.Query().SettingsSearchEngines(ctx)
+}
+
+// UpdateExecutionSettings is the resolver for the updateExecutionSettings field.
+func (r *mutationResolver) UpdateExecutionSettings(ctx context.Context, input model.ExecutionSettingsInput) (*model.ExecutionSettings, error) {
+	uid, _, err := validatePermission(ctx, "settings.system.edit")
+	if err != nil {
+		return nil, err
+	}
+
+	cat := config.CategoryExecution
+	sets := []struct {
+		key   string
+		value string
+	}{
+		{config.KeyExecutionMonitorEnabled, strconv.FormatBool(input.ExecutionMonitorEnabled)},
+		{config.KeyExecutionSameToolLimit, strconv.Itoa(input.ExecutionMonitorSameToolLimit)},
+		{config.KeyExecutionTotalToolLimit, strconv.Itoa(input.ExecutionMonitorTotalToolLimit)},
+		{config.KeyMaxGeneralAgentToolCalls, strconv.Itoa(input.MaxGeneralAgentToolCalls)},
+		{config.KeyMaxLimitedAgentToolCalls, strconv.Itoa(input.MaxLimitedAgentToolCalls)},
+		{config.KeyAgentPlanningStepEnabled, strconv.FormatBool(input.AgentPlanningStepEnabled)},
+		{config.KeyAssistantUseAgents, strconv.FormatBool(input.AssistantUseAgents)},
+	}
+	for _, s := range sets {
+		if err := applySetting(ctx, r.DB, r.Config, uid, cat, s.key, s.value, false); err != nil {
+			return nil, err
+		}
+	}
+
+	return r.Query().SettingsExecution(ctx)
 }
 
 // CreateAPIToken is the resolver for the createAPIToken field.
@@ -2071,12 +2159,13 @@ func (r *queryResolver) Settings(ctx context.Context) (*model.Settings, error) {
 	}
 
 	settings := &model.Settings{
-		Debug:              r.Config.Debug,
-		AskUser:            r.Config.AskUser,
-		Version:            version.GetBinaryVersion(),
-		DockerInside:       r.Config.DockerInside,
-		IsDevelopMode:      version.IsDevelopMode(),
-		AssistantUseAgents: r.Config.AssistantUseAgents,
+		Debug:         r.Config.Debug,
+		AskUser:       r.Config.AskUser,
+		Version:       version.GetBinaryVersion(),
+		DockerInside:  r.Config.DockerInside,
+		IsDevelopMode: version.IsDevelopMode(),
+		AssistantUseAgents: r.Config.Overrides.GetBool(
+			config.CategoryExecution, config.KeyAssistantUseAgents, r.Config.AssistantUseAgents),
 	}
 
 	return settings, nil
@@ -2291,6 +2380,70 @@ func (r *queryResolver) SettingsUser(ctx context.Context) (*model.UserPreference
 	}
 
 	return converter.ConvertUserPreferences(prefs), nil
+}
+
+// SettingsSearchEngines is the resolver for the settingsSearchEngines field.
+func (r *queryResolver) SettingsSearchEngines(ctx context.Context) (*model.SearchEngineSettings, error) {
+	if _, _, err := validatePermission(ctx, "settings.system.view"); err != nil {
+		return nil, err
+	}
+
+	c, o := r.Config, r.Config.Overrides
+	return &model.SearchEngineSettings{
+		DuckduckgoEnabled:    o.GetBool(config.CategorySearchEngines, config.KeyDuckDuckGoEnabled, c.DuckDuckGoEnabled),
+		DuckduckgoRegion:     o.GetString(config.CategorySearchEngines, config.KeyDuckDuckGoRegion, c.DuckDuckGoRegion),
+		DuckduckgoSafesearch: o.GetString(config.CategorySearchEngines, config.KeyDuckDuckGoSafeSearch, c.DuckDuckGoSafeSearch),
+		DuckduckgoTimeRange:  o.GetString(config.CategorySearchEngines, config.KeyDuckDuckGoTimeRange, c.DuckDuckGoTimeRange),
+		SploitusEnabled:      o.GetBool(config.CategorySearchEngines, config.KeySploitusEnabled, c.SploitusEnabled),
+		GoogleAPIKeySet:      o.GetString(config.CategorySearchEngines, config.KeyGoogleAPIKey, c.GoogleAPIKey) != "",
+		GoogleCxKey:          o.GetString(config.CategorySearchEngines, config.KeyGoogleCXKey, c.GoogleCXKey),
+		GoogleLrKey:          o.GetString(config.CategorySearchEngines, config.KeyGoogleLRKey, c.GoogleLRKey),
+		TraversaalAPIKeySet:  o.GetString(config.CategorySearchEngines, config.KeyTraversaalAPIKey, c.TraversaalAPIKey) != "",
+		TavilyAPIKeySet:      o.GetString(config.CategorySearchEngines, config.KeyTavilyAPIKey, c.TavilyAPIKey) != "",
+		FirecrawlAPIKeySet:   o.GetString(config.CategorySearchEngines, config.KeyFirecrawlAPIKey, c.FirecrawlAPIKey) != "",
+		FirecrawlAPIURL:      o.GetString(config.CategorySearchEngines, config.KeyFirecrawlAPIURL, c.FirecrawlAPIURL),
+		PerplexityAPIKeySet:  o.GetString(config.CategorySearchEngines, config.KeyPerplexityAPIKey, c.PerplexityAPIKey) != "",
+		PerplexityModel:      o.GetString(config.CategorySearchEngines, config.KeyPerplexityModel, c.PerplexityModel),
+		PerplexityContextSize: o.GetString(
+			config.CategorySearchEngines, config.KeyPerplexityContext, c.PerplexityContextSize),
+		SearxngURL:        o.GetString(config.CategorySearchEngines, config.KeySearxngURL, c.SearxngURL),
+		SearxngCategories: o.GetString(config.CategorySearchEngines, config.KeySearxngCategories, c.SearxngCategories),
+		SearxngLanguage:   o.GetString(config.CategorySearchEngines, config.KeySearxngLanguage, c.SearxngLanguage),
+		SearxngSafesearch: o.GetString(config.CategorySearchEngines, config.KeySearxngSafeSearch, c.SearxngSafeSearch),
+		SearxngTimeRange:  o.GetString(config.CategorySearchEngines, config.KeySearxngTimeRange, c.SearxngTimeRange),
+		SearxngTimeout:    o.GetInt(config.CategorySearchEngines, config.KeySearxngTimeout, c.SearxngTimeout),
+		WebSearchInternalEnabled: o.GetBool(
+			config.CategorySearchEngines, config.KeyWebSearchIntEnabled, c.WebSearchInternalEnabled),
+		WebSearchInternalMaxSites: o.GetInt(
+			config.CategorySearchEngines, config.KeyWebSearchIntMaxSites, c.WebSearchInternalMaxSites),
+		WebSearchInternalMaxSiteBytes: o.GetInt(
+			config.CategorySearchEngines, config.KeyWebSearchIntMaxBytes, c.WebSearchInternalMaxSiteBytes),
+	}, nil
+}
+
+// SettingsExecution is the resolver for the settingsExecution field.
+func (r *queryResolver) SettingsExecution(ctx context.Context) (*model.ExecutionSettings, error) {
+	if _, _, err := validatePermission(ctx, "settings.system.view"); err != nil {
+		return nil, err
+	}
+
+	c, o := r.Config, r.Config.Overrides
+	return &model.ExecutionSettings{
+		ExecutionMonitorEnabled: o.GetBool(
+			config.CategoryExecution, config.KeyExecutionMonitorEnabled, c.ExecutionMonitorEnabled),
+		ExecutionMonitorSameToolLimit: o.GetInt(
+			config.CategoryExecution, config.KeyExecutionSameToolLimit, c.ExecutionMonitorSameToolLimit),
+		ExecutionMonitorTotalToolLimit: o.GetInt(
+			config.CategoryExecution, config.KeyExecutionTotalToolLimit, c.ExecutionMonitorTotalToolLimit),
+		MaxGeneralAgentToolCalls: o.GetInt(
+			config.CategoryExecution, config.KeyMaxGeneralAgentToolCalls, c.MaxGeneralAgentToolCalls),
+		MaxLimitedAgentToolCalls: o.GetInt(
+			config.CategoryExecution, config.KeyMaxLimitedAgentToolCalls, c.MaxLimitedAgentToolCalls),
+		AgentPlanningStepEnabled: o.GetBool(
+			config.CategoryExecution, config.KeyAgentPlanningStepEnabled, c.AgentPlanningStepEnabled),
+		AssistantUseAgents: o.GetBool(
+			config.CategoryExecution, config.KeyAssistantUseAgents, c.AssistantUseAgents),
+	}, nil
 }
 
 // APIToken is the resolver for the apiToken field.

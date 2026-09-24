@@ -65,7 +65,7 @@ func (e *internalEngine) Engine() database.SearchengineType {
 }
 
 func (e *internalEngine) IsAvailable() bool {
-	if e.cfg == nil || !e.cfg.WebSearchInternalEnabled {
+	if e.cfg == nil || !e.cfg.Overrides.GetBool(config.CategorySearchEngines, config.KeyWebSearchIntEnabled, e.cfg.WebSearchInternalEnabled) {
 		return false
 	}
 	if e.fetcher == nil || e.summarizer == nil {
@@ -119,11 +119,11 @@ func (e *internalEngine) analyze(ctx context.Context, req Request) (string, erro
 		return "", Fatal(fmt.Errorf("internal engine: link discovery returned no usable URLs"))
 	}
 
-	maxSites := e.cfg.WebSearchInternalMaxSites
+	maxSites := e.cfg.Overrides.GetInt(config.CategorySearchEngines, config.KeyWebSearchIntMaxSites, e.cfg.WebSearchInternalMaxSites)
 	if maxSites <= 0 {
 		maxSites = internalDefaultMaxSites
 	}
-	maxBytes := e.cfg.WebSearchInternalMaxSiteBytes
+	maxBytes := e.cfg.Overrides.GetInt(config.CategorySearchEngines, config.KeyWebSearchIntMaxBytes, e.cfg.WebSearchInternalMaxSiteBytes)
 	if maxBytes <= 0 {
 		maxBytes = internalDefaultMaxSiteBytes
 	}

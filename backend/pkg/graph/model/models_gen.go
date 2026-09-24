@@ -202,6 +202,26 @@ type DefaultProvidersConfig struct {
 	Minimax   *ProviderConfig `json:"minimax,omitempty"`
 }
 
+type ExecutionSettings struct {
+	ExecutionMonitorEnabled        bool `json:"executionMonitorEnabled"`
+	ExecutionMonitorSameToolLimit  int  `json:"executionMonitorSameToolLimit"`
+	ExecutionMonitorTotalToolLimit int  `json:"executionMonitorTotalToolLimit"`
+	MaxGeneralAgentToolCalls       int  `json:"maxGeneralAgentToolCalls"`
+	MaxLimitedAgentToolCalls       int  `json:"maxLimitedAgentToolCalls"`
+	AgentPlanningStepEnabled       bool `json:"agentPlanningStepEnabled"`
+	AssistantUseAgents             bool `json:"assistantUseAgents"`
+}
+
+type ExecutionSettingsInput struct {
+	ExecutionMonitorEnabled        bool `json:"executionMonitorEnabled"`
+	ExecutionMonitorSameToolLimit  int  `json:"executionMonitorSameToolLimit"`
+	ExecutionMonitorTotalToolLimit int  `json:"executionMonitorTotalToolLimit"`
+	MaxGeneralAgentToolCalls       int  `json:"maxGeneralAgentToolCalls"`
+	MaxLimitedAgentToolCalls       int  `json:"maxLimitedAgentToolCalls"`
+	AgentPlanningStepEnabled       bool `json:"agentPlanningStepEnabled"`
+	AssistantUseAgents             bool `json:"assistantUseAgents"`
+}
+
 type Flow struct {
 	ID        int64       `json:"id"`
 	Title     string      `json:"title"`
@@ -450,6 +470,60 @@ type Screenshot struct {
 	Name      string    `json:"name"`
 	URL       string    `json:"url"`
 	CreatedAt time.Time `json:"createdAt"`
+}
+
+type SearchEngineSettings struct {
+	DuckduckgoEnabled             bool   `json:"duckduckgoEnabled"`
+	DuckduckgoRegion              string `json:"duckduckgoRegion"`
+	DuckduckgoSafesearch          string `json:"duckduckgoSafesearch"`
+	DuckduckgoTimeRange           string `json:"duckduckgoTimeRange"`
+	SploitusEnabled               bool   `json:"sploitusEnabled"`
+	GoogleAPIKeySet               bool   `json:"googleApiKeySet"`
+	GoogleCxKey                   string `json:"googleCxKey"`
+	GoogleLrKey                   string `json:"googleLrKey"`
+	TraversaalAPIKeySet           bool   `json:"traversaalApiKeySet"`
+	TavilyAPIKeySet               bool   `json:"tavilyApiKeySet"`
+	FirecrawlAPIKeySet            bool   `json:"firecrawlApiKeySet"`
+	FirecrawlAPIURL               string `json:"firecrawlApiUrl"`
+	PerplexityAPIKeySet           bool   `json:"perplexityApiKeySet"`
+	PerplexityModel               string `json:"perplexityModel"`
+	PerplexityContextSize         string `json:"perplexityContextSize"`
+	SearxngURL                    string `json:"searxngUrl"`
+	SearxngCategories             string `json:"searxngCategories"`
+	SearxngLanguage               string `json:"searxngLanguage"`
+	SearxngSafesearch             string `json:"searxngSafesearch"`
+	SearxngTimeRange              string `json:"searxngTimeRange"`
+	SearxngTimeout                int    `json:"searxngTimeout"`
+	WebSearchInternalEnabled      bool   `json:"webSearchInternalEnabled"`
+	WebSearchInternalMaxSites     int    `json:"webSearchInternalMaxSites"`
+	WebSearchInternalMaxSiteBytes int    `json:"webSearchInternalMaxSiteBytes"`
+}
+
+type SearchEngineSettingsInput struct {
+	DuckduckgoEnabled             bool    `json:"duckduckgoEnabled"`
+	DuckduckgoRegion              string  `json:"duckduckgoRegion"`
+	DuckduckgoSafesearch          string  `json:"duckduckgoSafesearch"`
+	DuckduckgoTimeRange           string  `json:"duckduckgoTimeRange"`
+	SploitusEnabled               bool    `json:"sploitusEnabled"`
+	GoogleAPIKey                  *string `json:"googleApiKey,omitempty"`
+	GoogleCxKey                   string  `json:"googleCxKey"`
+	GoogleLrKey                   string  `json:"googleLrKey"`
+	TraversaalAPIKey              *string `json:"traversaalApiKey,omitempty"`
+	TavilyAPIKey                  *string `json:"tavilyApiKey,omitempty"`
+	FirecrawlAPIKey               *string `json:"firecrawlApiKey,omitempty"`
+	FirecrawlAPIURL               string  `json:"firecrawlApiUrl"`
+	PerplexityAPIKey              *string `json:"perplexityApiKey,omitempty"`
+	PerplexityModel               string  `json:"perplexityModel"`
+	PerplexityContextSize         string  `json:"perplexityContextSize"`
+	SearxngURL                    string  `json:"searxngUrl"`
+	SearxngCategories             string  `json:"searxngCategories"`
+	SearxngLanguage               string  `json:"searxngLanguage"`
+	SearxngSafesearch             string  `json:"searxngSafesearch"`
+	SearxngTimeRange              string  `json:"searxngTimeRange"`
+	SearxngTimeout                int     `json:"searxngTimeout"`
+	WebSearchInternalEnabled      bool    `json:"webSearchInternalEnabled"`
+	WebSearchInternalMaxSites     int     `json:"webSearchInternalMaxSites"`
+	WebSearchInternalMaxSiteBytes int     `json:"webSearchInternalMaxSiteBytes"`
 }
 
 type SearchLog struct {

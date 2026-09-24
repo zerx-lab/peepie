@@ -50,6 +50,8 @@ type Querier interface {
 	DeleteProvider(ctx context.Context, id int64) (Provider, error)
 	DeleteSubtask(ctx context.Context, id int64) error
 	DeleteSubtasks(ctx context.Context, ids []int64) error
+	DeleteSystemSetting(ctx context.Context, arg DeleteSystemSettingParams) error
+	DeleteSystemSettingsByCategory(ctx context.Context, category string) error
 	DeleteUser(ctx context.Context, id int64) error
 	DeleteUserAPIToken(ctx context.Context, arg DeleteUserAPITokenParams) (ApiToken, error)
 	DeleteUserAPITokenByTokenID(ctx context.Context, arg DeleteUserAPITokenByTokenIDParams) (ApiToken, error)
@@ -159,6 +161,7 @@ type Querier interface {
 	GetSubtaskVectorStoreLogs(ctx context.Context, subtaskID sql.NullInt64) ([]Vecstorelog, error)
 	// Get all subtasks for multiple tasks
 	GetSubtasksForTasks(ctx context.Context, taskIds []int64) ([]GetSubtasksForTasksRow, error)
+	GetSystemSetting(ctx context.Context, arg GetSystemSettingParams) (SystemSetting, error)
 	GetTask(ctx context.Context, id int64) (Task, error)
 	GetTaskAgentLogs(ctx context.Context, taskID sql.NullInt64) ([]Agentlog, error)
 	GetTaskCompletedSubtasks(ctx context.Context, taskID int64) ([]Subtask, error)
@@ -251,6 +254,8 @@ type Querier interface {
 	ListAllKnowledgeDocuments(ctx context.Context) ([]ListAllKnowledgeDocumentsRow, error)
 	// List non-memory knowledge documents belonging to a specific flow (admin scoped).
 	ListFlowKnowledgeDocuments(ctx context.Context, flowID sql.NullString) ([]ListFlowKnowledgeDocumentsRow, error)
+	ListSystemSettings(ctx context.Context) ([]SystemSetting, error)
+	ListSystemSettingsByCategory(ctx context.Context, category string) ([]SystemSetting, error)
 	// List all non-memory knowledge documents owned by a specific user (user-scoped view).
 	ListUserKnowledgeDocuments(ctx context.Context, userID sql.NullString) ([]ListUserKnowledgeDocumentsRow, error)
 	// Vector similarity search over all knowledge documents (admin view, no user filter).
@@ -336,6 +341,7 @@ type Querier interface {
 	UpdateUserProvider(ctx context.Context, arg UpdateUserProviderParams) (Provider, error)
 	UpdateUserRole(ctx context.Context, arg UpdateUserRoleParams) (User, error)
 	UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) (User, error)
+	UpsertSystemSetting(ctx context.Context, arg UpsertSystemSettingParams) (SystemSetting, error)
 	UpsertUserPreferences(ctx context.Context, arg UpsertUserPreferencesParams) (UserPreference, error)
 }
 

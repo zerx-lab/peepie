@@ -93,6 +93,16 @@ export type CreateKnowledgeDocumentInput = {
     question: string;
 };
 
+export type ExecutionSettingsInput = {
+    agentPlanningStepEnabled: boolean;
+    assistantUseAgents: boolean;
+    executionMonitorEnabled: boolean;
+    executionMonitorSameToolLimit: number;
+    executionMonitorTotalToolLimit: number;
+    maxGeneralAgentToolCalls: number;
+    maxLimitedAgentToolCalls: number;
+};
+
 export enum KnowledgeAnswerType {
     Code = 'code',
     Guide = 'guide',
@@ -248,6 +258,33 @@ export enum ResultType {
     Success = 'success',
 }
 
+export type SearchEngineSettingsInput = {
+    duckduckgoEnabled: boolean;
+    duckduckgoRegion: string;
+    duckduckgoSafesearch: string;
+    duckduckgoTimeRange: string;
+    firecrawlApiKey?: string | null | undefined;
+    firecrawlApiUrl: string;
+    googleApiKey?: string | null | undefined;
+    googleCxKey: string;
+    googleLrKey: string;
+    perplexityApiKey?: string | null | undefined;
+    perplexityContextSize: string;
+    perplexityModel: string;
+    searxngCategories: string;
+    searxngLanguage: string;
+    searxngSafesearch: string;
+    searxngTimeRange: string;
+    searxngTimeout: number;
+    searxngUrl: string;
+    sploitusEnabled: boolean;
+    tavilyApiKey?: string | null | undefined;
+    traversaalApiKey?: string | null | undefined;
+    webSearchInternalEnabled: boolean;
+    webSearchInternalMaxSiteBytes: number;
+    webSearchInternalMaxSites: number;
+};
+
 export enum StatusType {
     Created = 'created',
     Failed = 'failed',
@@ -310,6 +347,43 @@ export type SettingsFragmentFragment = {
     version: string;
     dockerInside: boolean;
     isDevelopMode: boolean;
+    assistantUseAgents: boolean;
+};
+
+export type SearchEngineSettingsFragmentFragment = {
+    duckduckgoEnabled: boolean;
+    duckduckgoRegion: string;
+    duckduckgoSafesearch: string;
+    duckduckgoTimeRange: string;
+    sploitusEnabled: boolean;
+    googleApiKeySet: boolean;
+    googleCxKey: string;
+    googleLrKey: string;
+    traversaalApiKeySet: boolean;
+    tavilyApiKeySet: boolean;
+    firecrawlApiKeySet: boolean;
+    firecrawlApiUrl: string;
+    perplexityApiKeySet: boolean;
+    perplexityModel: string;
+    perplexityContextSize: string;
+    searxngUrl: string;
+    searxngCategories: string;
+    searxngLanguage: string;
+    searxngSafesearch: string;
+    searxngTimeRange: string;
+    searxngTimeout: number;
+    webSearchInternalEnabled: boolean;
+    webSearchInternalMaxSites: number;
+    webSearchInternalMaxSiteBytes: number;
+};
+
+export type ExecutionSettingsFragmentFragment = {
+    executionMonitorEnabled: boolean;
+    executionMonitorSameToolLimit: number;
+    executionMonitorTotalToolLimit: number;
+    maxGeneralAgentToolCalls: number;
+    maxLimitedAgentToolCalls: number;
+    agentPlanningStepEnabled: boolean;
     assistantUseAgents: boolean;
 };
 
@@ -766,6 +840,14 @@ export type SettingsProvidersQuery = {
     };
 };
 
+export type SettingsSearchEnginesQueryVariables = Exact<{ [key: string]: never }>;
+
+export type SettingsSearchEnginesQuery = { settingsSearchEngines: SearchEngineSettingsFragmentFragment };
+
+export type SettingsExecutionQueryVariables = Exact<{ [key: string]: never }>;
+
+export type SettingsExecutionQuery = { settingsExecution: ExecutionSettingsFragmentFragment };
+
 export type SettingsPromptsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type SettingsPromptsQuery = {
@@ -1155,6 +1237,18 @@ export type DeleteProviderMutationVariables = Exact<{
 
 export type DeleteProviderMutation = { deleteProvider: ResultType };
 
+export type UpdateSearchEngineSettingsMutationVariables = Exact<{
+    input: SearchEngineSettingsInput;
+}>;
+
+export type UpdateSearchEngineSettingsMutation = { updateSearchEngineSettings: SearchEngineSettingsFragmentFragment };
+
+export type UpdateExecutionSettingsMutationVariables = Exact<{
+    input: ExecutionSettingsInput;
+}>;
+
+export type UpdateExecutionSettingsMutation = { updateExecutionSettings: ExecutionSettingsFragmentFragment };
+
 export type ValidatePromptMutationVariables = Exact<{
     type: PromptType;
     template: string;
@@ -1434,6 +1528,67 @@ export const SettingsFragmentFragmentDoc = {
         },
     ],
 } as unknown as DocumentNode<SettingsFragmentFragment, unknown>;
+export const SearchEngineSettingsFragmentFragmentDoc = {
+    kind: 'Document',
+    definitions: [
+        {
+            kind: 'FragmentDefinition',
+            name: { kind: 'Name', value: 'searchEngineSettingsFragment' },
+            typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'SearchEngineSettings' } },
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    { kind: 'Field', name: { kind: 'Name', value: 'duckduckgoEnabled' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'duckduckgoRegion' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'duckduckgoSafesearch' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'duckduckgoTimeRange' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'sploitusEnabled' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'googleApiKeySet' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'googleCxKey' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'googleLrKey' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'traversaalApiKeySet' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'tavilyApiKeySet' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'firecrawlApiKeySet' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'firecrawlApiUrl' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'perplexityApiKeySet' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'perplexityModel' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'perplexityContextSize' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'searxngUrl' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'searxngCategories' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'searxngLanguage' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'searxngSafesearch' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'searxngTimeRange' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'searxngTimeout' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'webSearchInternalEnabled' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'webSearchInternalMaxSites' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'webSearchInternalMaxSiteBytes' } },
+                ],
+            },
+        },
+    ],
+} as unknown as DocumentNode<SearchEngineSettingsFragmentFragment, unknown>;
+export const ExecutionSettingsFragmentFragmentDoc = {
+    kind: 'Document',
+    definitions: [
+        {
+            kind: 'FragmentDefinition',
+            name: { kind: 'Name', value: 'executionSettingsFragment' },
+            typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'ExecutionSettings' } },
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    { kind: 'Field', name: { kind: 'Name', value: 'executionMonitorEnabled' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'executionMonitorSameToolLimit' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'executionMonitorTotalToolLimit' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'maxGeneralAgentToolCalls' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'maxLimitedAgentToolCalls' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'agentPlanningStepEnabled' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'assistantUseAgents' } },
+                ],
+            },
+        },
+    ],
+} as unknown as DocumentNode<ExecutionSettingsFragmentFragment, unknown>;
 export const TerminalFragmentFragmentDoc = {
     kind: 'Document',
     definitions: [
@@ -4143,6 +4298,110 @@ export const SettingsProvidersDocument = {
         },
     ],
 } as unknown as DocumentNode<SettingsProvidersQuery, SettingsProvidersQueryVariables>;
+export const SettingsSearchEnginesDocument = {
+    kind: 'Document',
+    definitions: [
+        {
+            kind: 'OperationDefinition',
+            operation: 'query',
+            name: { kind: 'Name', value: 'settingsSearchEngines' },
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'settingsSearchEngines' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'searchEngineSettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            kind: 'FragmentDefinition',
+            name: { kind: 'Name', value: 'searchEngineSettingsFragment' },
+            typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'SearchEngineSettings' } },
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    { kind: 'Field', name: { kind: 'Name', value: 'duckduckgoEnabled' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'duckduckgoRegion' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'duckduckgoSafesearch' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'duckduckgoTimeRange' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'sploitusEnabled' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'googleApiKeySet' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'googleCxKey' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'googleLrKey' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'traversaalApiKeySet' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'tavilyApiKeySet' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'firecrawlApiKeySet' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'firecrawlApiUrl' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'perplexityApiKeySet' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'perplexityModel' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'perplexityContextSize' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'searxngUrl' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'searxngCategories' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'searxngLanguage' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'searxngSafesearch' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'searxngTimeRange' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'searxngTimeout' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'webSearchInternalEnabled' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'webSearchInternalMaxSites' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'webSearchInternalMaxSiteBytes' } },
+                ],
+            },
+        },
+    ],
+} as unknown as DocumentNode<SettingsSearchEnginesQuery, SettingsSearchEnginesQueryVariables>;
+export const SettingsExecutionDocument = {
+    kind: 'Document',
+    definitions: [
+        {
+            kind: 'OperationDefinition',
+            operation: 'query',
+            name: { kind: 'Name', value: 'settingsExecution' },
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'settingsExecution' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'FragmentSpread', name: { kind: 'Name', value: 'executionSettingsFragment' } },
+                            ],
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            kind: 'FragmentDefinition',
+            name: { kind: 'Name', value: 'executionSettingsFragment' },
+            typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'ExecutionSettings' } },
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    { kind: 'Field', name: { kind: 'Name', value: 'executionMonitorEnabled' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'executionMonitorSameToolLimit' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'executionMonitorTotalToolLimit' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'maxGeneralAgentToolCalls' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'maxLimitedAgentToolCalls' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'agentPlanningStepEnabled' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'assistantUseAgents' } },
+                ],
+            },
+        },
+    ],
+} as unknown as DocumentNode<SettingsExecutionQuery, SettingsExecutionQueryVariables>;
 export const SettingsPromptsDocument = {
     kind: 'Document',
     definitions: [
@@ -9323,6 +9582,144 @@ export const DeleteProviderDocument = {
         },
     ],
 } as unknown as DocumentNode<DeleteProviderMutation, DeleteProviderMutationVariables>;
+export const UpdateSearchEngineSettingsDocument = {
+    kind: 'Document',
+    definitions: [
+        {
+            kind: 'OperationDefinition',
+            operation: 'mutation',
+            name: { kind: 'Name', value: 'updateSearchEngineSettings' },
+            variableDefinitions: [
+                {
+                    kind: 'VariableDefinition',
+                    variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+                    type: {
+                        kind: 'NonNullType',
+                        type: { kind: 'NamedType', name: { kind: 'Name', value: 'SearchEngineSettingsInput' } },
+                    },
+                },
+            ],
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'updateSearchEngineSettings' },
+                        arguments: [
+                            {
+                                kind: 'Argument',
+                                name: { kind: 'Name', value: 'input' },
+                                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+                            },
+                        ],
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'searchEngineSettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            kind: 'FragmentDefinition',
+            name: { kind: 'Name', value: 'searchEngineSettingsFragment' },
+            typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'SearchEngineSettings' } },
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    { kind: 'Field', name: { kind: 'Name', value: 'duckduckgoEnabled' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'duckduckgoRegion' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'duckduckgoSafesearch' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'duckduckgoTimeRange' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'sploitusEnabled' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'googleApiKeySet' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'googleCxKey' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'googleLrKey' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'traversaalApiKeySet' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'tavilyApiKeySet' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'firecrawlApiKeySet' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'firecrawlApiUrl' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'perplexityApiKeySet' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'perplexityModel' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'perplexityContextSize' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'searxngUrl' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'searxngCategories' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'searxngLanguage' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'searxngSafesearch' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'searxngTimeRange' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'searxngTimeout' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'webSearchInternalEnabled' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'webSearchInternalMaxSites' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'webSearchInternalMaxSiteBytes' } },
+                ],
+            },
+        },
+    ],
+} as unknown as DocumentNode<UpdateSearchEngineSettingsMutation, UpdateSearchEngineSettingsMutationVariables>;
+export const UpdateExecutionSettingsDocument = {
+    kind: 'Document',
+    definitions: [
+        {
+            kind: 'OperationDefinition',
+            operation: 'mutation',
+            name: { kind: 'Name', value: 'updateExecutionSettings' },
+            variableDefinitions: [
+                {
+                    kind: 'VariableDefinition',
+                    variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+                    type: {
+                        kind: 'NonNullType',
+                        type: { kind: 'NamedType', name: { kind: 'Name', value: 'ExecutionSettingsInput' } },
+                    },
+                },
+            ],
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'updateExecutionSettings' },
+                        arguments: [
+                            {
+                                kind: 'Argument',
+                                name: { kind: 'Name', value: 'input' },
+                                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+                            },
+                        ],
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'FragmentSpread', name: { kind: 'Name', value: 'executionSettingsFragment' } },
+                            ],
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            kind: 'FragmentDefinition',
+            name: { kind: 'Name', value: 'executionSettingsFragment' },
+            typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'ExecutionSettings' } },
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    { kind: 'Field', name: { kind: 'Name', value: 'executionMonitorEnabled' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'executionMonitorSameToolLimit' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'executionMonitorTotalToolLimit' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'maxGeneralAgentToolCalls' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'maxLimitedAgentToolCalls' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'agentPlanningStepEnabled' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'assistantUseAgents' } },
+                ],
+            },
+        },
+    ],
+} as unknown as DocumentNode<UpdateExecutionSettingsMutation, UpdateExecutionSettingsMutationVariables>;
 export const ValidatePromptDocument = {
     kind: 'Document',
     definitions: [

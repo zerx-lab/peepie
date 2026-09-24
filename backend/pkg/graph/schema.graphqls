@@ -206,6 +206,87 @@ type Settings {
   assistantUseAgents: Boolean!
 }
 
+# ==================== Runtime System Settings (hot-reloadable) ====================
+# These mirror a subset of the installer TUI / .env configuration that is safe to
+# change without a process restart (pkg/config.Overrides). Secret fields never echo
+# their plaintext value back once set: `xxxSet` reports whether a value is stored,
+# and the corresponding value field is omitted (null) in that case unless the caller
+# is actively overwriting it.
+
+type SearchEngineSettings {
+  duckduckgoEnabled: Boolean!
+  duckduckgoRegion: String!
+  duckduckgoSafesearch: String!
+  duckduckgoTimeRange: String!
+  sploitusEnabled: Boolean!
+  googleApiKeySet: Boolean!
+  googleCxKey: String!
+  googleLrKey: String!
+  traversaalApiKeySet: Boolean!
+  tavilyApiKeySet: Boolean!
+  firecrawlApiKeySet: Boolean!
+  firecrawlApiUrl: String!
+  perplexityApiKeySet: Boolean!
+  perplexityModel: String!
+  perplexityContextSize: String!
+  searxngUrl: String!
+  searxngCategories: String!
+  searxngLanguage: String!
+  searxngSafesearch: String!
+  searxngTimeRange: String!
+  searxngTimeout: Int!
+  webSearchInternalEnabled: Boolean!
+  webSearchInternalMaxSites: Int!
+  webSearchInternalMaxSiteBytes: Int!
+}
+
+input SearchEngineSettingsInput {
+  duckduckgoEnabled: Boolean!
+  duckduckgoRegion: String!
+  duckduckgoSafesearch: String!
+  duckduckgoTimeRange: String!
+  sploitusEnabled: Boolean!
+  googleApiKey: String
+  googleCxKey: String!
+  googleLrKey: String!
+  traversaalApiKey: String
+  tavilyApiKey: String
+  firecrawlApiKey: String
+  firecrawlApiUrl: String!
+  perplexityApiKey: String
+  perplexityModel: String!
+  perplexityContextSize: String!
+  searxngUrl: String!
+  searxngCategories: String!
+  searxngLanguage: String!
+  searxngSafesearch: String!
+  searxngTimeRange: String!
+  searxngTimeout: Int!
+  webSearchInternalEnabled: Boolean!
+  webSearchInternalMaxSites: Int!
+  webSearchInternalMaxSiteBytes: Int!
+}
+
+type ExecutionSettings {
+  executionMonitorEnabled: Boolean!
+  executionMonitorSameToolLimit: Int!
+  executionMonitorTotalToolLimit: Int!
+  maxGeneralAgentToolCalls: Int!
+  maxLimitedAgentToolCalls: Int!
+  agentPlanningStepEnabled: Boolean!
+  assistantUseAgents: Boolean!
+}
+
+input ExecutionSettingsInput {
+  executionMonitorEnabled: Boolean!
+  executionMonitorSameToolLimit: Int!
+  executionMonitorTotalToolLimit: Int!
+  maxGeneralAgentToolCalls: Int!
+  maxLimitedAgentToolCalls: Int!
+  agentPlanningStepEnabled: Boolean!
+  assistantUseAgents: Boolean!
+}
+
 # ==================== User Preferences Types ====================
 
 type UserPreferences {
@@ -1037,6 +1118,8 @@ type Query {
   settingsProviders: ProvidersConfig!
   settingsPrompts: PromptsConfig!
   settingsUser: UserPreferences!
+  settingsSearchEngines: SearchEngineSettings!
+  settingsExecution: ExecutionSettings!
 
   # API Tokens management
   apiToken(tokenId: String!): APIToken
@@ -1082,6 +1165,10 @@ type Mutation {
   createPrompt(type: PromptType!, template: String!): UserPrompt!
   updatePrompt(promptId: ID!, template: String!): UserPrompt!
   deletePrompt(promptId: ID!): ResultType!
+
+  # Runtime system settings (hot-reloadable, no restart required)
+  updateSearchEngineSettings(input: SearchEngineSettingsInput!): SearchEngineSettings!
+  updateExecutionSettings(input: ExecutionSettingsInput!): ExecutionSettings!
 
   # API Tokens management
   createAPIToken(input: CreateAPITokenInput!): APITokenWithSecret!

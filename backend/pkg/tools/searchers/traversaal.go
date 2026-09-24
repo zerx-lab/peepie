@@ -137,5 +137,5 @@ func (t *traversaal) apiKey() string {
 		return ""
 	}
 
-	return t.cfg.TraversaalAPIKey
+	return t.cfg.Overrides.GetString(config.CategorySearchEngines, config.KeyTraversaalAPIKey, t.cfg.TraversaalAPIKey)
 }

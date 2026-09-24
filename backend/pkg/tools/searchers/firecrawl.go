@@ -351,13 +351,16 @@ func (f *firecrawl) apiKey() string {
 		return ""
 	}
 
-	return f.cfg.FirecrawlAPIKey
+	return f.cfg.Overrides.GetString(config.CategorySearchEngines, config.KeyFirecrawlAPIKey, f.cfg.FirecrawlAPIKey)
 }
 
 func (f *firecrawl) searchURL() string {
 	baseURL := firecrawlDefaultURL
-	if f.cfg != nil && f.cfg.FirecrawlAPIURL != "" {
-		baseURL = f.cfg.FirecrawlAPIURL
+	if f.cfg != nil {
+		baseURL = f.cfg.Overrides.GetString(config.CategorySearchEngines, config.KeyFirecrawlAPIURL, f.cfg.FirecrawlAPIURL)
+	}
+	if baseURL == "" {
+		baseURL = firecrawlDefaultURL
 	}
 
 	return strings.TrimRight(baseURL, "/") + firecrawlSearchPath
