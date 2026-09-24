@@ -1,0 +1,33 @@
+version: '3'
+
+# Local development entry points. Mirrors .vscode/launch.json.
+# Prerequisites: `cp .env.example .env` (LLM keys), `docker compose up -d pgvector`,
+# `cd frontend && bun install`.
+
+tasks:
+  dev:backend:
+    desc: Start Go backend on http://localhost:8080 (reads ./.env)
+    dir: '{{.ROOT_DIR}}'
+    env:
+      CORS_ORIGINS: 'http://localhost:*,https://localhost:*'
+      SERVER_PORT: '8080'
+      SERVER_USE_SSL: 'false'
+      DATABASE_URL: 'postgres://postgres:postgres@localhost:5432/pentagidb?sslmode=disable'
+      PUBLIC_URL: 'http://localhost:8080'
+      STATIC_URL: 'http://localhost:8000'
+    cmds:
+      # go.mod lives in backend/; build there, run from repo root so ./.env is loaded.
+      - go build -C backend -trimpath -o ../build/pentagi-dev ./cmd/pentagi
+      - ./build/pentagi-dev
+
+  dev:web:
+    desc: Start Vite frontend on http://localhost:8000 (proxies API to localhost:8080)
+    dir: '{{.ROOT_DIR}}/frontend'
+    env:
+      VITE_APP_LOG_LEVEL: DEBUG
+      VITE_API_URL: 'localhost:8080'
+      VITE_USE_HTTPS: 'false'
+      VITE_PORT: '8000'
+      VITE_HOST: '0.0.0.0'
+    cmds:
+      - bun run dev
