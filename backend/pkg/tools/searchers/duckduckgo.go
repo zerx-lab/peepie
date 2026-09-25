@@ -170,7 +170,14 @@ func (d *duckduckgo) search(ctx context.Context, query string, maxResults int) (
 		}
 
 		if resp.StatusCode != http.StatusOK {
+			challengeBody, _ := io.ReadAll(io.LimitReader(resp.Body, 8192))
 			resp.Body.Close()
+			if isDuckDuckGoChallenge(challengeBody) {
+				return "", fmt.Errorf(
+					"DuckDuckGo bot-detection challenge (HTTP %d): outbound IP is likely rate-limited "+
+						"or blocked by DuckDuckGo; configure PROXY_URL with a non-datacenter egress or "+
+						"rely on a different configured search engine", resp.StatusCode)
+			}
 			if attempt == duckduckgoMaxRetries-1 {
 				return "", fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 			}
@@ -186,6 +193,17 @@ func (d *duckduckgo) search(ctx context.Context, query string, maxResults int) (
 		resp.Body.Close()
 		if err != nil {
 			return "", fmt.Errorf("failed to read response body: %w", err)
+		}
+
+		// DuckDuckGo can also serve its anti-bot challenge page with a 200 status. If
+		// this went unnoticed, parseHTMLResponse would find no result nodes and the
+		// caller would get a misleading "No results found" instead of falling back to
+		// the next configured engine.
+		if isDuckDuckGoChallenge(body) {
+			return "", fmt.Errorf(
+				"DuckDuckGo bot-detection challenge (HTTP 200 challenge page): outbound IP is likely " +
+					"rate-limited or blocked by DuckDuckGo; configure PROXY_URL with a non-datacenter " +
+					"egress or rely on a different configured search engine")
 		}
 
 		response, err = d.parseHTMLResponse(body)
@@ -229,6 +247,30 @@ func (d *duckduckgo) buildFormData(query string) string {
 	}
 
 	return params.Encode()
+}
+
+// duckduckgoChallengeMarkers are substrings that appear in DuckDuckGo's HTML
+// anti-bot/anomaly-detection challenge page. DuckDuckGo serves this page (instead of
+// search results) with either a non-200 status (commonly 202) or, confusingly, a
+// plain 200 when it throttles a datacenter/shared-egress IP or sees too many
+// requests. Detecting it explicitly lets the caller fall back to the next configured
+// engine with a clear reason instead of silently returning "No results found".
+var duckduckgoChallengeMarkers = []string{
+	"anomaly-modal",
+	"unusual traffic",
+	"detected an unusual amount of requests",
+}
+
+// isDuckDuckGoChallenge reports whether body looks like DuckDuckGo's bot-detection
+// challenge page rather than a normal search-results page.
+func isDuckDuckGoChallenge(body []byte) bool {
+	lower := strings.ToLower(string(body))
+	for _, marker := range duckduckgoChallengeMarkers {
+		if strings.Contains(lower, marker) {
+			return true
+		}
+	}
+	return false
 }
 
 // parseHTMLResponse parses the HTML search response from DuckDuckGo

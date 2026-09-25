@@ -257,6 +257,96 @@ func TestDuckDuckGoHandle_StatusCodeErrors(t *testing.T) {
 	}
 }
 
+func TestDuckDuckGoHandle_BotChallengeDetection(t *testing.T) {
+	tests := []struct {
+		name       string
+		statusCode int
+		body       string
+	}{
+		{
+			name:       "202 with anomaly-modal body is detected",
+			statusCode: http.StatusAccepted,
+			body:       `<html><body><div id="anomaly-modal">Please verify you are human</div></body></html>`,
+		},
+		{
+			name:       "200 with anomaly-modal body is detected",
+			statusCode: http.StatusOK,
+			body:       `<html><body><div id="anomaly-modal">Please verify you are human</div></body></html>`,
+		},
+		{
+			name:       "200 with unusual-traffic wording is detected",
+			statusCode: http.StatusOK,
+			body:       `<html><body>We have detected an unusual amount of requests from your network.</body></html>`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockMux := http.NewServeMux()
+			mockMux.HandleFunc("/html/", func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "text/html")
+				w.WriteHeader(tt.statusCode)
+				w.Write([]byte(tt.body))
+			})
+
+			proxy, err := newTestProxy("html.duckduckgo.com", mockMux)
+			if err != nil {
+				t.Fatalf("failed to create proxy: %v", err)
+			}
+			defer proxy.Close()
+
+			ddg := &duckduckgo{
+				cfg: &config.Config{
+					DuckDuckGoEnabled: true,
+					ProxyURL:          proxy.URL(),
+					ExternalSSLCAPath: proxy.CACertPath(),
+				},
+			}
+
+			result, err := ddg.Handle(t.Context(), Request{Query: "test", MaxResults: 5})
+
+			// A challenge page must never be reported as a (possibly empty) success —
+			// that would hide the block and skip the orchestrator's fallback to the
+			// next configured engine.
+			if err == nil {
+				t.Fatalf("Handle() expected an error for a bot-challenge page, got result: %q", result)
+			}
+			if result != "" {
+				t.Errorf("Handle() result = %q, want empty on challenge detection", result)
+			}
+			if !IsFatal(err) {
+				t.Errorf("Handle() error = %v, want a FatalError", err)
+			}
+			if !strings.Contains(err.Error(), "bot-detection challenge") {
+				t.Errorf("Handle() error = %v, expected a bot-detection challenge message", err)
+			}
+		})
+	}
+}
+
+func TestIsDuckDuckGoChallenge(t *testing.T) {
+	tests := []struct {
+		name string
+		body string
+		want bool
+	}{
+		{"anomaly modal marker", `<div class="anomaly-modal">blocked</div>`, true},
+		{"unusual traffic wording", "We noticed unusual traffic from your network", true},
+		{"unusual amount of requests wording", "detected an unusual amount of requests", true},
+		{"case insensitive", "ANOMALY-MODAL", true},
+		{"normal result page", `<div class="result results_links">real content</div>`, false},
+		{"empty body", "", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := isDuckDuckGoChallenge([]byte(tt.body)); got != tt.want {
+				t.Errorf("isDuckDuckGoChallenge(%q) = %v, want %v", tt.body, got, tt.want)
+			}
+		})
+	}
+}
+
 func TestDuckDuckGoParseHTMLStructured(t *testing.T) {
 	ddg := &duckduckgo{}
 	testdata := []struct {
