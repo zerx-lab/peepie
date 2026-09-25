@@ -17,8 +17,8 @@ tasks:
       STATIC_URL: 'http://localhost:8000'
     cmds:
       # go.mod lives in backend/; build there, run from repo root so ./.env is loaded.
-      - go build -C backend -trimpath -o ../build/pentagi-dev ./cmd/pentagi
-      - ./build/pentagi-dev
+      - go build -C backend -trimpath -o ../build/peepie-dev ./cmd/pentagi
+      - ./build/peepie-dev
 
   dev:web:
     desc: Start Vite frontend on http://localhost:8000 (proxies API to localhost:8080)
@@ -59,17 +59,17 @@ tasks:
       - go build -C backend -trimpath -o '../build/{{.OUTPUT}}' ./cmd/pentagi
 
   build:
-    desc: Build build/pentagi for the host platform with the frontend embedded
+    desc: Build build/peepie for the host platform with the frontend embedded
     deps: [build:embed]
     cmds:
       - task: build:go
         vars:
           GOOS: '{{OS}}'
           GOARCH: '{{ARCH}}'
-          OUTPUT: 'pentagi{{exeExt}}'
+          OUTPUT: 'peepie{{exeExt}}'
 
   build:linux:
-    desc: Cross-compile build/pentagi-linux-<ARCH> (ARCH=amd64 default, e.g. `task build:linux ARCH=arm64`)
+    desc: Cross-compile build/peepie-linux-<ARCH> (ARCH=amd64 default, e.g. `task build:linux ARCH=arm64`)
     deps: [build:embed]
     vars:
       ARCH: '{{.ARCH | default "amd64"}}'
@@ -78,10 +78,10 @@ tasks:
         vars:
           GOOS: linux
           GOARCH: '{{.ARCH}}'
-          OUTPUT: 'pentagi-linux-{{.ARCH}}'
+          OUTPUT: 'peepie-linux-{{.ARCH}}'
 
   build:windows:
-    desc: Cross-compile build/pentagi-windows-<ARCH>.exe (ARCH=amd64 default, e.g. `task build:windows ARCH=arm64`)
+    desc: Cross-compile build/peepie-windows-<ARCH>.exe (ARCH=amd64 default, e.g. `task build:windows ARCH=arm64`)
     deps: [build:embed]
     vars:
       ARCH: '{{.ARCH | default "amd64"}}'
@@ -90,4 +90,4 @@ tasks:
         vars:
           GOOS: windows
           GOARCH: '{{.ARCH}}'
-          OUTPUT: 'pentagi-windows-{{.ARCH}}.exe'
+          OUTPUT: 'peepie-windows-{{.ARCH}}.exe'
