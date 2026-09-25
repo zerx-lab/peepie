@@ -46,6 +46,75 @@ fragment executionSettingsFragment on ExecutionSettings {
     assistantUseAgents
 }
 
+fragment llmProviderKeySettingsFragment on LLMProviderKeySettings {
+    active
+    error
+    apiKeySet
+    serverUrl
+    providerName
+}
+
+fragment llmProviderSettingsFragment on LLMProviderSettings {
+    openai {
+        ...llmProviderKeySettingsFragment
+    }
+    anthropic {
+        ...llmProviderKeySettingsFragment
+    }
+    gemini {
+        ...llmProviderKeySettingsFragment
+    }
+    bedrock {
+        active
+        error
+        region
+        defaultAuth
+        bearerTokenSet
+        accessKeyIdSet
+        secretAccessKeySet
+        sessionTokenSet
+        serverUrl
+    }
+    ollama {
+        active
+        error
+        serverUrl
+        apiKeySet
+        model
+        configPath
+        pullModelsEnabled
+        pullModelsTimeout
+        loadModelsEnabled
+    }
+    custom {
+        active
+        error
+        serverUrl
+        apiKeySet
+        model
+        configPath
+        providerName
+        legacyReasoning
+        preserveReasoning
+    }
+    deepseek {
+        ...llmProviderKeySettingsFragment
+    }
+    glm {
+        ...llmProviderKeySettingsFragment
+    }
+    kimi {
+        ...llmProviderKeySettingsFragment
+    }
+    qwen {
+        ...llmProviderKeySettingsFragment
+    }
+    minimax {
+        ...llmProviderKeySettingsFragment
+    }
+    configPaths
+}
+
 fragment flowFragment on Flow {
     id
     title
@@ -695,6 +764,19 @@ query settingsExecution {
     }
 }
 
+query settingsLLMProviders {
+    settingsLLMProviders {
+        ...llmProviderSettingsFragment
+    }
+}
+
+query settingsEnvFile {
+    settingsEnvFile {
+        path
+        writable
+    }
+}
+
 query settingsPrompts {
     settingsPrompts {
         default {
@@ -1203,6 +1285,12 @@ mutation updateSearchEngineSettings($input: SearchEngineSettingsInput!) {
 mutation updateExecutionSettings($input: ExecutionSettingsInput!) {
     updateExecutionSettings(input: $input) {
         ...executionSettingsFragment
+    }
+}
+
+mutation updateLLMProviderSettings($input: LLMProviderSettingsInput!) {
+    updateLLMProviderSettings(input: $input) {
+        ...llmProviderSettingsFragment
     }
 }
 

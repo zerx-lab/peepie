@@ -73,6 +73,16 @@ export type AgentsConfigInput = {
     simpleJson: AgentConfigInput;
 };
 
+export type BedrockProviderSettingsInput = {
+    accessKeyId?: string | null | undefined;
+    bearerToken?: string | null | undefined;
+    defaultAuth: boolean;
+    region: string;
+    secretAccessKey?: string | null | undefined;
+    serverUrl: string;
+    sessionToken?: string | null | undefined;
+};
+
 export type CreateApiTokenInput = {
     name?: string | null | undefined;
     ttl: number;
@@ -91,6 +101,16 @@ export type CreateKnowledgeDocumentInput = {
     docType: KnowledgeDocType;
     guideType?: KnowledgeGuideType | null | undefined;
     question: string;
+};
+
+export type CustomProviderSettingsInput = {
+    apiKey?: string | null | undefined;
+    configPath: string;
+    legacyReasoning: boolean;
+    model: string;
+    preserveReasoning: boolean;
+    providerName: string;
+    serverUrl: string;
 };
 
 export type ExecutionSettingsInput = {
@@ -135,6 +155,26 @@ export enum KnowledgeGuideType {
     Use = 'use',
 }
 
+export type LlmProviderKeySettingsInput = {
+    apiKey?: string | null | undefined;
+    providerName?: string | null | undefined;
+    serverUrl: string;
+};
+
+export type LlmProviderSettingsInput = {
+    anthropic?: LlmProviderKeySettingsInput | null | undefined;
+    bedrock?: BedrockProviderSettingsInput | null | undefined;
+    custom?: CustomProviderSettingsInput | null | undefined;
+    deepseek?: LlmProviderKeySettingsInput | null | undefined;
+    gemini?: LlmProviderKeySettingsInput | null | undefined;
+    glm?: LlmProviderKeySettingsInput | null | undefined;
+    kimi?: LlmProviderKeySettingsInput | null | undefined;
+    minimax?: LlmProviderKeySettingsInput | null | undefined;
+    ollama?: OllamaProviderSettingsInput | null | undefined;
+    openai?: LlmProviderKeySettingsInput | null | undefined;
+    qwen?: LlmProviderKeySettingsInput | null | undefined;
+};
+
 export enum MessageLogType {
     Advice = 'advice',
     Answer = 'answer',
@@ -161,6 +201,16 @@ export enum ModelReasoningMode {
     AdaptiveOnly = 'adaptive_only',
     Budget = 'budget',
 }
+
+export type OllamaProviderSettingsInput = {
+    apiKey?: string | null | undefined;
+    configPath: string;
+    loadModelsEnabled: boolean;
+    model: string;
+    pullModelsEnabled: boolean;
+    pullModelsTimeout: number;
+    serverUrl: string;
+};
 
 export enum PromptType {
     Adviser = 'adviser',
@@ -385,6 +435,59 @@ export type ExecutionSettingsFragmentFragment = {
     maxLimitedAgentToolCalls: number;
     agentPlanningStepEnabled: boolean;
     assistantUseAgents: boolean;
+};
+
+export type LlmProviderKeySettingsFragmentFragment = {
+    active: boolean;
+    error: string | null;
+    apiKeySet: boolean;
+    serverUrl: string;
+    providerName: string | null;
+};
+
+export type LlmProviderSettingsFragmentFragment = {
+    configPaths: Array<string>;
+    openai: LlmProviderKeySettingsFragmentFragment;
+    anthropic: LlmProviderKeySettingsFragmentFragment;
+    gemini: LlmProviderKeySettingsFragmentFragment;
+    bedrock: {
+        active: boolean;
+        error: string | null;
+        region: string;
+        defaultAuth: boolean;
+        bearerTokenSet: boolean;
+        accessKeyIdSet: boolean;
+        secretAccessKeySet: boolean;
+        sessionTokenSet: boolean;
+        serverUrl: string;
+    };
+    ollama: {
+        active: boolean;
+        error: string | null;
+        serverUrl: string;
+        apiKeySet: boolean;
+        model: string;
+        configPath: string;
+        pullModelsEnabled: boolean;
+        pullModelsTimeout: number;
+        loadModelsEnabled: boolean;
+    };
+    custom: {
+        active: boolean;
+        error: string | null;
+        serverUrl: string;
+        apiKeySet: boolean;
+        model: string;
+        configPath: string;
+        providerName: string;
+        legacyReasoning: boolean;
+        preserveReasoning: boolean;
+    };
+    deepseek: LlmProviderKeySettingsFragmentFragment;
+    glm: LlmProviderKeySettingsFragmentFragment;
+    kimi: LlmProviderKeySettingsFragmentFragment;
+    qwen: LlmProviderKeySettingsFragmentFragment;
+    minimax: LlmProviderKeySettingsFragmentFragment;
 };
 
 export type FlowFragmentFragment = {
@@ -848,6 +951,14 @@ export type SettingsExecutionQueryVariables = Exact<{ [key: string]: never }>;
 
 export type SettingsExecutionQuery = { settingsExecution: ExecutionSettingsFragmentFragment };
 
+export type SettingsLlmProvidersQueryVariables = Exact<{ [key: string]: never }>;
+
+export type SettingsLlmProvidersQuery = { settingsLLMProviders: LlmProviderSettingsFragmentFragment };
+
+export type SettingsEnvFileQueryVariables = Exact<{ [key: string]: never }>;
+
+export type SettingsEnvFileQuery = { settingsEnvFile: { path: string; writable: boolean } };
+
 export type SettingsPromptsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type SettingsPromptsQuery = {
@@ -1249,6 +1360,12 @@ export type UpdateExecutionSettingsMutationVariables = Exact<{
 
 export type UpdateExecutionSettingsMutation = { updateExecutionSettings: ExecutionSettingsFragmentFragment };
 
+export type UpdateLlmProviderSettingsMutationVariables = Exact<{
+    input: LlmProviderSettingsInput;
+}>;
+
+export type UpdateLlmProviderSettingsMutation = { updateLLMProviderSettings: LlmProviderSettingsFragmentFragment };
+
 export type ValidatePromptMutationVariables = Exact<{
     type: PromptType;
     template: string;
@@ -1589,6 +1706,215 @@ export const ExecutionSettingsFragmentFragmentDoc = {
         },
     ],
 } as unknown as DocumentNode<ExecutionSettingsFragmentFragment, unknown>;
+export const LlmProviderKeySettingsFragmentFragmentDoc = {
+    kind: 'Document',
+    definitions: [
+        {
+            kind: 'FragmentDefinition',
+            name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+            typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'LLMProviderKeySettings' } },
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    { kind: 'Field', name: { kind: 'Name', value: 'active' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'error' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'apiKeySet' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'serverUrl' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'providerName' } },
+                ],
+            },
+        },
+    ],
+} as unknown as DocumentNode<LlmProviderKeySettingsFragmentFragment, unknown>;
+export const LlmProviderSettingsFragmentFragmentDoc = {
+    kind: 'Document',
+    definitions: [
+        {
+            kind: 'FragmentDefinition',
+            name: { kind: 'Name', value: 'llmProviderSettingsFragment' },
+            typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'LLMProviderSettings' } },
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'openai' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'anthropic' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'gemini' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'bedrock' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'active' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'error' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'region' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'defaultAuth' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'bearerTokenSet' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'accessKeyIdSet' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'secretAccessKeySet' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'sessionTokenSet' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'serverUrl' } },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'ollama' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'active' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'error' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'serverUrl' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'apiKeySet' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'model' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'configPath' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'pullModelsEnabled' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'pullModelsTimeout' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'loadModelsEnabled' } },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'custom' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'active' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'error' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'serverUrl' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'apiKeySet' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'model' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'configPath' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'providerName' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'legacyReasoning' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'preserveReasoning' } },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'deepseek' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'glm' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'kimi' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'qwen' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'minimax' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                    { kind: 'Field', name: { kind: 'Name', value: 'configPaths' } },
+                ],
+            },
+        },
+        {
+            kind: 'FragmentDefinition',
+            name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+            typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'LLMProviderKeySettings' } },
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    { kind: 'Field', name: { kind: 'Name', value: 'active' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'error' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'apiKeySet' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'serverUrl' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'providerName' } },
+                ],
+            },
+        },
+    ],
+} as unknown as DocumentNode<LlmProviderSettingsFragmentFragment, unknown>;
 export const TerminalFragmentFragmentDoc = {
     kind: 'Document',
     definitions: [
@@ -4402,6 +4728,244 @@ export const SettingsExecutionDocument = {
         },
     ],
 } as unknown as DocumentNode<SettingsExecutionQuery, SettingsExecutionQueryVariables>;
+export const SettingsLlmProvidersDocument = {
+    kind: 'Document',
+    definitions: [
+        {
+            kind: 'OperationDefinition',
+            operation: 'query',
+            name: { kind: 'Name', value: 'settingsLLMProviders' },
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'settingsLLMProviders' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'llmProviderSettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            kind: 'FragmentDefinition',
+            name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+            typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'LLMProviderKeySettings' } },
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    { kind: 'Field', name: { kind: 'Name', value: 'active' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'error' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'apiKeySet' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'serverUrl' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'providerName' } },
+                ],
+            },
+        },
+        {
+            kind: 'FragmentDefinition',
+            name: { kind: 'Name', value: 'llmProviderSettingsFragment' },
+            typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'LLMProviderSettings' } },
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'openai' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'anthropic' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'gemini' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'bedrock' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'active' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'error' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'region' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'defaultAuth' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'bearerTokenSet' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'accessKeyIdSet' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'secretAccessKeySet' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'sessionTokenSet' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'serverUrl' } },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'ollama' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'active' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'error' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'serverUrl' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'apiKeySet' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'model' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'configPath' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'pullModelsEnabled' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'pullModelsTimeout' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'loadModelsEnabled' } },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'custom' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'active' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'error' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'serverUrl' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'apiKeySet' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'model' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'configPath' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'providerName' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'legacyReasoning' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'preserveReasoning' } },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'deepseek' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'glm' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'kimi' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'qwen' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'minimax' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                    { kind: 'Field', name: { kind: 'Name', value: 'configPaths' } },
+                ],
+            },
+        },
+    ],
+} as unknown as DocumentNode<SettingsLlmProvidersQuery, SettingsLlmProvidersQueryVariables>;
+export const SettingsEnvFileDocument = {
+    kind: 'Document',
+    definitions: [
+        {
+            kind: 'OperationDefinition',
+            operation: 'query',
+            name: { kind: 'Name', value: 'settingsEnvFile' },
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'settingsEnvFile' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'path' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'writable' } },
+                            ],
+                        },
+                    },
+                ],
+            },
+        },
+    ],
+} as unknown as DocumentNode<SettingsEnvFileQuery, SettingsEnvFileQueryVariables>;
 export const SettingsPromptsDocument = {
     kind: 'Document',
     definitions: [
@@ -9720,6 +10284,235 @@ export const UpdateExecutionSettingsDocument = {
         },
     ],
 } as unknown as DocumentNode<UpdateExecutionSettingsMutation, UpdateExecutionSettingsMutationVariables>;
+export const UpdateLlmProviderSettingsDocument = {
+    kind: 'Document',
+    definitions: [
+        {
+            kind: 'OperationDefinition',
+            operation: 'mutation',
+            name: { kind: 'Name', value: 'updateLLMProviderSettings' },
+            variableDefinitions: [
+                {
+                    kind: 'VariableDefinition',
+                    variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+                    type: {
+                        kind: 'NonNullType',
+                        type: { kind: 'NamedType', name: { kind: 'Name', value: 'LLMProviderSettingsInput' } },
+                    },
+                },
+            ],
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'updateLLMProviderSettings' },
+                        arguments: [
+                            {
+                                kind: 'Argument',
+                                name: { kind: 'Name', value: 'input' },
+                                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+                            },
+                        ],
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'llmProviderSettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            kind: 'FragmentDefinition',
+            name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+            typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'LLMProviderKeySettings' } },
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    { kind: 'Field', name: { kind: 'Name', value: 'active' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'error' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'apiKeySet' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'serverUrl' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'providerName' } },
+                ],
+            },
+        },
+        {
+            kind: 'FragmentDefinition',
+            name: { kind: 'Name', value: 'llmProviderSettingsFragment' },
+            typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'LLMProviderSettings' } },
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'openai' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'anthropic' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'gemini' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'bedrock' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'active' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'error' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'region' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'defaultAuth' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'bearerTokenSet' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'accessKeyIdSet' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'secretAccessKeySet' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'sessionTokenSet' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'serverUrl' } },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'ollama' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'active' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'error' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'serverUrl' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'apiKeySet' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'model' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'configPath' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'pullModelsEnabled' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'pullModelsTimeout' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'loadModelsEnabled' } },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'custom' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'active' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'error' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'serverUrl' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'apiKeySet' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'model' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'configPath' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'providerName' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'legacyReasoning' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'preserveReasoning' } },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'deepseek' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'glm' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'kimi' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'qwen' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'minimax' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'llmProviderKeySettingsFragment' },
+                                },
+                            ],
+                        },
+                    },
+                    { kind: 'Field', name: { kind: 'Name', value: 'configPaths' } },
+                ],
+            },
+        },
+    ],
+} as unknown as DocumentNode<UpdateLlmProviderSettingsMutation, UpdateLlmProviderSettingsMutationVariables>;
 export const ValidatePromptDocument = {
     kind: 'Document',
     definitions: [

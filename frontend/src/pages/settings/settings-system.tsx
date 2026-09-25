@@ -1,522 +1,415 @@
+import type { ReactNode } from 'react';
+
 import { useMutation, useQuery } from '@apollo/client/react';
-import { Loader2, Save } from 'lucide-react';
+import { Bot, FileText, Gauge, Search, TriangleAlert } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
-
-import type {
-    ExecutionSettingsInput,
-    SearchEngineSettingsFragmentFragment,
-    SearchEngineSettingsInput,
-} from '@/graphql/types';
 
 import { AppHeader, AppHeaderContent, AppHeaderTitle } from '@/components/layouts/app/app-header';
 import { ErrorState } from '@/components/shared/error-state';
 import { LoadingState } from '@/components/shared/loading-state';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import {
+    SettingsEnvFileDocument,
     SettingsExecutionDocument,
+    SettingsLlmProvidersDocument,
+    SettingsProvidersDocument,
     SettingsSearchEnginesDocument,
     UpdateExecutionSettingsDocument,
+    UpdateLlmProviderSettingsDocument,
     UpdateSearchEngineSettingsDocument,
 } from '@/graphql/types';
+import { type ExecutionEdits, ExecutionSection } from '@/pages/settings/system/execution-section';
+import { SectionSaveBar } from '@/pages/settings/system/fields';
+import {
+    buildLlmProviderInput,
+    getLlmProviderStatus,
+    isLlmProviderDirty,
+    type LlmProviderEdits,
+    llmProviderIds,
+} from '@/pages/settings/system/llm-providers';
+import {
+    getLlmProviderLabel,
+    llmProviderAnchorId,
+    LlmProvidersSection,
+} from '@/pages/settings/system/llm-providers-section';
+import {
+    buildSearchEngineInput,
+    getSearchEngineStatus,
+    isSearchEnginesDirty,
+    type SearchEngineEdits,
+    searchEngineIds,
+} from '@/pages/settings/system/search-engines';
+import { searchEngineAnchorId, SearchEnginesSection } from '@/pages/settings/system/search-engines-section';
+import { hasPendingEdits } from '@/pages/settings/system/secrets';
+import {
+    type SystemNavCategory,
+    type SystemSection,
+    systemSections,
+    SystemSettingsNav,
+} from '@/pages/settings/system/system-settings-nav';
 
-// Local editable shape: secret fields are always sent as `undefined` unless the
-// user types a new value, so an unmodified save never clears an already
-// configured key (see backend applySecretSetting). `*Set` mirrors what the
-// server reports as already configured, purely for the placeholder/badge.
-type SearchForm = Omit<
-    SearchEngineSettingsFragmentFragment,
-    'firecrawlApiKeySet' | 'googleApiKeySet' | 'perplexityApiKeySet' | 'tavilyApiKeySet' | 'traversaalApiKeySet'
-> & {
-    firecrawlApiKey: string;
-    firecrawlApiKeySet: boolean;
-    googleApiKey: string;
-    googleApiKeySet: boolean;
-    perplexityApiKey: string;
-    perplexityApiKeySet: boolean;
-    tavilyApiKey: string;
-    tavilyApiKeySet: boolean;
-    traversaalApiKey: string;
-    traversaalApiKeySet: boolean;
-};
-
-function ExecutionCard() {
+function EnvFileBanner() {
     const { t } = useTranslation('settings');
-    const { data, error, loading, refetch } = useQuery(SettingsExecutionDocument);
-    const [updateSettings, { loading: isSaving }] = useMutation(UpdateExecutionSettingsDocument);
-    // Local edits layered on top of the last known server values. Reset to {}
-    // after a successful save, since the mutation result becomes the new
-    // server value for the active query (Apollo re-renders `data`).
-    const [overrides, setOverrides] = useState<Partial<ExecutionSettingsInput>>({});
+    const { data } = useQuery(SettingsEnvFileDocument);
+    const envFile = data?.settingsEnvFile;
 
-    if (loading && !data) {
-        return <LoadingState title={t('system.execution.loading')} />;
-    }
-
-    if (error) {
-        return (
-            <ErrorState
-                message={error.message}
-                onRetry={refetch}
-                title={t('system.execution.errorTitle')}
-            />
-        );
-    }
-
-    if (!data?.settingsExecution) {
+    if (!envFile) {
         return null;
     }
 
-    const form: ExecutionSettingsInput = { ...data.settingsExecution, ...overrides };
-
-    const set = <K extends keyof ExecutionSettingsInput>(key: K, value: ExecutionSettingsInput[K]) =>
-        setOverrides((prev) => ({ ...prev, [key]: value }));
-
-    const handleSave = async () => {
-        try {
-            await updateSettings({ variables: { input: form } });
-            setOverrides({});
-            toast.success(t('system.saved'));
-        } catch (err) {
-            toast.error(err instanceof Error ? err.message : t('system.saveFailed'));
-        }
-    };
-
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle>{t('system.execution.title')}</CardTitle>
-                <CardDescription>{t('system.execution.description')}</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-6">
-                <ToggleField
-                    checked={form.assistantUseAgents}
-                    label={t('system.execution.assistantUseAgents')}
-                    onChange={(v) => set('assistantUseAgents', v)}
-                />
-                <ToggleField
-                    checked={form.agentPlanningStepEnabled}
-                    label={t('system.execution.agentPlanningStepEnabled')}
-                    onChange={(v) => set('agentPlanningStepEnabled', v)}
-                />
-
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                    <NumberField
-                        label={t('system.execution.maxGeneralAgentToolCalls')}
-                        onChange={(v) => set('maxGeneralAgentToolCalls', v)}
-                        value={form.maxGeneralAgentToolCalls}
-                    />
-                    <NumberField
-                        label={t('system.execution.maxLimitedAgentToolCalls')}
-                        onChange={(v) => set('maxLimitedAgentToolCalls', v)}
-                        value={form.maxLimitedAgentToolCalls}
-                    />
-                </div>
-
-                <div className="flex flex-col gap-3">
-                    <ToggleField
-                        checked={form.executionMonitorEnabled}
-                        label={t('system.execution.monitorEnabled')}
-                        onChange={(v) => set('executionMonitorEnabled', v)}
-                    />
-                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                        <NumberField
-                            label={t('system.execution.sameToolLimit')}
-                            onChange={(v) => set('executionMonitorSameToolLimit', v)}
-                            value={form.executionMonitorSameToolLimit}
-                        />
-                        <NumberField
-                            label={t('system.execution.totalToolLimit')}
-                            onChange={(v) => set('executionMonitorTotalToolLimit', v)}
-                            value={form.executionMonitorTotalToolLimit}
-                        />
-                    </div>
-                </div>
-
-                <div className="flex justify-end">
-                    <Button
-                        disabled={isSaving}
-                        onClick={handleSave}
-                    >
-                        {isSaving ? <Loader2 className="animate-spin" /> : <Save />}
-                        {t('system.save')}
-                    </Button>
-                </div>
-            </CardContent>
-        </Card>
-    );
-}
-
-function NumberField({ label, onChange, value }: { label: string; onChange: (value: number) => void; value: number }) {
-    return (
-        <div className="flex flex-col gap-1.5">
-            <Label>{label}</Label>
-            <Input
-                onChange={(e) => onChange(Number(e.target.value) || 0)}
-                type="number"
-                value={value}
-            />
-        </div>
-    );
-}
-
-function SearchEnginesCard() {
-    const { t } = useTranslation('settings');
-    const { data, error, loading, refetch } = useQuery(SettingsSearchEnginesDocument);
-    const [updateSettings, { loading: isSaving }] = useMutation(UpdateSearchEngineSettingsDocument);
-    // Local edits layered on top of the last known server values. Reset to {}
-    // after a successful save, since the mutation result becomes the new
-    // server value for the active query (Apollo re-renders `data`).
-    const [overrides, setOverrides] = useState<Partial<SearchForm>>({});
-
-    if (loading && !data) {
-        return <LoadingState title={t('system.searchEngines.loading')} />;
-    }
-
-    if (error) {
+    if (envFile.writable) {
         return (
-            <ErrorState
-                message={error.message}
-                onRetry={refetch}
-                title={t('system.searchEngines.errorTitle')}
-            />
+            <Alert>
+                <FileText />
+                <AlertDescription>{t('system.envFile.writable', { path: envFile.path })}</AlertDescription>
+            </Alert>
         );
     }
 
-    if (!data?.settingsSearchEngines) {
-        return null;
-    }
-
-    const form: SearchForm = { ...toSearchForm(data.settingsSearchEngines), ...overrides };
-
-    const set = <K extends keyof SearchForm>(key: K, value: SearchForm[K]) =>
-        setOverrides((prev) => ({ ...prev, [key]: value }));
-
-    const handleSave = async () => {
-        const input: SearchEngineSettingsInput = {
-            duckduckgoEnabled: form.duckduckgoEnabled,
-            duckduckgoRegion: form.duckduckgoRegion,
-            duckduckgoSafesearch: form.duckduckgoSafesearch,
-            duckduckgoTimeRange: form.duckduckgoTimeRange,
-            firecrawlApiKey: form.firecrawlApiKey || undefined,
-            firecrawlApiUrl: form.firecrawlApiUrl,
-            googleApiKey: form.googleApiKey || undefined,
-            googleCxKey: form.googleCxKey,
-            googleLrKey: form.googleLrKey,
-            perplexityApiKey: form.perplexityApiKey || undefined,
-            perplexityContextSize: form.perplexityContextSize,
-            perplexityModel: form.perplexityModel,
-            searxngCategories: form.searxngCategories,
-            searxngLanguage: form.searxngLanguage,
-            searxngSafesearch: form.searxngSafesearch,
-            searxngTimeout: form.searxngTimeout,
-            searxngTimeRange: form.searxngTimeRange,
-            searxngUrl: form.searxngUrl,
-            sploitusEnabled: form.sploitusEnabled,
-            tavilyApiKey: form.tavilyApiKey || undefined,
-            traversaalApiKey: form.traversaalApiKey || undefined,
-            webSearchInternalEnabled: form.webSearchInternalEnabled,
-            webSearchInternalMaxSiteBytes: form.webSearchInternalMaxSiteBytes,
-            webSearchInternalMaxSites: form.webSearchInternalMaxSites,
-        };
-
-        try {
-            await updateSettings({ variables: { input } });
-            setOverrides({});
-            toast.success(t('system.saved'));
-        } catch (err) {
-            toast.error(err instanceof Error ? err.message : t('system.saveFailed'));
-        }
-    };
-
-    const secretPlaceholder = (isSet: boolean) =>
-        isSet ? t('system.searchEngines.secretConfigured') : t('system.searchEngines.secretEmpty');
-
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>{t('system.searchEngines.title')}</CardTitle>
-                <CardDescription>{t('system.searchEngines.description')}</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-6">
-                <div className="flex flex-col gap-3">
-                    <div className="flex items-center gap-2">
-                        <h4 className="text-sm font-medium">{t('system.searchEngines.duckduckgo')}</h4>
-                        {form.duckduckgoEnabled && <Badge variant="secondary">{t('system.enabled')}</Badge>}
-                    </div>
-                    <ToggleField
-                        checked={form.duckduckgoEnabled}
-                        label={t('system.searchEngines.enabled')}
-                        onChange={(v) => set('duckduckgoEnabled', v)}
-                    />
-                    <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-                        <TextField
-                            label={t('system.searchEngines.region')}
-                            onChange={(v) => set('duckduckgoRegion', v)}
-                            value={form.duckduckgoRegion}
-                        />
-                        <TextField
-                            label={t('system.searchEngines.safeSearch')}
-                            onChange={(v) => set('duckduckgoSafesearch', v)}
-                            value={form.duckduckgoSafesearch}
-                        />
-                        <TextField
-                            label={t('system.searchEngines.timeRange')}
-                            onChange={(v) => set('duckduckgoTimeRange', v)}
-                            value={form.duckduckgoTimeRange}
-                        />
-                    </div>
-                </div>
-
-                <ToggleField
-                    checked={form.sploitusEnabled}
-                    label={t('system.searchEngines.sploitus')}
-                    onChange={(v) => set('sploitusEnabled', v)}
-                />
-
-                <div className="flex flex-col gap-3">
-                    <h4 className="text-sm font-medium">{t('system.searchEngines.google')}</h4>
-                    <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-                        <SecretField
-                            label={t('system.searchEngines.apiKey')}
-                            onChange={(v) => set('googleApiKey', v)}
-                            placeholder={secretPlaceholder(form.googleApiKeySet)}
-                            value={form.googleApiKey}
-                        />
-                        <TextField
-                            label={t('system.searchEngines.googleCxKey')}
-                            onChange={(v) => set('googleCxKey', v)}
-                            value={form.googleCxKey}
-                        />
-                        <TextField
-                            label={t('system.searchEngines.googleLrKey')}
-                            onChange={(v) => set('googleLrKey', v)}
-                            value={form.googleLrKey}
-                        />
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                    <SecretField
-                        label={t('system.searchEngines.traversaal')}
-                        onChange={(v) => set('traversaalApiKey', v)}
-                        placeholder={secretPlaceholder(form.traversaalApiKeySet)}
-                        value={form.traversaalApiKey}
-                    />
-                    <SecretField
-                        label={t('system.searchEngines.tavily')}
-                        onChange={(v) => set('tavilyApiKey', v)}
-                        placeholder={secretPlaceholder(form.tavilyApiKeySet)}
-                        value={form.tavilyApiKey}
-                    />
-                </div>
-
-                <div className="flex flex-col gap-3">
-                    <h4 className="text-sm font-medium">{t('system.searchEngines.firecrawl')}</h4>
-                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                        <SecretField
-                            label={t('system.searchEngines.apiKey')}
-                            onChange={(v) => set('firecrawlApiKey', v)}
-                            placeholder={secretPlaceholder(form.firecrawlApiKeySet)}
-                            value={form.firecrawlApiKey}
-                        />
-                        <TextField
-                            label={t('system.searchEngines.apiUrl')}
-                            onChange={(v) => set('firecrawlApiUrl', v)}
-                            value={form.firecrawlApiUrl}
-                        />
-                    </div>
-                </div>
-
-                <div className="flex flex-col gap-3">
-                    <h4 className="text-sm font-medium">{t('system.searchEngines.perplexity')}</h4>
-                    <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-                        <SecretField
-                            label={t('system.searchEngines.apiKey')}
-                            onChange={(v) => set('perplexityApiKey', v)}
-                            placeholder={secretPlaceholder(form.perplexityApiKeySet)}
-                            value={form.perplexityApiKey}
-                        />
-                        <TextField
-                            label={t('system.searchEngines.model')}
-                            onChange={(v) => set('perplexityModel', v)}
-                            value={form.perplexityModel}
-                        />
-                        <TextField
-                            label={t('system.searchEngines.contextSize')}
-                            onChange={(v) => set('perplexityContextSize', v)}
-                            value={form.perplexityContextSize}
-                        />
-                    </div>
-                </div>
-
-                <div className="flex flex-col gap-3">
-                    <h4 className="text-sm font-medium">{t('system.searchEngines.searxng')}</h4>
-                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                        <TextField
-                            label={t('system.searchEngines.apiUrl')}
-                            onChange={(v) => set('searxngUrl', v)}
-                            value={form.searxngUrl}
-                        />
-                        <TextField
-                            label={t('system.searchEngines.categories')}
-                            onChange={(v) => set('searxngCategories', v)}
-                            value={form.searxngCategories}
-                        />
-                        <TextField
-                            label={t('system.searchEngines.language')}
-                            onChange={(v) => set('searxngLanguage', v)}
-                            value={form.searxngLanguage}
-                        />
-                        <TextField
-                            label={t('system.searchEngines.safeSearch')}
-                            onChange={(v) => set('searxngSafesearch', v)}
-                            value={form.searxngSafesearch}
-                        />
-                        <TextField
-                            label={t('system.searchEngines.timeRange')}
-                            onChange={(v) => set('searxngTimeRange', v)}
-                            value={form.searxngTimeRange}
-                        />
-                        <NumberField
-                            label={t('system.searchEngines.timeoutSeconds')}
-                            onChange={(v) => set('searxngTimeout', v)}
-                            value={form.searxngTimeout}
-                        />
-                    </div>
-                </div>
-
-                <div className="flex flex-col gap-3">
-                    <h4 className="text-sm font-medium">{t('system.searchEngines.webSearchInternal')}</h4>
-                    <ToggleField
-                        checked={form.webSearchInternalEnabled}
-                        label={t('system.searchEngines.enabled')}
-                        onChange={(v) => set('webSearchInternalEnabled', v)}
-                    />
-                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                        <NumberField
-                            label={t('system.searchEngines.maxSites')}
-                            onChange={(v) => set('webSearchInternalMaxSites', v)}
-                            value={form.webSearchInternalMaxSites}
-                        />
-                        <NumberField
-                            label={t('system.searchEngines.maxSiteBytes')}
-                            onChange={(v) => set('webSearchInternalMaxSiteBytes', v)}
-                            value={form.webSearchInternalMaxSiteBytes}
-                        />
-                    </div>
-                </div>
-
-                <div className="flex justify-end">
-                    <Button
-                        disabled={isSaving}
-                        onClick={handleSave}
-                    >
-                        {isSaving ? <Loader2 className="animate-spin" /> : <Save />}
-                        {t('system.save')}
-                    </Button>
-                </div>
-            </CardContent>
-        </Card>
+        <Alert className="border-yellow-500/50 text-yellow-800 dark:text-yellow-400 [&>svg]:text-yellow-600 dark:[&>svg]:text-yellow-400">
+            <TriangleAlert />
+            <AlertDescription>{t('system.envFile.notWritable', { path: envFile.path })}</AlertDescription>
+        </Alert>
     );
 }
 
-function SecretField({
-    label,
-    onChange,
-    placeholder,
-    value,
-}: {
-    label: string;
-    onChange: (value: string) => void;
-    placeholder: string;
-    value: string;
-}) {
+function SectionHeader({ children, title }: { children?: ReactNode; title: string }) {
     return (
-        <div className="flex flex-col gap-1.5">
-            <Label>{label}</Label>
-            <Input
-                autoComplete="off"
-                onChange={(e) => onChange(e.target.value)}
-                placeholder={placeholder}
-                type="password"
-                value={value}
-            />
+        <div className="flex flex-col gap-1">
+            <h2 className="text-lg font-semibold">{title}</h2>
+            {children}
         </div>
     );
 }
 
 function SettingsSystem() {
+    const { t } = useTranslation('settings');
+    const [searchParams, setSearchParams] = useSearchParams();
+    const sectionParam = searchParams.get('section');
+    const section: SystemSection = systemSections.find((value) => value === sectionParam) ?? 'llm-providers';
+
+    const llmQuery = useQuery(SettingsLlmProvidersDocument);
+    const searchQuery = useQuery(SettingsSearchEnginesDocument);
+    const executionQuery = useQuery(SettingsExecutionDocument);
+
+    // Pending edits live here (not in the sections) so switching categories keeps them.
+    const [llmEdits, setLlmEdits] = useState<LlmProviderEdits>({});
+    const [searchEdits, setSearchEdits] = useState<SearchEngineEdits>({});
+    const [executionEdits, setExecutionEdits] = useState<ExecutionEdits>({});
+
+    // Settings types carry no `id`, so Apollo cannot normalize mutation results
+    // into the queries: write them back explicitly.
+    const [updateLlmProviders, { loading: isSavingLlm }] = useMutation(UpdateLlmProviderSettingsDocument, {
+        // The Providers page lists which provider types are enabled.
+        refetchQueries: [{ query: SettingsProvidersDocument }],
+        update: (cache, { data }) => {
+            if (data) {
+                cache.writeQuery({
+                    data: { settingsLLMProviders: data.updateLLMProviderSettings },
+                    query: SettingsLlmProvidersDocument,
+                });
+            }
+        },
+    });
+    const [updateSearchEngines, { loading: isSavingSearch }] = useMutation(UpdateSearchEngineSettingsDocument, {
+        update: (cache, { data }) => {
+            if (data) {
+                cache.writeQuery({
+                    data: { settingsSearchEngines: data.updateSearchEngineSettings },
+                    query: SettingsSearchEnginesDocument,
+                });
+            }
+        },
+    });
+    const [updateExecution, { loading: isSavingExecution }] = useMutation(UpdateExecutionSettingsDocument, {
+        update: (cache, { data }) => {
+            if (data) {
+                cache.writeQuery({
+                    data: { settingsExecution: data.updateExecutionSettings },
+                    query: SettingsExecutionDocument,
+                });
+            }
+        },
+    });
+
+    const llm = llmQuery.data?.settingsLLMProviders;
+    const search = searchQuery.data?.settingsSearchEngines;
+    const execution = executionQuery.data?.settingsExecution;
+
+    const isLlmDirty = !!llm && llmProviderIds.some((id) => isLlmProviderDirty(llm, llmEdits, id));
+    const isSearchDirty = !!search && isSearchEnginesDirty(search, searchEdits);
+    const isExecutionDirty = !!execution && hasPendingEdits(execution, executionEdits);
+
+    const llmItems = llmProviderIds.map((id) => ({
+        anchorId: llmProviderAnchorId(id),
+        id,
+        label: getLlmProviderLabel(id, t),
+        status: llm ? getLlmProviderStatus(llm, id) : ('unconfigured' as const),
+    }));
+    const llmActiveCount = llmItems.filter((item) => item.status === 'active').length;
+    const llmFailedCount = llmItems.filter((item) => item.status === 'error').length;
+
+    const searchItems = searchEngineIds.map((id) => ({
+        anchorId: searchEngineAnchorId(id),
+        id,
+        label: t(`system.searchEngines.engines.${id}`),
+        status: search ? getSearchEngineStatus(search, id) : ('unconfigured' as const),
+    }));
+    const searchEnabledCount = searchItems.filter((item) => item.status === 'enabled').length;
+
+    const categories: SystemNavCategory[] = [
+        {
+            hasUnsavedChanges: isLlmDirty,
+            icon: Bot,
+            id: 'llm-providers',
+            items: llm ? llmItems : [],
+            label: t('system.llm.title'),
+            summary: llm ? t('system.llm.navSummary', { active: llmActiveCount, total: llmItems.length }) : null,
+        },
+        {
+            hasUnsavedChanges: isSearchDirty,
+            icon: Search,
+            id: 'search-engines',
+            items: search ? searchItems : [],
+            label: t('system.searchEngines.title'),
+            summary: search ? t('system.searchEngines.navSummary', { count: searchEnabledCount }) : null,
+        },
+        {
+            hasUnsavedChanges: isExecutionDirty,
+            icon: Gauge,
+            id: 'execution',
+            items: [],
+            label: t('system.execution.title'),
+            summary: execution
+                ? t(execution.executionMonitorEnabled ? 'system.execution.monitorOn' : 'system.execution.monitorOff')
+                : null,
+        },
+    ];
+
+    const selectSection = (next: SystemSection) =>
+        setSearchParams((prev) => {
+            const params = new URLSearchParams(prev);
+            params.set('section', next);
+
+            return params;
+        });
+
+    const save = async (mutate: () => Promise<unknown>, reset: () => void) => {
+        try {
+            await mutate();
+            reset();
+            toast.success(t('system.saved'));
+        } catch (err) {
+            // Keep the pending edits so the user can fix and retry.
+            toast.error(err instanceof Error ? err.message : t('system.saveFailed'));
+        }
+    };
+
+    const renderContent = () => {
+        switch (section) {
+            case 'execution': {
+                if (executionQuery.loading && !execution) {
+                    return <LoadingState title={t('system.execution.loading')} />;
+                }
+
+                if (!execution) {
+                    return (
+                        <ErrorState
+                            message={executionQuery.error?.message ?? ''}
+                            onRetry={executionQuery.refetch}
+                            title={t('system.execution.errorTitle')}
+                        />
+                    );
+                }
+
+                const form = { ...execution, ...executionEdits };
+
+                return (
+                    <>
+                        <SectionHeader title={t('system.execution.title')}>
+                            <div className="flex flex-wrap gap-2">
+                                <Badge variant={execution.executionMonitorEnabled ? 'green' : 'outline'}>
+                                    {t(
+                                        execution.executionMonitorEnabled
+                                            ? 'system.execution.monitorOn'
+                                            : 'system.execution.monitorOff',
+                                    )}
+                                </Badge>
+                                <Badge variant={execution.agentPlanningStepEnabled ? 'green' : 'outline'}>
+                                    {t(
+                                        execution.agentPlanningStepEnabled
+                                            ? 'system.execution.planningOn'
+                                            : 'system.execution.planningOff',
+                                    )}
+                                </Badge>
+                            </div>
+                        </SectionHeader>
+                        <ExecutionSection
+                            edits={executionEdits}
+                            onEditsChange={setExecutionEdits}
+                            server={execution}
+                        />
+                        {isExecutionDirty && (
+                            <SectionSaveBar
+                                isSaving={isSavingExecution}
+                                onDiscard={() => setExecutionEdits({})}
+                                onSave={() =>
+                                    save(
+                                        () =>
+                                            updateExecution({
+                                                variables: {
+                                                    input: {
+                                                        agentPlanningStepEnabled: form.agentPlanningStepEnabled,
+                                                        assistantUseAgents: form.assistantUseAgents,
+                                                        executionMonitorEnabled: form.executionMonitorEnabled,
+                                                        executionMonitorSameToolLimit:
+                                                            form.executionMonitorSameToolLimit,
+                                                        executionMonitorTotalToolLimit:
+                                                            form.executionMonitorTotalToolLimit,
+                                                        maxGeneralAgentToolCalls: form.maxGeneralAgentToolCalls,
+                                                        maxLimitedAgentToolCalls: form.maxLimitedAgentToolCalls,
+                                                    },
+                                                },
+                                            }),
+                                        () => setExecutionEdits({}),
+                                    )
+                                }
+                            />
+                        )}
+                    </>
+                );
+            }
+
+            case 'llm-providers': {
+                if (llmQuery.loading && !llm) {
+                    return <LoadingState title={t('system.llm.loading')} />;
+                }
+
+                if (!llm) {
+                    return (
+                        <ErrorState
+                            message={llmQuery.error?.message ?? ''}
+                            onRetry={llmQuery.refetch}
+                            title={t('system.llm.errorTitle')}
+                        />
+                    );
+                }
+
+                return (
+                    <>
+                        <SectionHeader title={t('system.llm.title')}>
+                            <p className="text-muted-foreground text-sm">{t('system.llm.description')}</p>
+                            <p className="text-sm">
+                                {t('system.llm.summary', { active: llmActiveCount, total: llmItems.length })}
+                                {llmFailedCount > 0 && (
+                                    <span className="text-destructive">
+                                        {' · '}
+                                        {t('system.llm.failedCount', { count: llmFailedCount })}
+                                    </span>
+                                )}
+                            </p>
+                        </SectionHeader>
+                        <LlmProvidersSection
+                            edits={llmEdits}
+                            onEditsChange={setLlmEdits}
+                            server={llm}
+                        />
+                        {isLlmDirty && (
+                            <SectionSaveBar
+                                isSaving={isSavingLlm}
+                                onDiscard={() => setLlmEdits({})}
+                                onSave={() =>
+                                    save(
+                                        () =>
+                                            updateLlmProviders({
+                                                variables: { input: buildLlmProviderInput(llm, llmEdits) },
+                                            }),
+                                        () => setLlmEdits({}),
+                                    )
+                                }
+                            />
+                        )}
+                    </>
+                );
+            }
+
+            case 'search-engines': {
+                if (searchQuery.loading && !search) {
+                    return <LoadingState title={t('system.searchEngines.loading')} />;
+                }
+
+                if (!search) {
+                    return (
+                        <ErrorState
+                            message={searchQuery.error?.message ?? ''}
+                            onRetry={searchQuery.refetch}
+                            title={t('system.searchEngines.errorTitle')}
+                        />
+                    );
+                }
+
+                return (
+                    <>
+                        <SectionHeader title={t('system.searchEngines.title')}>
+                            <p className="text-muted-foreground text-sm">{t('system.searchEngines.description')}</p>
+                            <p className="text-sm">
+                                {t('system.searchEngines.summary', {
+                                    count: searchEnabledCount,
+                                    total: searchItems.length,
+                                })}
+                            </p>
+                        </SectionHeader>
+                        <SearchEnginesSection
+                            edits={searchEdits}
+                            onEditsChange={setSearchEdits}
+                            server={search}
+                        />
+                        {isSearchDirty && (
+                            <SectionSaveBar
+                                isSaving={isSavingSearch}
+                                onDiscard={() => setSearchEdits({})}
+                                onSave={() =>
+                                    save(
+                                        () =>
+                                            updateSearchEngines({
+                                                variables: { input: buildSearchEngineInput(search, searchEdits) },
+                                            }),
+                                        () => setSearchEdits({}),
+                                    )
+                                }
+                            />
+                        )}
+                    </>
+                );
+            }
+        }
+    };
+
     return (
         <>
-            <SettingsSystemHeader />
-            <div className="flex flex-1 flex-col gap-6 p-4">
-                <SearchEnginesCard />
-                <ExecutionCard />
+            <AppHeader>
+                <AppHeaderContent>
+                    <AppHeaderTitle>{t('system.title')}</AppHeaderTitle>
+                </AppHeaderContent>
+            </AppHeader>
+            <div className="flex flex-1 flex-col gap-4 p-4 lg:flex-row lg:gap-6">
+                <SystemSettingsNav
+                    active={section}
+                    categories={categories}
+                    onSelect={selectSection}
+                />
+                <div className="flex min-w-0 flex-1 flex-col gap-4">
+                    <EnvFileBanner />
+                    {renderContent()}
+                </div>
             </div>
         </>
     );
-}
-
-function SettingsSystemHeader() {
-    const { t } = useTranslation('settings');
-
-    return (
-        <AppHeader>
-            <AppHeaderContent>
-                <AppHeaderTitle>{t('system.title')}</AppHeaderTitle>
-            </AppHeaderContent>
-        </AppHeader>
-    );
-}
-
-function TextField({ label, onChange, value }: { label: string; onChange: (value: string) => void; value: string }) {
-    return (
-        <div className="flex flex-col gap-1.5">
-            <Label>{label}</Label>
-            <Input
-                onChange={(e) => onChange(e.target.value)}
-                value={value}
-            />
-        </div>
-    );
-}
-
-function ToggleField({
-    checked,
-    label,
-    onChange,
-}: {
-    checked: boolean;
-    label: string;
-    onChange: (value: boolean) => void;
-}) {
-    return (
-        <div className="flex items-center justify-between gap-4 rounded-md border p-3">
-            <Label className="font-normal">{label}</Label>
-            <Switch
-                checked={checked}
-                onCheckedChange={onChange}
-            />
-        </div>
-    );
-}
-
-function toSearchForm(data: SearchEngineSettingsFragmentFragment): SearchForm {
-    return {
-        ...data,
-        firecrawlApiKey: '',
-        googleApiKey: '',
-        perplexityApiKey: '',
-        tavilyApiKey: '',
-        traversaalApiKey: '',
-    };
 }
 
 export default SettingsSystem;
