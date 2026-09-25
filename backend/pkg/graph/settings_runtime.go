@@ -13,6 +13,8 @@ import (
 	"pentagi/pkg/graph/model"
 	"pentagi/pkg/providers"
 	"pentagi/pkg/providers/provider"
+
+	"github.com/distribution/reference"
 )
 
 // providerConfigsDir holds the provider config files shipped in the image
@@ -247,4 +249,18 @@ func validateProviderConfigPath(path string) error {
 	default:
 		return fmt.Errorf("provider config path must point to a .yml, .yaml or .json file: %s", path)
 	}
+}
+
+// normalizeDockerImage trims a configured worker image and rejects values
+// Docker cannot pull, so a typo fails on save rather than at flow creation.
+// Empty is valid: it hands the choice back to the LLM image chooser.
+func normalizeDockerImage(image string) (string, error) {
+	image = strings.TrimSpace(image)
+	if image == "" {
+		return "", nil
+	}
+	if _, err := reference.ParseNormalizedNamed(image); err != nil {
+		return "", fmt.Errorf("invalid docker image %q: %w", image, err)
+	}
+	return image, nil
 }

@@ -15,6 +15,7 @@ fragment searchEngineSettingsFragment on SearchEngineSettings {
     duckduckgoSafesearch
     duckduckgoTimeRange
     sploitusEnabled
+    braveApiKeySet
     googleApiKeySet
     googleCxKey
     googleLrKey
@@ -44,6 +45,8 @@ fragment executionSettingsFragment on ExecutionSettings {
     maxLimitedAgentToolCalls
     agentPlanningStepEnabled
     assistantUseAgents
+    flowDockerImage
+    assistantDockerImage
 }
 
 fragment llmProviderKeySettingsFragment on LLMProviderKeySettings {
@@ -1223,8 +1226,20 @@ mutation renameFlow($flowId: ID!, $title: String!) {
     renameFlow(flowId: $flowId, title: $title)
 }
 
-mutation createAssistant($flowId: ID!, $modelProvider: String!, $input: String!, $useAgents: Boolean!, $resourceIds: [ID!]) {
-    createAssistant(flowId: $flowId, modelProvider: $modelProvider, input: $input, useAgents: $useAgents, resourceIds: $resourceIds) {
+mutation createAssistant(
+    $flowId: ID!
+    $modelProvider: String!
+    $input: String!
+    $useAgents: Boolean!
+    $resourceIds: [ID!]
+) {
+    createAssistant(
+        flowId: $flowId
+        modelProvider: $modelProvider
+        input: $input
+        useAgents: $useAgents
+        resourceIds: $resourceIds
+    ) {
         flow {
             ...flowFragment
         }
@@ -1235,7 +1250,13 @@ mutation createAssistant($flowId: ID!, $modelProvider: String!, $input: String!,
 }
 
 mutation callAssistant($flowId: ID!, $assistantId: ID!, $input: String!, $useAgents: Boolean!, $resourceIds: [ID!]) {
-    callAssistant(flowId: $flowId, assistantId: $assistantId, input: $input, useAgents: $useAgents, resourceIds: $resourceIds)
+    callAssistant(
+        flowId: $flowId
+        assistantId: $assistantId
+        input: $input
+        useAgents: $useAgents
+        resourceIds: $resourceIds
+    )
 }
 
 mutation stopAssistant($flowId: ID!, $assistantId: ID!) {

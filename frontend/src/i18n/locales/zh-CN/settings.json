@@ -317,6 +317,7 @@
             "engines": {
                 "duckduckgo": "DuckDuckGo",
                 "sploitus": "Sploitus（漏洞利用聚合）",
+                "brave": "Brave 搜索",
                 "google": "Google 自定义搜索",
                 "traversaal": "Traversaal",
                 "tavily": "Tavily",
@@ -327,8 +328,33 @@
             },
             "enabled": "启用",
             "region": "地区",
+            "regionDefault": "默认（美国）",
+            "regionOptions": {
+                "us-en": "美国",
+                "uk-en": "英国",
+                "de-de": "德国",
+                "fr-fr": "法国",
+                "es-es": "西班牙",
+                "it-it": "意大利",
+                "jp-jp": "日本",
+                "cn-zh": "中国",
+                "ru-ru": "俄罗斯"
+            },
             "safeSearch": "安全搜索",
+            "safeSearchDefault": "默认（关闭）",
+            "safeSearchOptions": {
+                "strict": "严格",
+                "moderate": "适中",
+                "off": "关闭"
+            },
             "timeRange": "时间范围",
+            "timeRangeDefault": "不限时间",
+            "timeRangeOptions": {
+                "d": "最近一天",
+                "w": "最近一周",
+                "m": "最近一个月",
+                "y": "最近一年"
+            },
             "apiKey": "API 密钥",
             "googleCxKey": "自定义搜索引擎 ID（CX）",
             "googleLrKey": "语言限制（LR）",
@@ -359,7 +385,13 @@
             "maxLimitedAgentToolCalls": "受限 Agent 最大工具调用次数",
             "monitorEnabled": "启用执行监控",
             "sameToolLimit": "同一工具重复调用上限",
-            "totalToolLimit": "工具调用总次数上限"
+            "totalToolLimit": "工具调用总次数上限",
+            "imagesTitle": "工作镜像",
+            "imagesDescription": "新建流程时沙箱容器使用的 Docker 镜像。留空则由 AI 在默认镜像与渗透测试镜像之间自动选择。已有流程继续使用当前容器。",
+            "flowDockerImage": "自动化镜像",
+            "assistantDockerImage": "助手镜像",
+            "imagePlaceholder": "由 AI 自动选择",
+            "imageHint": "例如 vxcontrol/kali-linux 或 registry.local/team/kali:2025.1"
         }
     }
 }

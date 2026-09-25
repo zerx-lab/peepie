@@ -6,7 +6,7 @@ import type { ExecutionSettingsFragmentFragment, ExecutionSettingsInput } from '
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-import { NumberField, ToggleField } from './fields';
+import { NumberField, TextField, ToggleField } from './fields';
 
 export type ExecutionEdits = Partial<ExecutionSettingsInput>;
 
@@ -53,6 +53,28 @@ export function ExecutionSection({ edits, onEditsChange, server }: ExecutionSect
                             value={form.maxLimitedAgentToolCalls}
                         />
                     </div>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader>
+                    <CardTitle>{t('system.execution.imagesTitle')}</CardTitle>
+                    <CardDescription>{t('system.execution.imagesDescription')}</CardDescription>
+                </CardHeader>
+                <CardContent className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                    <TextField
+                        hint={t('system.execution.imageHint')}
+                        label={t('system.execution.flowDockerImage')}
+                        onChange={(v) => set('flowDockerImage', v)}
+                        placeholder={t('system.execution.imagePlaceholder')}
+                        value={form.flowDockerImage}
+                    />
+                    <TextField
+                        hint={t('system.execution.imageHint')}
+                        label={t('system.execution.assistantDockerImage')}
+                        onChange={(v) => set('assistantDockerImage', v)}
+                        placeholder={t('system.execution.imagePlaceholder')}
+                        value={form.assistantDockerImage}
+                    />
                 </CardContent>
             </Card>
             <Card>

@@ -20,6 +20,7 @@ const (
 	KeyDuckDuckGoRegion     = "duckduckgo_region"
 	KeyDuckDuckGoSafeSearch = "duckduckgo_safesearch"
 	KeyDuckDuckGoTimeRange  = "duckduckgo_time_range"
+	KeyBraveAPIKey          = "brave_api_key"
 	KeySploitusEnabled      = "sploitus_enabled"
 	KeyGoogleAPIKey         = "google_api_key"
 	KeyGoogleCXKey          = "google_cx_key"
@@ -51,6 +52,8 @@ const (
 	KeyMaxLimitedAgentToolCalls = "max_limited_agent_tool_calls"
 	KeyAgentPlanningStepEnabled = "agent_planning_step_enabled"
 	KeyAssistantUseAgents       = "assistant_use_agents"
+	KeyDockerFlowImage          = "docker_flow_image"
+	KeyDockerAssistantImage     = "docker_assistant_image"
 )
 
 // Keys within CategorySummarizer. General and assistant summarizers share the
@@ -140,6 +143,7 @@ const (
 // echoed back to the frontend (never returned in plaintext once set).
 var SecretKeys = map[string]bool{
 	KeyGoogleAPIKey:        true,
+	KeyBraveAPIKey:         true,
 	KeyTraversaalAPIKey:    true,
 	KeyTavilyAPIKey:        true,
 	KeyFirecrawlAPIKey:     true,

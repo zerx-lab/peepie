@@ -115,10 +115,12 @@ export type CustomProviderSettingsInput = {
 
 export type ExecutionSettingsInput = {
     agentPlanningStepEnabled: boolean;
+    assistantDockerImage: string;
     assistantUseAgents: boolean;
     executionMonitorEnabled: boolean;
     executionMonitorSameToolLimit: number;
     executionMonitorTotalToolLimit: number;
+    flowDockerImage: string;
     maxGeneralAgentToolCalls: number;
     maxLimitedAgentToolCalls: number;
 };
@@ -309,6 +311,7 @@ export enum ResultType {
 }
 
 export type SearchEngineSettingsInput = {
+    braveApiKey?: string | null | undefined;
     duckduckgoEnabled: boolean;
     duckduckgoRegion: string;
     duckduckgoSafesearch: string;
@@ -406,6 +409,7 @@ export type SearchEngineSettingsFragmentFragment = {
     duckduckgoSafesearch: string;
     duckduckgoTimeRange: string;
     sploitusEnabled: boolean;
+    braveApiKeySet: boolean;
     googleApiKeySet: boolean;
     googleCxKey: string;
     googleLrKey: string;
@@ -435,6 +439,8 @@ export type ExecutionSettingsFragmentFragment = {
     maxLimitedAgentToolCalls: number;
     agentPlanningStepEnabled: boolean;
     assistantUseAgents: boolean;
+    flowDockerImage: string;
+    assistantDockerImage: string;
 };
 
 export type LlmProviderKeySettingsFragmentFragment = {
@@ -1660,6 +1666,7 @@ export const SearchEngineSettingsFragmentFragmentDoc = {
                     { kind: 'Field', name: { kind: 'Name', value: 'duckduckgoSafesearch' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'duckduckgoTimeRange' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'sploitusEnabled' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'braveApiKeySet' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'googleApiKeySet' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'googleCxKey' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'googleLrKey' } },
@@ -1701,6 +1708,8 @@ export const ExecutionSettingsFragmentFragmentDoc = {
                     { kind: 'Field', name: { kind: 'Name', value: 'maxLimitedAgentToolCalls' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'agentPlanningStepEnabled' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'assistantUseAgents' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'flowDockerImage' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'assistantDockerImage' } },
                 ],
             },
         },
@@ -4662,6 +4671,7 @@ export const SettingsSearchEnginesDocument = {
                     { kind: 'Field', name: { kind: 'Name', value: 'duckduckgoSafesearch' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'duckduckgoTimeRange' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'sploitusEnabled' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'braveApiKeySet' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'googleApiKeySet' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'googleCxKey' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'googleLrKey' } },
@@ -4723,6 +4733,8 @@ export const SettingsExecutionDocument = {
                     { kind: 'Field', name: { kind: 'Name', value: 'maxLimitedAgentToolCalls' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'agentPlanningStepEnabled' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'assistantUseAgents' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'flowDockerImage' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'assistantDockerImage' } },
                 ],
             },
         },
@@ -10201,6 +10213,7 @@ export const UpdateSearchEngineSettingsDocument = {
                     { kind: 'Field', name: { kind: 'Name', value: 'duckduckgoSafesearch' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'duckduckgoTimeRange' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'sploitusEnabled' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'braveApiKeySet' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'googleApiKeySet' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'googleCxKey' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'googleLrKey' } },
@@ -10279,6 +10292,8 @@ export const UpdateExecutionSettingsDocument = {
                     { kind: 'Field', name: { kind: 'Name', value: 'maxLimitedAgentToolCalls' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'agentPlanningStepEnabled' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'assistantUseAgents' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'flowDockerImage' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'assistantDockerImage' } },
                 ],
             },
         },

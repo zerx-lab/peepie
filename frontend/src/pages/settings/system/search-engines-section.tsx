@@ -6,8 +6,21 @@ import type { SearchEngineSettingsFragmentFragment } from '@/graphql/types';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-import { NumberField, SecretField, StatusBadge, TextField, ToggleField } from './fields';
-import { getSearchEngineStatus, type SearchEngineEdits, type SearchEngineId } from './search-engines';
+import { NumberField, SecretField, SelectField, StatusBadge, TextField, ToggleField } from './fields';
+import {
+    duckDuckGoRegionOptions,
+    duckDuckGoSafeSearchOptions,
+    duckDuckGoTimeRangeOptions,
+    getSearchEngineStatus,
+    type SearchEngineEdits,
+    type SearchEngineId,
+} from './search-engines';
+
+// Radix Select rejects an empty-string item value, so the "use backend default" option is
+// represented by this sentinel and translated to/from '' at the edit boundary.
+const DEFAULT_OPTION = '__default__';
+const toSelectValue = (value: string) => (value === '' ? DEFAULT_OPTION : value);
+const fromSelectValue = (value: string) => (value === DEFAULT_OPTION ? '' : value);
 
 export const searchEngineAnchorId = (id: SearchEngineId) => `search-engine-${id}`;
 
@@ -37,20 +50,41 @@ export function SearchEnginesSection({ edits, onEditsChange, server }: SearchEng
                         onChange={(v) => set('duckduckgoEnabled', v)}
                     />
                     <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-                        <TextField
+                        <SelectField
                             label={t('system.searchEngines.region')}
-                            onChange={(v) => set('duckduckgoRegion', v)}
-                            value={form.duckduckgoRegion}
+                            onChange={(v) => set('duckduckgoRegion', fromSelectValue(v))}
+                            options={[
+                                { label: t('system.searchEngines.regionDefault'), value: DEFAULT_OPTION },
+                                ...duckDuckGoRegionOptions.map((v) => ({
+                                    label: t(`system.searchEngines.regionOptions.${v}`),
+                                    value: v,
+                                })),
+                            ]}
+                            value={toSelectValue(form.duckduckgoRegion)}
                         />
-                        <TextField
+                        <SelectField
                             label={t('system.searchEngines.safeSearch')}
-                            onChange={(v) => set('duckduckgoSafesearch', v)}
-                            value={form.duckduckgoSafesearch}
+                            onChange={(v) => set('duckduckgoSafesearch', fromSelectValue(v))}
+                            options={[
+                                { label: t('system.searchEngines.safeSearchDefault'), value: DEFAULT_OPTION },
+                                ...duckDuckGoSafeSearchOptions.map((v) => ({
+                                    label: t(`system.searchEngines.safeSearchOptions.${v}`),
+                                    value: v,
+                                })),
+                            ]}
+                            value={toSelectValue(form.duckduckgoSafesearch)}
                         />
-                        <TextField
+                        <SelectField
                             label={t('system.searchEngines.timeRange')}
-                            onChange={(v) => set('duckduckgoTimeRange', v)}
-                            value={form.duckduckgoTimeRange}
+                            onChange={(v) => set('duckduckgoTimeRange', fromSelectValue(v))}
+                            options={[
+                                { label: t('system.searchEngines.timeRangeDefault'), value: DEFAULT_OPTION },
+                                ...duckDuckGoTimeRangeOptions.map((v) => ({
+                                    label: t(`system.searchEngines.timeRangeOptions.${v}`),
+                                    value: v,
+                                })),
+                            ]}
+                            value={toSelectValue(form.duckduckgoTimeRange)}
                         />
                     </div>
                 </>
@@ -65,6 +99,20 @@ export function SearchEnginesSection({ edits, onEditsChange, server }: SearchEng
                     label={t('system.searchEngines.enabled')}
                     onChange={(v) => set('sploitusEnabled', v)}
                 />
+            </EngineCard>
+
+            <EngineCard
+                engineId="brave"
+                server={server}
+            >
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                    <SecretField
+                        edit={edits.braveApiKey}
+                        isSet={server.braveApiKeySet}
+                        label={t('system.searchEngines.apiKey')}
+                        onChange={(v) => set('braveApiKey', v)}
+                    />
+                </div>
             </EngineCard>
 
             <EngineCard

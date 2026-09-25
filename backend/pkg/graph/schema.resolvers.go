@@ -806,6 +806,7 @@ func (r *mutationResolver) UpdateSearchEngineSettings(ctx context.Context, input
 	putSecret(values, config.KeyTraversaalAPIKey, input.TraversaalAPIKey)
 	putSecret(values, config.KeyTavilyAPIKey, input.TavilyAPIKey)
 	putSecret(values, config.KeyFirecrawlAPIKey, input.FirecrawlAPIKey)
+	putSecret(values, config.KeyBraveAPIKey, input.BraveAPIKey)
 	putSecret(values, config.KeyPerplexityAPIKey, input.PerplexityAPIKey)
 
 	if err := applySettings(ctx, r.DB, r.Config, uid, config.CategorySearchEngines, values); err != nil {
@@ -822,6 +823,15 @@ func (r *mutationResolver) UpdateExecutionSettings(ctx context.Context, input mo
 		return nil, err
 	}
 
+	flowImage, err := normalizeDockerImage(input.FlowDockerImage)
+	if err != nil {
+		return nil, err
+	}
+	assistantImage, err := normalizeDockerImage(input.AssistantDockerImage)
+	if err != nil {
+		return nil, err
+	}
+
 	values := map[string]string{
 		config.KeyExecutionMonitorEnabled:  strconv.FormatBool(input.ExecutionMonitorEnabled),
 		config.KeyExecutionSameToolLimit:   strconv.Itoa(input.ExecutionMonitorSameToolLimit),
@@ -830,6 +840,8 @@ func (r *mutationResolver) UpdateExecutionSettings(ctx context.Context, input mo
 		config.KeyMaxLimitedAgentToolCalls: strconv.Itoa(input.MaxLimitedAgentToolCalls),
 		config.KeyAgentPlanningStepEnabled: strconv.FormatBool(input.AgentPlanningStepEnabled),
 		config.KeyAssistantUseAgents:       strconv.FormatBool(input.AssistantUseAgents),
+		config.KeyDockerFlowImage:          flowImage,
+		config.KeyDockerAssistantImage:     assistantImage,
 	}
 	if err := applySettings(ctx, r.DB, r.Config, uid, config.CategoryExecution, values); err != nil {
 		return nil, err
@@ -2407,6 +2419,7 @@ func (r *queryResolver) SettingsSearchEngines(ctx context.Context) (*model.Searc
 		DuckduckgoSafesearch: o.GetString(config.CategorySearchEngines, config.KeyDuckDuckGoSafeSearch, c.DuckDuckGoSafeSearch),
 		DuckduckgoTimeRange:  o.GetString(config.CategorySearchEngines, config.KeyDuckDuckGoTimeRange, c.DuckDuckGoTimeRange),
 		SploitusEnabled:      o.GetBool(config.CategorySearchEngines, config.KeySploitusEnabled, c.SploitusEnabled),
+		BraveAPIKeySet:       o.GetString(config.CategorySearchEngines, config.KeyBraveAPIKey, c.BraveAPIKey) != "",
 		GoogleAPIKeySet:      o.GetString(config.CategorySearchEngines, config.KeyGoogleAPIKey, c.GoogleAPIKey) != "",
 		GoogleCxKey:          o.GetString(config.CategorySearchEngines, config.KeyGoogleCXKey, c.GoogleCXKey),
 		GoogleLrKey:          o.GetString(config.CategorySearchEngines, config.KeyGoogleLRKey, c.GoogleLRKey),
@@ -2455,6 +2468,10 @@ func (r *queryResolver) SettingsExecution(ctx context.Context) (*model.Execution
 			config.CategoryExecution, config.KeyAgentPlanningStepEnabled, c.AgentPlanningStepEnabled),
 		AssistantUseAgents: o.GetBool(
 			config.CategoryExecution, config.KeyAssistantUseAgents, c.AssistantUseAgents),
+		FlowDockerImage: o.GetString(
+			config.CategoryExecution, config.KeyDockerFlowImage, c.DockerFlowImage),
+		AssistantDockerImage: o.GetString(
+			config.CategoryExecution, config.KeyDockerAssistantImage, c.DockerAssistantImage),
 	}, nil
 }
 

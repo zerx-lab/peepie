@@ -62,7 +62,11 @@ type Config struct {
 	DockerPortsBase              int    `env:"DOCKER_PORTS_BASE" envDefault:"28000"`
 	DockerDefaultImage           string `env:"DOCKER_DEFAULT_IMAGE" envDefault:"debian:latest"`
 	DockerDefaultImageForPentest string `env:"DOCKER_DEFAULT_IMAGE_FOR_PENTEST" envDefault:"vxcontrol/kali-linux"`
-	TerminalToolTimeout          int    `env:"TERMINAL_TOOL_TIMEOUT" envDefault:"1200"`
+	// Fixed worker images for new automation flows and new assistant flows;
+	// empty lets the LLM image chooser pick from the two defaults above.
+	DockerFlowImage      string `env:"DOCKER_FLOW_IMAGE"`
+	DockerAssistantImage string `env:"DOCKER_ASSISTANT_IMAGE"`
+	TerminalToolTimeout  int    `env:"TERMINAL_TOOL_TIMEOUT" envDefault:"1200"`
 
 	// === API Server Configuration ===
 	ServerPort   int    `env:"SERVER_PORT" envDefault:"8080"`
@@ -172,6 +176,9 @@ type Config struct {
 	DuckDuckGoRegion     string `env:"DUCKDUCKGO_REGION"`
 	DuckDuckGoSafeSearch string `env:"DUCKDUCKGO_SAFESEARCH"`
 	DuckDuckGoTimeRange  string `env:"DUCKDUCKGO_TIME_RANGE"`
+
+	// === Search Engine: Brave Search ===
+	BraveAPIKey string `env:"BRAVE_API_KEY"`
 
 	// Sploitus exploit aggregator (https://sploitus.com)
 	// service under cloudflare protection, IP should have good reputation to avoid being blocked

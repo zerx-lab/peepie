@@ -249,10 +249,12 @@ type ComplexityRoot struct {
 
 	ExecutionSettings struct {
 		AgentPlanningStepEnabled       func(childComplexity int) int
+		AssistantDockerImage           func(childComplexity int) int
 		AssistantUseAgents             func(childComplexity int) int
 		ExecutionMonitorEnabled        func(childComplexity int) int
 		ExecutionMonitorSameToolLimit  func(childComplexity int) int
 		ExecutionMonitorTotalToolLimit func(childComplexity int) int
+		FlowDockerImage                func(childComplexity int) int
 		MaxGeneralAgentToolCalls       func(childComplexity int) int
 		MaxLimitedAgentToolCalls       func(childComplexity int) int
 	}
@@ -616,6 +618,7 @@ type ComplexityRoot struct {
 	}
 
 	SearchEngineSettings struct {
+		BraveAPIKeySet                func(childComplexity int) int
 		DuckduckgoEnabled             func(childComplexity int) int
 		DuckduckgoRegion              func(childComplexity int) int
 		DuckduckgoSafesearch          func(childComplexity int) int
@@ -1973,6 +1976,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ExecutionSettings.AgentPlanningStepEnabled(childComplexity), true
 
+	case "ExecutionSettings.assistantDockerImage":
+		if e.complexity.ExecutionSettings.AssistantDockerImage == nil {
+			break
+		}
+
+		return e.complexity.ExecutionSettings.AssistantDockerImage(childComplexity), true
+
 	case "ExecutionSettings.assistantUseAgents":
 		if e.complexity.ExecutionSettings.AssistantUseAgents == nil {
 			break
@@ -2000,6 +2010,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ExecutionSettings.ExecutionMonitorTotalToolLimit(childComplexity), true
+
+	case "ExecutionSettings.flowDockerImage":
+		if e.complexity.ExecutionSettings.FlowDockerImage == nil {
+			break
+		}
+
+		return e.complexity.ExecutionSettings.FlowDockerImage(childComplexity), true
 
 	case "ExecutionSettings.maxGeneralAgentToolCalls":
 		if e.complexity.ExecutionSettings.MaxGeneralAgentToolCalls == nil {
@@ -4163,6 +4180,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Screenshot.URL(childComplexity), true
+
+	case "SearchEngineSettings.braveApiKeySet":
+		if e.complexity.SearchEngineSettings.BraveAPIKeySet == nil {
+			break
+		}
+
+		return e.complexity.SearchEngineSettings.BraveAPIKeySet(childComplexity), true
 
 	case "SearchEngineSettings.duckduckgoEnabled":
 		if e.complexity.SearchEngineSettings.DuckduckgoEnabled == nil {
@@ -16498,6 +16522,94 @@ func (ec *executionContext) fieldContext_ExecutionSettings_assistantUseAgents(_ 
 	return fc, nil
 }
 
+func (ec *executionContext) _ExecutionSettings_flowDockerImage(ctx context.Context, field graphql.CollectedField, obj *model.ExecutionSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExecutionSettings_flowDockerImage(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FlowDockerImage, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ExecutionSettings_flowDockerImage(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ExecutionSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ExecutionSettings_assistantDockerImage(ctx context.Context, field graphql.CollectedField, obj *model.ExecutionSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExecutionSettings_assistantDockerImage(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AssistantDockerImage, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ExecutionSettings_assistantDockerImage(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ExecutionSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Flow_id(ctx context.Context, field graphql.CollectedField, obj *model.Flow) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Flow_id(ctx, field)
 	if err != nil {
@@ -22583,6 +22695,8 @@ func (ec *executionContext) fieldContext_Mutation_updateSearchEngineSettings(ctx
 				return ec.fieldContext_SearchEngineSettings_duckduckgoTimeRange(ctx, field)
 			case "sploitusEnabled":
 				return ec.fieldContext_SearchEngineSettings_sploitusEnabled(ctx, field)
+			case "braveApiKeySet":
+				return ec.fieldContext_SearchEngineSettings_braveApiKeySet(ctx, field)
 			case "googleApiKeySet":
 				return ec.fieldContext_SearchEngineSettings_googleApiKeySet(ctx, field)
 			case "googleCxKey":
@@ -22692,6 +22806,10 @@ func (ec *executionContext) fieldContext_Mutation_updateExecutionSettings(ctx co
 				return ec.fieldContext_ExecutionSettings_agentPlanningStepEnabled(ctx, field)
 			case "assistantUseAgents":
 				return ec.fieldContext_ExecutionSettings_assistantUseAgents(ctx, field)
+			case "flowDockerImage":
+				return ec.fieldContext_ExecutionSettings_flowDockerImage(ctx, field)
+			case "assistantDockerImage":
+				return ec.fieldContext_ExecutionSettings_assistantDockerImage(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ExecutionSettings", field.Name)
 		},
@@ -29083,6 +29201,8 @@ func (ec *executionContext) fieldContext_Query_settingsSearchEngines(_ context.C
 				return ec.fieldContext_SearchEngineSettings_duckduckgoTimeRange(ctx, field)
 			case "sploitusEnabled":
 				return ec.fieldContext_SearchEngineSettings_sploitusEnabled(ctx, field)
+			case "braveApiKeySet":
+				return ec.fieldContext_SearchEngineSettings_braveApiKeySet(ctx, field)
 			case "googleApiKeySet":
 				return ec.fieldContext_SearchEngineSettings_googleApiKeySet(ctx, field)
 			case "googleCxKey":
@@ -29181,6 +29301,10 @@ func (ec *executionContext) fieldContext_Query_settingsExecution(_ context.Conte
 				return ec.fieldContext_ExecutionSettings_agentPlanningStepEnabled(ctx, field)
 			case "assistantUseAgents":
 				return ec.fieldContext_ExecutionSettings_assistantUseAgents(ctx, field)
+			case "flowDockerImage":
+				return ec.fieldContext_ExecutionSettings_flowDockerImage(ctx, field)
+			case "assistantDockerImage":
+				return ec.fieldContext_ExecutionSettings_assistantDockerImage(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ExecutionSettings", field.Name)
 		},
@@ -30638,6 +30762,50 @@ func (ec *executionContext) _SearchEngineSettings_sploitusEnabled(ctx context.Co
 }
 
 func (ec *executionContext) fieldContext_SearchEngineSettings_sploitusEnabled(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchEngineSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchEngineSettings_braveApiKeySet(ctx context.Context, field graphql.CollectedField, obj *model.SearchEngineSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchEngineSettings_braveApiKeySet(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.BraveAPIKeySet, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchEngineSettings_braveApiKeySet(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "SearchEngineSettings",
 		Field:      field,
@@ -42431,7 +42599,7 @@ func (ec *executionContext) unmarshalInputExecutionSettingsInput(ctx context.Con
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"executionMonitorEnabled", "executionMonitorSameToolLimit", "executionMonitorTotalToolLimit", "maxGeneralAgentToolCalls", "maxLimitedAgentToolCalls", "agentPlanningStepEnabled", "assistantUseAgents"}
+	fieldsInOrder := [...]string{"executionMonitorEnabled", "executionMonitorSameToolLimit", "executionMonitorTotalToolLimit", "maxGeneralAgentToolCalls", "maxLimitedAgentToolCalls", "agentPlanningStepEnabled", "assistantUseAgents", "flowDockerImage", "assistantDockerImage"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -42487,6 +42655,20 @@ func (ec *executionContext) unmarshalInputExecutionSettingsInput(ctx context.Con
 				return it, err
 			}
 			it.AssistantUseAgents = data
+		case "flowDockerImage":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("flowDockerImage"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.FlowDockerImage = data
+		case "assistantDockerImage":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assistantDockerImage"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AssistantDockerImage = data
 		}
 	}
 
@@ -42858,7 +43040,7 @@ func (ec *executionContext) unmarshalInputSearchEngineSettingsInput(ctx context.
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"duckduckgoEnabled", "duckduckgoRegion", "duckduckgoSafesearch", "duckduckgoTimeRange", "sploitusEnabled", "googleApiKey", "googleCxKey", "googleLrKey", "traversaalApiKey", "tavilyApiKey", "firecrawlApiKey", "firecrawlApiUrl", "perplexityApiKey", "perplexityModel", "perplexityContextSize", "searxngUrl", "searxngCategories", "searxngLanguage", "searxngSafesearch", "searxngTimeRange", "searxngTimeout", "webSearchInternalEnabled", "webSearchInternalMaxSites", "webSearchInternalMaxSiteBytes"}
+	fieldsInOrder := [...]string{"duckduckgoEnabled", "duckduckgoRegion", "duckduckgoSafesearch", "duckduckgoTimeRange", "sploitusEnabled", "braveApiKey", "googleApiKey", "googleCxKey", "googleLrKey", "traversaalApiKey", "tavilyApiKey", "firecrawlApiKey", "firecrawlApiUrl", "perplexityApiKey", "perplexityModel", "perplexityContextSize", "searxngUrl", "searxngCategories", "searxngLanguage", "searxngSafesearch", "searxngTimeRange", "searxngTimeout", "webSearchInternalEnabled", "webSearchInternalMaxSites", "webSearchInternalMaxSiteBytes"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -42900,6 +43082,13 @@ func (ec *executionContext) unmarshalInputSearchEngineSettingsInput(ctx context.
 				return it, err
 			}
 			it.SploitusEnabled = data
+		case "braveApiKey":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("braveApiKey"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.BraveAPIKey = data
 		case "googleApiKey":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("googleApiKey"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -44496,6 +44685,16 @@ func (ec *executionContext) _ExecutionSettings(ctx context.Context, sel ast.Sele
 			}
 		case "assistantUseAgents":
 			out.Values[i] = ec._ExecutionSettings_assistantUseAgents(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "flowDockerImage":
+			out.Values[i] = ec._ExecutionSettings_flowDockerImage(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "assistantDockerImage":
+			out.Values[i] = ec._ExecutionSettings_assistantDockerImage(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -47678,6 +47877,11 @@ func (ec *executionContext) _SearchEngineSettings(ctx context.Context, sel ast.S
 			}
 		case "sploitusEnabled":
 			out.Values[i] = ec._SearchEngineSettings_sploitusEnabled(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "braveApiKeySet":
+			out.Values[i] = ec._SearchEngineSettings_braveApiKeySet(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

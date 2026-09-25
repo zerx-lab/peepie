@@ -247,23 +247,27 @@ type DefaultProvidersConfig struct {
 }
 
 type ExecutionSettings struct {
-	ExecutionMonitorEnabled        bool `json:"executionMonitorEnabled"`
-	ExecutionMonitorSameToolLimit  int  `json:"executionMonitorSameToolLimit"`
-	ExecutionMonitorTotalToolLimit int  `json:"executionMonitorTotalToolLimit"`
-	MaxGeneralAgentToolCalls       int  `json:"maxGeneralAgentToolCalls"`
-	MaxLimitedAgentToolCalls       int  `json:"maxLimitedAgentToolCalls"`
-	AgentPlanningStepEnabled       bool `json:"agentPlanningStepEnabled"`
-	AssistantUseAgents             bool `json:"assistantUseAgents"`
+	ExecutionMonitorEnabled        bool   `json:"executionMonitorEnabled"`
+	ExecutionMonitorSameToolLimit  int    `json:"executionMonitorSameToolLimit"`
+	ExecutionMonitorTotalToolLimit int    `json:"executionMonitorTotalToolLimit"`
+	MaxGeneralAgentToolCalls       int    `json:"maxGeneralAgentToolCalls"`
+	MaxLimitedAgentToolCalls       int    `json:"maxLimitedAgentToolCalls"`
+	AgentPlanningStepEnabled       bool   `json:"agentPlanningStepEnabled"`
+	AssistantUseAgents             bool   `json:"assistantUseAgents"`
+	FlowDockerImage                string `json:"flowDockerImage"`
+	AssistantDockerImage           string `json:"assistantDockerImage"`
 }
 
 type ExecutionSettingsInput struct {
-	ExecutionMonitorEnabled        bool `json:"executionMonitorEnabled"`
-	ExecutionMonitorSameToolLimit  int  `json:"executionMonitorSameToolLimit"`
-	ExecutionMonitorTotalToolLimit int  `json:"executionMonitorTotalToolLimit"`
-	MaxGeneralAgentToolCalls       int  `json:"maxGeneralAgentToolCalls"`
-	MaxLimitedAgentToolCalls       int  `json:"maxLimitedAgentToolCalls"`
-	AgentPlanningStepEnabled       bool `json:"agentPlanningStepEnabled"`
-	AssistantUseAgents             bool `json:"assistantUseAgents"`
+	ExecutionMonitorEnabled        bool   `json:"executionMonitorEnabled"`
+	ExecutionMonitorSameToolLimit  int    `json:"executionMonitorSameToolLimit"`
+	ExecutionMonitorTotalToolLimit int    `json:"executionMonitorTotalToolLimit"`
+	MaxGeneralAgentToolCalls       int    `json:"maxGeneralAgentToolCalls"`
+	MaxLimitedAgentToolCalls       int    `json:"maxLimitedAgentToolCalls"`
+	AgentPlanningStepEnabled       bool   `json:"agentPlanningStepEnabled"`
+	AssistantUseAgents             bool   `json:"assistantUseAgents"`
+	FlowDockerImage                string `json:"flowDockerImage"`
+	AssistantDockerImage           string `json:"assistantDockerImage"`
 }
 
 type Flow struct {
@@ -587,6 +591,7 @@ type SearchEngineSettings struct {
 	DuckduckgoSafesearch          string `json:"duckduckgoSafesearch"`
 	DuckduckgoTimeRange           string `json:"duckduckgoTimeRange"`
 	SploitusEnabled               bool   `json:"sploitusEnabled"`
+	BraveAPIKeySet                bool   `json:"braveApiKeySet"`
 	GoogleAPIKeySet               bool   `json:"googleApiKeySet"`
 	GoogleCxKey                   string `json:"googleCxKey"`
 	GoogleLrKey                   string `json:"googleLrKey"`
@@ -614,6 +619,7 @@ type SearchEngineSettingsInput struct {
 	DuckduckgoSafesearch          string  `json:"duckduckgoSafesearch"`
 	DuckduckgoTimeRange           string  `json:"duckduckgoTimeRange"`
 	SploitusEnabled               bool    `json:"sploitusEnabled"`
+	BraveAPIKey                   *string `json:"braveApiKey,omitempty"`
 	GoogleAPIKey                  *string `json:"googleApiKey,omitempty"`
 	GoogleCxKey                   string  `json:"googleCxKey"`
 	GoogleLrKey                   string  `json:"googleLrKey"`

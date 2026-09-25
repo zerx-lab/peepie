@@ -321,6 +321,7 @@
             "engines": {
                 "duckduckgo": "DuckDuckGo",
                 "sploitus": "Sploitus (exploit aggregator)",
+                "brave": "Brave Search",
                 "google": "Google Custom Search",
                 "traversaal": "Traversaal",
                 "tavily": "Tavily",
@@ -331,8 +332,33 @@
             },
             "enabled": "Enabled",
             "region": "Region",
+            "regionDefault": "Default (US)",
+            "regionOptions": {
+                "us-en": "United States",
+                "uk-en": "United Kingdom",
+                "de-de": "Germany",
+                "fr-fr": "France",
+                "es-es": "Spain",
+                "it-it": "Italy",
+                "jp-jp": "Japan",
+                "cn-zh": "China",
+                "ru-ru": "Russia"
+            },
             "safeSearch": "Safe search",
+            "safeSearchDefault": "Default (off)",
+            "safeSearchOptions": {
+                "strict": "Strict",
+                "moderate": "Moderate",
+                "off": "Off"
+            },
             "timeRange": "Time range",
+            "timeRangeDefault": "Any time",
+            "timeRangeOptions": {
+                "d": "Past day",
+                "w": "Past week",
+                "m": "Past month",
+                "y": "Past year"
+            },
             "apiKey": "API key",
             "googleCxKey": "Custom search engine ID (CX)",
             "googleLrKey": "Language restrict (LR)",
@@ -363,7 +389,13 @@
             "maxLimitedAgentToolCalls": "Max tool calls — limited agents",
             "monitorEnabled": "Enable execution monitor",
             "sameToolLimit": "Same-tool repetition limit",
-            "totalToolLimit": "Total tool-call limit"
+            "totalToolLimit": "Total tool-call limit",
+            "imagesTitle": "Worker images",
+            "imagesDescription": "Docker image for the sandbox container of new flows. Leave empty to let the AI choose from the default and pentest images. Existing flows keep their current container.",
+            "flowDockerImage": "Automation image",
+            "assistantDockerImage": "Assistant image",
+            "imagePlaceholder": "Chosen by AI",
+            "imageHint": "e.g. vxcontrol/kali-linux or registry.local/team/kali:2025.1"
         }
     }
 }

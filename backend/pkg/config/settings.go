@@ -22,6 +22,7 @@ var settingDefs = []settingDef{
 	{CategorySearchEngines, KeyDuckDuckGoSafeSearch, "DUCKDUCKGO_SAFESEARCH"},
 	{CategorySearchEngines, KeyDuckDuckGoTimeRange, "DUCKDUCKGO_TIME_RANGE"},
 	{CategorySearchEngines, KeySploitusEnabled, "SPLOITUS_ENABLED"},
+	{CategorySearchEngines, KeyBraveAPIKey, "BRAVE_API_KEY"},
 	{CategorySearchEngines, KeyGoogleAPIKey, "GOOGLE_API_KEY"},
 	{CategorySearchEngines, KeyGoogleCXKey, "GOOGLE_CX_KEY"},
 	{CategorySearchEngines, KeyGoogleLRKey, "GOOGLE_LR_KEY"},
@@ -49,6 +50,8 @@ var settingDefs = []settingDef{
 	{CategoryExecution, KeyMaxLimitedAgentToolCalls, "MAX_LIMITED_AGENT_TOOL_CALLS"},
 	{CategoryExecution, KeyAgentPlanningStepEnabled, "AGENT_PLANNING_STEP_ENABLED"},
 	{CategoryExecution, KeyAssistantUseAgents, "ASSISTANT_USE_AGENTS"},
+	{CategoryExecution, KeyDockerFlowImage, "DOCKER_FLOW_IMAGE"},
+	{CategoryExecution, KeyDockerAssistantImage, "DOCKER_ASSISTANT_IMAGE"},
 
 	{CategoryLLMProviders, KeyOpenAIKey, "OPEN_AI_KEY"},
 	{CategoryLLMProviders, KeyOpenAIServerURL, "OPEN_AI_SERVER_URL"},

@@ -219,6 +219,7 @@ type SearchEngineSettings {
   duckduckgoSafesearch: String!
   duckduckgoTimeRange: String!
   sploitusEnabled: Boolean!
+  braveApiKeySet: Boolean!
   googleApiKeySet: Boolean!
   googleCxKey: String!
   googleLrKey: String!
@@ -246,6 +247,7 @@ input SearchEngineSettingsInput {
   duckduckgoSafesearch: String!
   duckduckgoTimeRange: String!
   sploitusEnabled: Boolean!
+  braveApiKey: String
   googleApiKey: String
   googleCxKey: String!
   googleLrKey: String!
@@ -275,6 +277,9 @@ type ExecutionSettings {
   maxLimitedAgentToolCalls: Int!
   agentPlanningStepEnabled: Boolean!
   assistantUseAgents: Boolean!
+  # Fixed worker image for new automation / assistant flows; empty lets the LLM choose.
+  flowDockerImage: String!
+  assistantDockerImage: String!
 }
 
 input ExecutionSettingsInput {
@@ -285,6 +290,8 @@ input ExecutionSettingsInput {
   maxLimitedAgentToolCalls: Int!
   agentPlanningStepEnabled: Boolean!
   assistantUseAgents: Boolean!
+  flowDockerImage: String!
+  assistantDockerImage: String!
 }
 
 # Built-in LLM provider credentials (the same OPEN_AI_KEY / ANTHROPIC_API_KEY / ...

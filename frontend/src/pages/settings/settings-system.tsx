@@ -265,12 +265,14 @@ function SettingsSystem() {
                                                 variables: {
                                                     input: {
                                                         agentPlanningStepEnabled: form.agentPlanningStepEnabled,
+                                                        assistantDockerImage: form.assistantDockerImage,
                                                         assistantUseAgents: form.assistantUseAgents,
                                                         executionMonitorEnabled: form.executionMonitorEnabled,
                                                         executionMonitorSameToolLimit:
                                                             form.executionMonitorSameToolLimit,
                                                         executionMonitorTotalToolLimit:
                                                             form.executionMonitorTotalToolLimit,
+                                                        flowDockerImage: form.flowDockerImage,
                                                         maxGeneralAgentToolCalls: form.maxGeneralAgentToolCalls,
                                                         maxLimitedAgentToolCalls: form.maxLimitedAgentToolCalls,
                                                     },

@@ -142,7 +142,7 @@ The backend re-reads the table and the file every 5s (`cmd/pentagi/main.go`), so
 
 - **LLM Providers**: `OPEN_AI_*`, `ANTHROPIC_*`, `GEMINI_*`, `BEDROCK_*` (except `BEDROCK_CONFIG_PATH`), `OLLAMA_SERVER_*`, `LLM_SERVER_*`, `DEEPSEEK_*`, `GLM_*`, `KIMI_*`, `QWEN_*`, `MINIMAX_*`. A save first builds every provider it affects and is rejected (nothing written) if a configured provider cannot be built. Only providers whose settings changed are rebuilt; flows and assistants that are already running switch to the new credentials on their next LLM call, and the embedder is rebuilt when the OpenAI key/URL it falls back to changes. A configured provider that fails to build at startup no longer aborts the process: it is left out, logged, and its error is shown in the Web UI. `PENTAGI_OLLAMA_SERVER_CONFIG_PATH` / `PENTAGI_LLM_SERVER_CONFIG_PATH` (host files mounted by Docker Compose) still need the installer and a container recreate; in the Web UI pick a config file that already exists inside the container.
 - **Search Engines**: `DUCKDUCKGO_*`, `SPLOITUS_ENABLED`, `GOOGLE_*`, `TRAVERSAAL_API_KEY`, `TAVILY_API_KEY`, `FIRECRAWL_*`, `PERPLEXITY_*`, `SEARXNG_*`, `WEB_SEARCH_INTERNAL_*`.
-- **Execution**: `EXECUTION_MONITOR_*`, `MAX_GENERAL_AGENT_TOOL_CALLS`, `MAX_LIMITED_AGENT_TOOL_CALLS`, `AGENT_PLANNING_STEP_ENABLED`, `ASSISTANT_USE_AGENTS`.
+- **Execution**: `EXECUTION_MONITOR_*`, `MAX_GENERAL_AGENT_TOOL_CALLS`, `MAX_LIMITED_AGENT_TOOL_CALLS`, `AGENT_PLANNING_STEP_ENABLED`, `ASSISTANT_USE_AGENTS`, `DOCKER_FLOW_IMAGE`, `DOCKER_ASSISTANT_IMAGE`. The two image settings apply to flows created afterwards; existing flows keep their container image.
 
 Read access requires the `settings.system.view` privilege and edits require `settings.system.edit` (Admin role by default; see the `20260924_120000_system_settings.sql` migration). The key catalogue (setting key ↔ environment variable) lives in `backend/pkg/config/settings.go`, the file sync in `backend/pkg/config/envfile.go`, and provider hot reload in `backend/pkg/providers/state.go`.
 
@@ -388,6 +388,8 @@ These settings control how PentAGI interacts with Docker, which is used for term
 | DockerWorkDir                | `DOCKER_WORK_DIR`                  | *(none)*               | Custom working directory inside Docker containers |
 | DockerDefaultImage           | `DOCKER_DEFAULT_IMAGE`             | `debian:latest`        | Default Docker image for containers when specific images fail |
 | DockerDefaultImageForPentest | `DOCKER_DEFAULT_IMAGE_FOR_PENTEST` | `vxcontrol/kali-linux` | Default Docker image for penetration testing tasks |
+| DockerFlowImage              | `DOCKER_FLOW_IMAGE`                | *(none)*               | Fixed worker image for new automation flows. Empty lets the LLM image chooser pick between the two defaults above. Editable in Settings -> System -> Execution |
+| DockerAssistantImage         | `DOCKER_ASSISTANT_IMAGE`           | *(none)*               | Fixed worker image for flows opened by a new assistant. Empty lets the LLM image chooser pick. Editable in Settings -> System -> Execution |
 | TerminalToolTimeout          | `TERMINAL_TOOL_TIMEOUT`            | `1200`                 | Default execution timeout in seconds applied when an agent requests `timeout=0` or a negative value. Accepted range: `1`–`10800` (3 hours). Values `<= 0` or above `10800` are clamped to the 3-hour maximum. Negative values are treated identically to `0`. |
 
 ### Worker Docker Access (`DOCKER_INSIDE_*`)
@@ -1623,6 +1625,12 @@ These settings control the integration with various search engines used for web 
 | Option          | Environment Variable | Default Value | Description                                                 |
 | --------------- | -------------------- | ------------- | ----------------------------------------------------------- |
 | SploitusEnabled | `SPLOITUS_ENABLED`   | `true`        | Enable or disable Sploitus exploit and vulnerability search |
+
+### Brave Search
+
+| Option      | Environment Variable | Default Value | Description                                                                                                                                             |
+| ----------- | --------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| BraveAPIKey | `BRAVE_API_KEY`       | *(none)*       | API key for the Brave Search API (https://brave.com/search/api/); a link-discovery engine with no summarization, similar in role to Google/DuckDuckGo |
 
 ### Google Search
 

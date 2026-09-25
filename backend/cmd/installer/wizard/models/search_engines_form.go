@@ -114,6 +114,13 @@ func (m *SearchEnginesFormModel) BuildForm() tea.Cmd {
 		config.TavilyAPIKey,
 	))
 
+	// Brave API Key
+	fields = append(fields, m.createAPIKeyField("brave_api_key",
+		locale.ToolsSearchEnginesBraveKey,
+		locale.ToolsSearchEnginesBraveKeyDesc,
+		config.BraveAPIKey,
+	))
+
 	// Firecrawl API Key
 	fields = append(fields, m.createAPIKeyField("firecrawl_api_key",
 		locale.ToolsSearchEnginesFirecrawlKey,
@@ -412,6 +419,15 @@ func (m *SearchEnginesFormModel) GetCurrentConfiguration() string {
 			m.GetStyles().Warning.Render(locale.StatusNotConfigured)))
 	}
 
+	// Brave
+	if config.BraveAPIKey.Value != "" {
+		sections = append(sections, fmt.Sprintf("• Brave: %s",
+			m.GetStyles().Success.Render(locale.StatusConfigured)))
+	} else {
+		sections = append(sections, fmt.Sprintf("• Brave: %s",
+			m.GetStyles().Warning.Render(locale.StatusNotConfigured)))
+	}
+
 	// Firecrawl
 	if config.FirecrawlAPIKey.Value != "" {
 		sections = append(sections, fmt.Sprintf("• Firecrawl: %s",
@@ -502,6 +518,7 @@ func (m *SearchEnginesFormModel) HandleSave() error {
 		PerplexityModel:               config.PerplexityModel,
 		PerplexityContextSize:         config.PerplexityContextSize,
 		TavilyAPIKey:                  config.TavilyAPIKey,
+		BraveAPIKey:                   config.BraveAPIKey,
 		FirecrawlAPIKey:               config.FirecrawlAPIKey,
 		FirecrawlAPIURL:               config.FirecrawlAPIURL,
 		TraversaalAPIKey:              config.TraversaalAPIKey,
@@ -550,6 +567,8 @@ func (m *SearchEnginesFormModel) HandleSave() error {
 			newConfig.PerplexityContextSize.Value = value
 		case "tavily_api_key":
 			newConfig.TavilyAPIKey.Value = value
+		case "brave_api_key":
+			newConfig.BraveAPIKey.Value = value
 		case "firecrawl_api_key":
 			newConfig.FirecrawlAPIKey.Value = value
 		case "firecrawl_api_url":

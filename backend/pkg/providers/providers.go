@@ -56,7 +56,7 @@ type ProviderController interface {
 		executor tools.FlowToolsExecutor,
 		flowID, userID int64,
 		askUser bool,
-		input string,
+		image, input string,
 	) (FlowProvider, error)
 	LoadFlowProvider(
 		ctx context.Context,
@@ -276,7 +276,7 @@ func (pc *providerController) NewFlowProvider(
 	executor tools.FlowToolsExecutor,
 	flowID, userID int64,
 	askUser bool,
-	input string,
+	image, input string,
 ) (FlowProvider, error) {
 	ctx, span := obs.Observer.NewSpan(ctx, obs.SpanKindInternal, "providers.NewFlowProvider")
 	defer span.End()
@@ -286,20 +286,23 @@ func (pc *providerController) NewFlowProvider(
 		return nil, fmt.Errorf("failed to get provider: %w", err)
 	}
 
-	imageTmpl, err := prompter.RenderTemplate(templates.PromptTypeImageChooser, map[string]any{
-		"DefaultImage":           pc.docker.GetDefaultImage(),
-		"DefaultImageForPentest": pc.cfg.DockerDefaultImageForPentest,
-		"Input":                  input,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("failed to get primary docker image template: %w", err)
-	}
+	// A configured image is used as-is; only an empty one is left to the LLM.
+	if image == "" {
+		imageTmpl, err := prompter.RenderTemplate(templates.PromptTypeImageChooser, map[string]any{
+			"DefaultImage":           pc.docker.GetDefaultImage(),
+			"DefaultImageForPentest": pc.cfg.DockerDefaultImageForPentest,
+			"Input":                  input,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("failed to get primary docker image template: %w", err)
+		}
 
-	image, err := callWithSetupRetries(ctx, prv, pconfig.OptionsTypeSimple, imageTmpl)
-	if err != nil {
-		return nil, fmt.Errorf("failed to select primary docker image via llm call: %w", err)
+		image, err = callWithSetupRetries(ctx, prv, pconfig.OptionsTypeSimple, imageTmpl)
+		if err != nil {
+			return nil, fmt.Errorf("failed to select primary docker image via llm call: %w", err)
+		}
+		image = strings.ToLower(strings.TrimSpace(image))
 	}
-	image = strings.ToLower(strings.TrimSpace(image))
 
 	languageTmpl, err := prompter.RenderTemplate(templates.PromptTypeLanguageChooser, map[string]any{
 		"Input": input,

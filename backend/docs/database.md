@@ -199,7 +199,7 @@ PostgreSQL enums are migrated explicitly and generated as Go string types in `mo
 | `TERMLOG_TYPE` | `stdin`, `stdout`, `stderr` |
 | `VECSTORE_ACTION_TYPE` | `retrieve`, `store` |
 | `PROVIDER_TYPE` | `openai`, `anthropic`, `gemini`, `bedrock`, `ollama`, `custom`, `deepseek`, `glm`, `kimi`, `qwen`, `minimax` |
-| `SEARCHENGINE_TYPE` | `google`, `tavily`, `firecrawl`, `traversaal`, `browser`, `duckduckgo`, `perplexity`, `searxng`, `sploitus` |
+| `SEARCHENGINE_TYPE` | `google`, `tavily`, `firecrawl`, `traversaal`, `browser`, `duckduckgo`, `perplexity`, `searxng`, `sploitus`, `brave` |
 | `PROMPT_TYPE` | Agent/system prompt keys from `primary_agent` through `task_assignment_wrapper` (full list in `models.go`) |
 
 Never add an enum value only in Go code. Add or replace the PostgreSQL enum in a goose migration, regenerate sqlc, and update backend validation where applicable. Provider and search-engine additions have additional project steps documented in `CLAUDE.md`.

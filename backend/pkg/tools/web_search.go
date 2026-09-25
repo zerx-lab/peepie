@@ -35,6 +35,7 @@ import (
 const (
 	EngineGoogle     = database.SearchengineTypeGoogle
 	EngineDuckDuckGo = database.SearchengineTypeDuckduckgo
+	EngineBrave      = database.SearchengineTypeBrave
 	EngineTavily     = database.SearchengineTypeTavily
 	EngineFirecrawl  = database.SearchengineTypeFirecrawl
 	EngineTraversaal = database.SearchengineTypeTraversaal
@@ -83,7 +84,7 @@ var fallbackStrategy = map[SearchMode][]database.SearchengineType{
 	// 1. Link discovery — cheap index engines first, ordered by breadth/consistency;
 	//    analytic engines are a deep last resort so links never dead-ends.
 	ModeLinks: {
-		EngineGoogle, EngineDuckDuckGo, EngineSearxng, EngineFirecrawl,
+		EngineGoogle, EngineBrave, EngineDuckDuckGo, EngineSearxng, EngineFirecrawl,
 		EngineTavily, EnginePerplexity, EngineTraversaal,
 	},
 
@@ -91,27 +92,27 @@ var fallbackStrategy = map[SearchMode][]database.SearchengineType{
 	//    browser-analytics engine is a mid/late fallback; link engines are the floor.
 	ModeAnswer: {
 		EngineTavily, EngineFirecrawl, EnginePerplexity, EngineInternal, EngineTraversaal,
-		EngineGoogle, EngineDuckDuckGo, EngineSearxng,
+		EngineGoogle, EngineBrave, EngineDuckDuckGo, EngineSearxng,
 	},
 
 	// 3. Deep research — strongest reasoning engine first, then the rest.
 	ModeResearch: {
 		EnginePerplexity, EngineTavily, EngineFirecrawl, EngineInternal, EngineTraversaal,
-		EngineGoogle, EngineDuckDuckGo, EngineSearxng,
+		EngineGoogle, EngineBrave, EngineDuckDuckGo, EngineSearxng,
 	},
 
 	// 4. Exploit search — dedicated exploit index first, universal analytic engines
 	//    next, classic engines last.
 	ModeExploit: {
 		EngineSploitus, EngineTavily, EngineFirecrawl, EnginePerplexity, EngineInternal,
-		EngineTraversaal, EngineGoogle, EngineDuckDuckGo, EngineSearxng,
+		EngineTraversaal, EngineGoogle, EngineBrave, EngineDuckDuckGo, EngineSearxng,
 	},
 }
 
 // linkEngineOrder is the priority order of link-discovery engines. It is used to feed
 // the internal analytics engine the URLs to read.
 var linkEngineOrder = []database.SearchengineType{
-	EngineGoogle, EngineDuckDuckGo, EngineSearxng, EngineFirecrawl,
+	EngineGoogle, EngineBrave, EngineDuckDuckGo, EngineSearxng, EngineFirecrawl,
 }
 
 const (
@@ -178,6 +179,7 @@ func buildSearchEngines(
 	engines := map[database.SearchengineType]searchers.Searcher{
 		EngineGoogle:     searchers.NewGoogle(cfg),
 		EngineDuckDuckGo: searchers.NewDuckDuckGo(cfg),
+		EngineBrave:      searchers.NewBrave(cfg),
 		EngineTavily:     searchers.NewTavily(cfg, sum),
 		EngineFirecrawl:  searchers.NewFirecrawl(cfg, sum),
 		EngineTraversaal: searchers.NewTraversaal(cfg),
@@ -204,6 +206,7 @@ func NewInternalEngine(cfg *config.Config, summarizer SummarizeHandler, fetcher 
 	byID := map[database.SearchengineType]searchers.Searcher{
 		EngineGoogle:     searchers.NewGoogle(cfg),
 		EngineDuckDuckGo: searchers.NewDuckDuckGo(cfg),
+		EngineBrave:      searchers.NewBrave(cfg),
 		EngineSearxng:    searchers.NewSearxng(cfg, sum),
 		EngineFirecrawl:  searchers.NewFirecrawl(cfg, sum),
 	}

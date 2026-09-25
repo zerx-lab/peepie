@@ -117,6 +117,7 @@ func init() {
 		&EnvDesc_SPLOITUS_ENABLED:      "Sploitus 搜索",
 		&EnvDesc_PERPLEXITY_API_KEY:    "Perplexity API 密钥",
 		&EnvDesc_TAVILY_API_KEY:        "Tavily API 密钥",
+		&EnvDesc_BRAVE_API_KEY:         "Brave 搜索 API 密钥",
 		&EnvDesc_FIRECRAWL_API_KEY:     "Firecrawl API 密钥",
 		&EnvDesc_FIRECRAWL_API_URL:     "Firecrawl API URL",
 		&EnvDesc_TRAVERSAAL_API_KEY:    "Traversaal API 密钥",

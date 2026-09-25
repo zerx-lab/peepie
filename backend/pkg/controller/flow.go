@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"slices"
+	"strings"
 	"sync"
 	"time"
 
@@ -70,6 +71,16 @@ type flowWorker struct {
 	flowCtx *FlowContext
 	docker  docker.DockerClient
 	logger  *logrus.Entry
+}
+
+// configuredFlowImage returns the worker image set in system settings for new
+// assistant or automation flows; empty leaves the choice to the LLM.
+func configuredFlowImage(cfg *config.Config, assistant bool) string {
+	key, fallback := config.KeyDockerFlowImage, cfg.DockerFlowImage
+	if assistant {
+		key, fallback = config.KeyDockerAssistantImage, cfg.DockerAssistantImage
+	}
+	return strings.TrimSpace(cfg.Overrides.GetString(config.CategoryExecution, key, fallback))
 }
 
 type newFlowWorkerCtx struct {
@@ -208,8 +219,11 @@ func NewFlowWorker(
 	if err != nil {
 		return nil, wrapErrorEndSpan(ctx, flowSpan, "failed to create flow tools executor", err)
 	}
+	// CreateAssistant is the only caller that opens a flow as a dry run, so a
+	// dry-run flow hosts an assistant and every other flow is an automation.
 	flowProvider, err := fwc.provs.NewFlowProvider(
-		ctx, fwc.prvname, prompter, executor, flow.ID, fwc.userID, fwc.cfg.AskUser, fwc.input,
+		ctx, fwc.prvname, prompter, executor, flow.ID, fwc.userID, fwc.cfg.AskUser,
+		configuredFlowImage(fwc.cfg, fwc.dryRun), fwc.input,
 	)
 	if err != nil {
 		return nil, wrapErrorEndSpan(ctx, flowSpan, "failed to get flow provider", err)

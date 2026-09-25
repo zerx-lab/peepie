@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { InputPassword } from '@/components/ui/input-password';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 
@@ -168,6 +169,53 @@ export function SectionSaveBar({
                     {t('system.save')}
                 </Button>
             </div>
+        </div>
+    );
+}
+
+// Constrained dropdown for fields whose value must match a fixed backend enum
+// (e.g. DuckDuckGo region/safe-search/time-range). Prevents silently-ignored
+// or malformed values from a free-text input.
+export function SelectField({
+    hint,
+    label,
+    onChange,
+    options,
+    value,
+}: {
+    hint?: string;
+    label: string;
+    onChange: (value: string) => void;
+    options: { label: string; value: string }[];
+    value: string;
+}) {
+    const id = useId();
+
+    return (
+        <div className="flex flex-col gap-1.5">
+            <Label htmlFor={id}>{label}</Label>
+            <Select
+                onValueChange={onChange}
+                value={value}
+            >
+                <SelectTrigger
+                    className="w-full"
+                    id={id}
+                >
+                    <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                    {options.map((option) => (
+                        <SelectItem
+                            key={option.value}
+                            value={option.value}
+                        >
+                            {option.label}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+            {hint && <FieldHint>{hint}</FieldHint>}
         </div>
     );
 }

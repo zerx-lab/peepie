@@ -38,6 +38,8 @@ API 密钥获取地址：
 		&ToolsSearchEnginesPerplexityKeyDesc:        "Perplexity AI 搜索的 API 密钥",
 		&ToolsSearchEnginesTavilyKey:                "Tavily API 密钥",
 		&ToolsSearchEnginesTavilyKeyDesc:            "Tavily 搜索服务的 API 密钥",
+		&ToolsSearchEnginesBraveKey:                 "Brave 搜索 API 密钥",
+		&ToolsSearchEnginesBraveKeyDesc:             "Brave 搜索引擎 API 密钥（https://brave.com/search/api/）",
 		&ToolsSearchEnginesFirecrawlKey:             "Firecrawl API 密钥",
 		&ToolsSearchEnginesFirecrawlKeyDesc:         "Firecrawl 搜索服务的 API 密钥",
 		&ToolsSearchEnginesFirecrawlURL:             "Firecrawl API URL",

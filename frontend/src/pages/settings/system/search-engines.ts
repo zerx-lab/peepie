@@ -5,6 +5,7 @@ import { type EditsWithSecrets, hasPendingEdits, resolveSecret } from './secrets
 export const searchEngineIds = [
     'duckduckgo',
     'sploitus',
+    'brave',
     'google',
     'traversaal',
     'tavily',
@@ -16,7 +17,25 @@ export const searchEngineIds = [
 
 export type SearchEngineId = (typeof searchEngineIds)[number];
 
+// Mirrors backend/pkg/tools/searchers/duckduckgo.go's Region*/DuckDuckGoSafeSearch*/TimeRange*
+// constants. An empty string means "use the backend default" for each field; keep these in
+// sync if the backend adds/removes a supported value.
+export const duckDuckGoRegionOptions = [
+    'us-en',
+    'uk-en',
+    'de-de',
+    'fr-fr',
+    'es-es',
+    'it-it',
+    'jp-jp',
+    'cn-zh',
+    'ru-ru',
+] as const;
+export const duckDuckGoSafeSearchOptions = ['strict', 'moderate', 'off'] as const;
+export const duckDuckGoTimeRangeOptions = ['d', 'w', 'm', 'y'] as const;
+
 const searchSecretFields = [
+    'braveApiKey',
     'firecrawlApiKey',
     'googleApiKey',
     'perplexityApiKey',
@@ -36,9 +55,18 @@ export function buildSearchEngineInput(
     server: SearchEngineSettingsFragmentFragment,
     edits: SearchEngineEdits,
 ): SearchEngineSettingsInput {
-    const { firecrawlApiKey, googleApiKey, perplexityApiKey, tavilyApiKey, traversaalApiKey, ...plainEdits } = edits;
+    const {
+        braveApiKey,
+        firecrawlApiKey,
+        googleApiKey,
+        perplexityApiKey,
+        tavilyApiKey,
+        traversaalApiKey,
+        ...plainEdits
+    } = edits;
 
     return {
+        braveApiKey: resolveSecret(braveApiKey),
         duckduckgoEnabled: plainEdits.duckduckgoEnabled ?? server.duckduckgoEnabled,
         duckduckgoRegion: plainEdits.duckduckgoRegion ?? server.duckduckgoRegion,
         duckduckgoSafesearch: plainEdits.duckduckgoSafesearch ?? server.duckduckgoSafesearch,
@@ -72,6 +100,8 @@ export function getSearchEngineStatus(
     id: SearchEngineId,
 ): SearchEngineStatus {
     switch (id) {
+        case 'brave':
+            return server.braveApiKeySet ? 'enabled' : 'unconfigured';
         case 'duckduckgo':
             return server.duckduckgoEnabled ? 'enabled' : 'disabled';
         case 'firecrawl':
