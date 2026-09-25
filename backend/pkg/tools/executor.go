@@ -254,7 +254,17 @@ func (ce *customExecutor) Execute(
 
 	var raw any
 	if err := json.Unmarshal(args, &raw); err != nil {
-		return fmt.Sprintf("failed to unmarshal '%s' tool call arguments: %v: fix it", name, err), nil
+		// LLMs occasionally wrap the arguments object in commentary, a
+		// markdown code fence, or drift into plain prose instead of strict
+		// JSON. Recover the embedded object when one exists instead of
+		// failing outright and burning a fix-it round-trip on content that
+		// was actually present.
+		repaired, ok := extractJSONObject(args)
+		if !ok || json.Unmarshal(repaired, &raw) != nil {
+			return fmt.Sprintf("failed to unmarshal '%s' tool call arguments: %v: %s: fix it",
+				name, err, ce.argsHint(name)), nil
+		}
+		args = repaired
 	}
 
 	toolType := GetToolType(name)
@@ -414,6 +424,63 @@ func (ce *customExecutor) GetToolSchema(name string) (*schema.Schema, error) {
 	}
 
 	return nil, fmt.Errorf("tool %s not found", name)
+}
+
+// argsHint builds a short, schema-aware instruction listing the tool's
+// required argument fields, used to steer the model back to valid JSON
+// after a malformed tool call. Falls back to a generic instruction when the
+// tool's schema can't be resolved.
+func (ce *customExecutor) argsHint(name string) string {
+	sch, err := ce.GetToolSchema(name)
+	if err != nil || len(sch.Required) == 0 {
+		return "respond with a single valid JSON object and nothing else"
+	}
+	return fmt.Sprintf("respond with a single valid JSON object containing only the required fields (%s) and nothing else",
+		strings.Join(sch.Required, ", "))
+}
+
+// extractJSONObject scans raw bytes for the first balanced top-level JSON
+// object, tolerating surrounding prose or a markdown code fence. Returns
+// false when no balanced, valid object is found.
+func extractJSONObject(data []byte) (json.RawMessage, bool) {
+	start := bytes.IndexByte(data, '{')
+	if start < 0 {
+		return nil, false
+	}
+
+	depth := 0
+	inString := false
+	escaped := false
+	for i := start; i < len(data); i++ {
+		c := data[i]
+		if inString {
+			switch {
+			case escaped:
+				escaped = false
+			case c == '\\':
+				escaped = true
+			case c == '"':
+				inString = false
+			}
+			continue
+		}
+		switch c {
+		case '"':
+			inString = true
+		case '{':
+			depth++
+		case '}':
+			depth--
+			if depth == 0 {
+				candidate := data[start : i+1]
+				if json.Valid(candidate) {
+					return candidate, true
+				}
+				return nil, false
+			}
+		}
+	}
+	return nil, false
 }
 
 func (ce *customExecutor) converToJSONSchema(params any) (*schema.Schema, error) {

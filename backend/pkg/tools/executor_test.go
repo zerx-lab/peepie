@@ -251,6 +251,72 @@ func TestExecuteEarlyReturns(t *testing.T) {
 			t.Fatalf("Execute() result = %q, expected argument-fix message", result)
 		}
 	})
+
+	t.Run("pure prose args with no embedded json still returns fix message", func(t *testing.T) {
+		t.Parallel()
+		ce := &customExecutor{
+			definitions: []llms.FunctionDefinition{registryDefinitions[PentesterToolName]},
+			handlers: map[string]ExecutorHandler{
+				PentesterToolName: func(ctx context.Context, name string, args json.RawMessage) (string, error) {
+					return "ok", nil
+				},
+			},
+		}
+		result, err := ce.Execute(t.Context(), 1, "id", PentesterToolName, "", "",
+			json.RawMessage(`I cannot access external targets without explicit authorization.`))
+		if err != nil {
+			t.Fatalf("Execute() unexpected error: %v", err)
+		}
+		if !strings.Contains(result, "failed to unmarshal") || !strings.Contains(result, "fix it") {
+			t.Fatalf("Execute() result = %q, expected argument-fix message", result)
+		}
+		if !strings.Contains(result, "question") || !strings.Contains(result, "message") {
+			t.Fatalf("Execute() result = %q, expected hint listing required fields", result)
+		}
+	})
+
+	t.Run("json wrapped in prose is recovered and executed", func(t *testing.T) {
+		t.Parallel()
+		var gotArgs json.RawMessage
+		ce := &customExecutor{
+			tclp: stubToolCallLogProvider{},
+			handlers: map[string]ExecutorHandler{
+				TerminalToolName: func(ctx context.Context, name string, args json.RawMessage) (string, error) {
+					gotArgs = args
+					return "ok", nil
+				},
+			},
+		}
+		wrapped := "Sure, here you go:\n```json\n{\"command\": \"ls -la\"}\n```\nLet me know if that works."
+		result, err := ce.Execute(t.Context(), 1, "id", TerminalToolName, "", "", json.RawMessage(wrapped))
+		if err != nil {
+			t.Fatalf("Execute() unexpected error: %v", err)
+		}
+		if result != "ok" {
+			t.Fatalf("Execute() result = %q, expected handler to run on recovered args", result)
+		}
+		if string(gotArgs) != `{"command": "ls -la"}` {
+			t.Fatalf("handler received args = %q, expected recovered JSON object", string(gotArgs))
+		}
+	})
+}
+
+// stubToolCallLogProvider is a no-op ToolCallLogProvider for exercising
+// Execute() paths that persist a tool-call log entry.
+type stubToolCallLogProvider struct{}
+
+func (stubToolCallLogProvider) PutLog(
+	ctx context.Context, callID, name string, args json.RawMessage, taskID, subtaskID *int64,
+) (int64, error) {
+	return 1, nil
+}
+
+func (stubToolCallLogProvider) UpdateLogSuccess(ctx context.Context, id int64, result string, durationSeconds float64) error {
+	return nil
+}
+
+func (stubToolCallLogProvider) UpdateLogFailed(ctx context.Context, id int64, result string, durationSeconds float64) error {
+	return nil
 }
 
 func TestGetToolSchemaFallbackAndUnknown(t *testing.T) {
