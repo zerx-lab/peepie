@@ -14,7 +14,7 @@ export const SEEDED_USER = {
     created_at: '2026-01-10T09:00:00Z',
     hash: 'e2e-user-hash',
     id: 1,
-    mail: 'admin@pentagi.com',
+    mail: 'admin@peepie.com',
     name: 'admin',
     password_change_required: false,
     role_id: 1,

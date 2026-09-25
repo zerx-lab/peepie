@@ -2177,7 +2177,7 @@ var (
 	ResetPasswordFormTitle       = "Reset Admin Password"
 	ResetPasswordFormDescription = "Reset the administrator password for Peepie"
 	ResetPasswordFormName        = "Reset Password"
-	ResetPasswordFormOverview    = `Reset the password for the default administrator account (admin@pentagi.com).
+	ResetPasswordFormOverview    = `Reset the password for the default administrator account (admin@peepie.com).
 
 This operation requires Peepie to be running and will update the password in the PostgreSQL database.
 
@@ -2209,7 +2209,7 @@ Password requirements:
 	ResetPasswordHelpContent = `Reset the administrator password for accessing Peepie.
 
 This operation:
-• Updates the password for admin@pentagi.com account
+• Updates the password for admin@peepie.com account
 • Sets the user status to 'active'
 • Requires Peepie database to be accessible
 • Does not affect other user accounts

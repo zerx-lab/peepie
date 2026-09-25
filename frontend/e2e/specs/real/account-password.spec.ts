@@ -16,7 +16,7 @@ const changePassword = (
 const login = (api: APIRequestContext, mail: string, password: string) =>
     api.post('/api/v1/auth/login', { data: { mail, password } });
 
-const ADMIN_USER = process.env.E2E_USER ?? 'admin@pentagi.com';
+const ADMIN_USER = process.env.E2E_USER ?? 'admin@peepie.com';
 const ADMIN_PASSWORD = process.env.E2E_PASSWORD ?? 'admin';
 
 test.describe('account password at the trust boundary', { tag: '@real' }, () => {

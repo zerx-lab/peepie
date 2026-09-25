@@ -2,7 +2,7 @@ import { expect, test as setup } from '@playwright/test';
 
 import { AUTH_STATE_PATH } from '../playwright.config.ts';
 
-const E2E_USER = process.env.E2E_USER ?? 'admin@pentagi.com';
+const E2E_USER = process.env.E2E_USER ?? 'admin@peepie.com';
 const E2E_PASSWORD = process.env.E2E_PASSWORD ?? 'admin';
 
 setup('authenticate', async ({ page }) => {

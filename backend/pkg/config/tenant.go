@@ -111,7 +111,7 @@ func (c *Config) ParseGroupID(groupID string) (int64, error) {
 }
 
 // TenantUserID namespaces a telemetry "user" identity. Instances share the
-// seeded admin@pentagi.com account, so without this every tenant's traces would
+// seeded admin@peepie.com account, so without this every tenant's traces would
 // collapse onto one Langfuse user. Returns the address unchanged in
 // single-instance mode.
 func (c *Config) TenantUserID(mail string) string {

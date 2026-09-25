@@ -6,13 +6,13 @@
 //
 // Usage: node schema-compat.mjs
 //   E2E_BASE_URL  (required)  e.g. https://localhost:8444
-//   E2E_USER / E2E_PASSWORD   (default admin@pentagi.com / admin)
+//   E2E_USER / E2E_PASSWORD   (default admin@peepie.com / admin)
 import { buildClientSchema, getIntrospectionQuery, parse, separateOperations, validate } from 'graphql';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const BASE_URL = process.env.E2E_BASE_URL;
-const USER = process.env.E2E_USER ?? 'admin@pentagi.com';
+const USER = process.env.E2E_USER ?? 'admin@peepie.com';
 const PASSWORD = process.env.E2E_PASSWORD ?? 'admin';
 
 if (!BASE_URL) {

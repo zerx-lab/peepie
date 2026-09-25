@@ -856,16 +856,16 @@ curl -O https://raw.githubusercontent.com/vxcontrol/pentagi/master/docker-compos
 docker compose up -d
 ```
 
-Visit [localhost:8443](https://localhost:8443) to access PentAGI Web UI (default is `admin@pentagi.com` / `admin`)
+Visit [localhost:8443](https://localhost:8443) to access PentAGI Web UI (default is `admin@peepie.com` / `admin`)
 
 #### Web UI Accounts
 
 PentAGI does not expose public self-service sign-up from the login page. A fresh installation creates the default local administrator account:
 
-- **Email**: `admin@pentagi.com`
+- **Email**: `admin@peepie.com`
 - **Password**: `admin`
 
-On first login, change the default password before using the instance for real work. If the administrator password is lost later, use the installer maintenance menu to reset the default `admin@pentagi.com` account password.
+The account is seeded with `password_change_required`, so the first login forces a password change before any other page is reachable; publishing these default credentials therefore does not expose a running instance. Existing installations are migrated from the former `admin@pentagi.com` login to `admin@peepie.com` automatically (the password is unchanged). If the administrator password is lost later, use the installer maintenance menu to reset the default `admin@peepie.com` account password.
 
 For multi-user setups, an authenticated administrator can manage local users through the Users REST API (`/api/v1/users/`). The OpenAPI UI is available at `https://localhost:8443/api/v1/swagger/index.html` after the instance is running.
 

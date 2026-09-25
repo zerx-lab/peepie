@@ -25,7 +25,7 @@ const (
 	DefaultPostgreSQLDatabase = "pentagidb"
 
 	// Admin user email
-	AdminEmail = "admin@pentagi.com"
+	AdminEmail = "admin@peepie.com"
 
 	// Environment variable names
 	EnvPostgreSQLUser     = "PENTAGI_POSTGRES_USER"

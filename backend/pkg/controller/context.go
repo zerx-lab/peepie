@@ -78,7 +78,7 @@ func tenantMeta(cfg *config.Config, md langfuse.Metadata) langfuse.Metadata {
 }
 
 // tenantUserID namespaces the Langfuse "user" dimension. Instances share the
-// seeded admin@pentagi.com account, so without this every tenant's traces would
+// seeded admin@peepie.com account, so without this every tenant's traces would
 // collapse onto one Langfuse user. Returns the address unchanged in
 // single-instance mode.
 func tenantUserID(cfg *config.Config, mail string) string {

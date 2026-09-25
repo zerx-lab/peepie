@@ -110,7 +110,7 @@ func init() {
 		&ResetPasswordFormTitle:       "重置管理员密码",
 		&ResetPasswordFormDescription: "重置 Peepie 管理员密码",
 		&ResetPasswordFormName:        "重置密码",
-		&ResetPasswordFormOverview: `重置默认管理员账户（admin@pentagi.com）的密码。
+		&ResetPasswordFormOverview: `重置默认管理员账户（admin@peepie.com）的密码。
 
 此操作要求 Peepie 正在运行，并会更新 PostgreSQL 数据库中的密码。
 
@@ -134,7 +134,7 @@ func init() {
 		&ResetPasswordHelpContent: `重置用于访问 Peepie 的管理员密码。
 
 此操作：
-• 更新 admin@pentagi.com 账户的密码
+• 更新 admin@peepie.com 账户的密码
 • 将用户状态设为 'active'
 • 要求 Peepie 数据库可访问
 • 不影响其他用户账户
