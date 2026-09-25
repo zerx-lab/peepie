@@ -3,13 +3,13 @@ package router
 import (
 	"context"
 	"encoding/gob"
+	"io/fs"
 	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"os"
 	"path"
-	"path/filepath"
 	"slices"
 	"strings"
 	"time"
@@ -25,6 +25,7 @@ import (
 	"pentagi/pkg/server/logger"
 	"pentagi/pkg/server/oauth"
 	"pentagi/pkg/server/services"
+	"pentagi/pkg/server/webui"
 
 	_ "pentagi/pkg/server/docs" // swagger docs
 
@@ -348,27 +349,26 @@ func NewRouter(
 				proxy.ServeHTTP(c.Writer, c.Request)
 			}
 		}())
+	} else if embedded, ok := webui.Embedded(); ok {
+		logrus.Info("serving embedded frontend build")
+		registerStaticFileServer(router, embedded)
 	} else {
-		registerStaticFileServer(router, cfg.StaticDir)
+		logrus.Infof("serving frontend from STATIC_DIR %q", cfg.StaticDir)
+		registerStaticFileServer(router, os.DirFS(cfg.StaticDir))
 	}
 
 	return router
 }
 
-// registerStaticFileServer serves the locally-built SPA (used when no STATIC_URL
-// upstream is set): cache headers, hashed assets via static.Serve, and an SPA
-// fallback that serves index.html for client routes but returns 404 for a missing
-// /assets/* — so the module loader fails cleanly and the app can reload to recover
+// registerStaticFileServer serves the SPA build in webFS (embedded into the
+// binary, or STATIC_DIR on disk; used when no STATIC_URL upstream is set):
+// cache headers, hashed assets via static.Serve, and an SPA fallback that
+// serves index.html for client routes but returns 404 for a missing /assets/*
+// — so the module loader fails cleanly and the app can reload to recover
 // instead of getting index.html and a MIME error. Split out to be unit-testable.
-func registerStaticFileServer(router *gin.Engine, staticDir string) {
+func registerStaticFileServer(router *gin.Engine, webFS fs.FS) {
 	router.Use(staticCacheMiddleware())
-	router.Use(static.Serve("/", static.LocalFile(staticDir, true)))
-
-	indexExists := true
-	indexPath := filepath.Join(staticDir, "index.html")
-	if _, err := os.Stat(indexPath); err != nil {
-		indexExists = false
-	}
+	router.Use(static.Serve("/", staticFS{FileSystem: http.FS(webFS), fsys: webFS}))
 
 	router.NoRoute(func(c *gin.Context) {
 		if c.Request.Method == http.MethodGet && !strings.HasPrefix(c.Request.URL.Path, baseURL) {
@@ -381,9 +381,12 @@ func registerStaticFileServer(router *gin.Engine, staticDir string) {
 				}
 			}
 
-			if isFrontendRoute && indexExists {
-				c.File(indexPath)
-				return
+			if isFrontendRoute {
+				// Read per request so an on-disk STATIC_DIR redeploy is picked up.
+				if index, err := fs.ReadFile(webFS, "index.html"); err == nil {
+					c.Data(http.StatusOK, "text/html; charset=utf-8", index)
+					return
+				}
 			}
 
 			if strings.HasPrefix(path, "/assets/") {
@@ -398,6 +401,26 @@ func registerStaticFileServer(router *gin.Engine, staticDir string) {
 
 		c.Redirect(http.StatusMovedPermanently, "/")
 	})
+}
+
+// staticFS adapts an fs.FS to static.ServeFileSystem.
+type staticFS struct {
+	http.FileSystem
+	fsys fs.FS
+}
+
+func (s staticFS) Exists(prefix, urlPath string) bool {
+	p, ok := strings.CutPrefix(path.Clean("/"+urlPath), path.Clean("/"+prefix))
+	if !ok {
+		return false
+	}
+	p = strings.TrimPrefix(p, "/")
+	if p == "" {
+		p = "."
+	}
+	_, err := fs.Stat(s.fsys, p)
+
+	return err == nil
 }
 
 func setKnowledgeGroup(parent *gin.RouterGroup, svc *services.KnowledgeService) {

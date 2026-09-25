@@ -31,3 +31,63 @@ tasks:
       VITE_HOST: '0.0.0.0'
     cmds:
       - bun run dev
+
+  build:web:
+    desc: Build the frontend SPA into frontend/dist
+    dir: '{{.ROOT_DIR}}/frontend'
+    cmds:
+      - bun run build
+
+  build:embed:
+    desc: Build the frontend and stage it for go:embed in backend/pkg/server/webui/dist
+    dir: '{{.ROOT_DIR}}'
+    deps: [build:web]
+    cmds:
+      # go:embed cannot reach outside the module, so stage dist inside backend/.
+      - find backend/pkg/server/webui/dist -mindepth 1 ! -name .gitkeep -exec rm -rf {} +
+      - cp -R frontend/dist/. backend/pkg/server/webui/dist/
+
+  build:go:
+    internal: true
+    dir: '{{.ROOT_DIR}}'
+    env:
+      # Pure-Go static binary, same as the Docker image; required for cross-compiling.
+      CGO_ENABLED: '0'
+      GOOS: '{{.GOOS}}'
+      GOARCH: '{{.GOARCH}}'
+    cmds:
+      - go build -C backend -trimpath -o '../build/{{.OUTPUT}}' ./cmd/pentagi
+
+  build:
+    desc: Build build/pentagi for the host platform with the frontend embedded
+    deps: [build:embed]
+    cmds:
+      - task: build:go
+        vars:
+          GOOS: '{{OS}}'
+          GOARCH: '{{ARCH}}'
+          OUTPUT: 'pentagi{{exeExt}}'
+
+  build:linux:
+    desc: Cross-compile build/pentagi-linux-<ARCH> (ARCH=amd64 default, e.g. `task build:linux ARCH=arm64`)
+    deps: [build:embed]
+    vars:
+      ARCH: '{{.ARCH | default "amd64"}}'
+    cmds:
+      - task: build:go
+        vars:
+          GOOS: linux
+          GOARCH: '{{.ARCH}}'
+          OUTPUT: 'pentagi-linux-{{.ARCH}}'
+
+  build:windows:
+    desc: Cross-compile build/pentagi-windows-<ARCH>.exe (ARCH=amd64 default, e.g. `task build:windows ARCH=arm64`)
+    deps: [build:embed]
+    vars:
+      ARCH: '{{.ARCH | default "amd64"}}'
+    cmds:
+      - task: build:go
+        vars:
+          GOOS: windows
+          GOARCH: '{{.ARCH}}'
+          OUTPUT: 'pentagi-windows-{{.ARCH}}.exe'

@@ -25,7 +25,7 @@ func newStaticTestServer(t *testing.T) *gin.Engine {
 	require.NoError(t, os.WriteFile(filepath.Join(dir, "assets", "app-abc123.js"), []byte("export const x = 1;\n"), 0o600))
 
 	engine := gin.New()
-	registerStaticFileServer(engine, dir)
+	registerStaticFileServer(engine, os.DirFS(dir))
 
 	return engine
 }

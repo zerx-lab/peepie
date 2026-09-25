@@ -14,6 +14,8 @@ backend/cmd/installer/**/log.json
 
 frontend/coverage
 frontend/dist
+backend/pkg/server/webui/dist/*
+!backend/pkg/server/webui/dist/.gitkeep
 frontend/node_modules
 frontend/ssl
 node_modules

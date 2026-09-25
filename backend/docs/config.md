@@ -562,7 +562,7 @@ These settings control how the server serves frontend assets and handles Cross-O
 | Option      | Environment Variable | Default Value | Description                                                              |
 | ----------- | -------------------- | ------------- | ------------------------------------------------------------------------ |
 | StaticURL   | `STATIC_URL`         | *(none)*      | URL to serve static frontend assets from (enables reverse proxy mode)    |
-| StaticDir   | `STATIC_DIR`         | `./fe`        | Directory containing frontend static files (used when not in proxy mode) |
+| StaticDir   | `STATIC_DIR`         | `./fe`        | Directory containing frontend static files (used when not in proxy mode and no frontend is embedded) |
 | CorsOrigins | `CORS_ORIGINS`       | `*`           | Allowed origins for CORS requests (comma-separated)                      |
 
 ### Usage Details
@@ -582,13 +582,13 @@ The frontend settings are extensively used in `pkg/server/router.go` for configu
   }
   ```
 
-- **StaticDir**: When StaticURL is not set, specifies the local directory containing static frontend assets:
+- **StaticDir**: When StaticURL is not set and the binary has no embedded frontend, specifies the local directory containing static frontend assets. Binaries built with `task build` embed `frontend/dist` (via `pkg/server/webui`) and ignore this setting:
   ```go
-  // Serve static files from local directory
-  router.Use(static.Serve("/", static.LocalFile(cfg.StaticDir, true)))
-
-  // Also used for finding index.html for SPA routes
-  indexPath := filepath.Join(cfg.StaticDir, "index.html")
+  if embedded, ok := webui.Embedded(); ok {
+      registerStaticFileServer(router, embedded)
+  } else {
+      registerStaticFileServer(router, os.DirFS(cfg.StaticDir))
+  }
   ```
 
 - **CorsOrigins**: Configures CORS policy for the API, controlling which origins can make requests:
