@@ -103,7 +103,7 @@ function OAuthResult() {
 
     return (
         <div className="flex h-screen w-full items-center justify-center bg-linear-to-r from-slate-800 to-slate-950">
-            <Logo className="animate-logo-spin m-auto size-32 text-white delay-10000" />
+            <Logo className="m-auto h-20 w-auto text-white" />
             <div className="fixed bottom-4 text-sm text-white">{t(STATUS_MESSAGE_KEYS[resultStatus])}</div>
         </div>
     );

@@ -91,7 +91,7 @@ function FlowReport() {
         return (
             <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
                 <div className="flex min-h-screen flex-col items-center justify-center p-8">
-                    <Logo className="animate-logo-spin mb-8 size-16 text-white" />
+                    <Logo className="mx-auto mb-8 h-12 w-auto text-gray-900 dark:text-white" />
                     <div className="flex flex-col gap-4 text-center">
                         <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
                             {state === 'loading' ? t('report.loadingTitle') : t('report.generatingTitle')}
@@ -110,7 +110,7 @@ function FlowReport() {
         return (
             <div className="min-h-screen bg-linear-to-br from-red-50 via-white to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
                 <div className="flex min-h-screen flex-col items-center justify-center p-8">
-                    <Logo className="mb-8 size-16" />
+                    <Logo className="mx-auto mb-8 h-12 w-auto" />
                     <div className="flex flex-col gap-4 text-center">
                         <h1 className="text-2xl font-semibold text-red-600 dark:text-red-400">
                             {t('report.errorTitle')}

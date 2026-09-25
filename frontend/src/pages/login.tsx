@@ -37,7 +37,10 @@ function Login() {
                     )}
                 </div>
                 <div className="from-primary/20 via-primary/10 to-background hidden bg-linear-to-br lg:flex">
-                    <Logo className="animate-logo-spin text-foreground m-auto size-32 delay-10000" />
+                    <Logo
+                        aria-hidden
+                        className="text-foreground m-auto h-24 w-auto"
+                    />
                 </div>
             </div>
         </div>

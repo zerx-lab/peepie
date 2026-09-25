@@ -153,7 +153,6 @@
 }
 
 @theme {
-    --animate-logo-spin: logo-spin 10s cubic-bezier(0.5, -0.5, 0.5, 1.25) infinite;
     --animate-roll-reveal: roll-reveal 0.4s cubic-bezier(0.22, 1.28, 0.54, 0.99);
     --animate-slide-left: slide-left 0.3s ease-out;
     --animate-slide-top: slide-top 0.3s ease-out;
@@ -210,19 +209,6 @@
     --shadow-xl: var(--shadow-xl);
     --shadow-2xl: var(--shadow-2xl);
 
-    --transition-delay-10000: 10000ms;
-
-    @keyframes logo-spin {
-        0% {
-            transform: rotate(0deg);
-        }
-        30% {
-            transform: rotate(360deg);
-        }
-        100% {
-            transform: rotate(360deg);
-        }
-    }
     @keyframes roll-reveal {
         from {
             opacity: 0;

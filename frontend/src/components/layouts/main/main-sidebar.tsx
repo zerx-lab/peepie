@@ -24,7 +24,7 @@ import { Link, useLocation, useMatch, useParams } from 'react-router-dom';
 import type { Flow } from '@/providers/sidebar-flows-provider';
 import type { Theme } from '@/providers/theme-provider';
 
-import Logo from '@/components/icons/logo';
+import Logo, { LogoMark } from '@/components/icons/logo';
 import { LanguageMenuSub } from '@/components/shared/language-switcher';
 import {
     DropdownMenu,
@@ -105,13 +105,9 @@ export function MainSidebar() {
         <Sidebar collapsible="icon">
             <SidebarHeader>
                 <SidebarMenu>
-                    <SidebarMenuItem className="flex items-center gap-2">
-                        <div className="flex aspect-square size-8 items-center justify-center">
-                            <Logo className="hover:animate-logo-spin size-6" />
-                        </div>
-                        <div className="grid flex-1 text-left leading-tight">
-                            <span className="truncate font-semibold">Peepie</span>
-                        </div>
+                    <SidebarMenuItem className="flex h-8 items-center">
+                        <Logo className="ml-1.5 h-6 w-auto group-data-[collapsible=icon]:hidden" />
+                        <LogoMark className="hidden size-8 group-data-[collapsible=icon]:block" />
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarHeader>

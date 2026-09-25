@@ -9,6 +9,7 @@ import type { OAuthProvider } from '@/providers/user-provider';
 
 import Github from '@/components/icons/github';
 import Google from '@/components/icons/google';
+import Logo from '@/components/icons/logo';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { FormSubmitButton } from '@/components/ui/form-submit-button';
@@ -180,7 +181,9 @@ function LoginForm({ providers, returnUrl = routes.newFlow }: LoginFormProps) {
                 noValidate
                 onSubmit={form.handleSubmit(handleSubmit)}
             >
-                <h1 className="text-center text-3xl font-bold">Peepie</h1>
+                <h1>
+                    <Logo className="text-foreground mx-auto h-10 w-auto" />
+                </h1>
 
                 {providers?.length > 0 && (
                     <>
