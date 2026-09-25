@@ -17,7 +17,7 @@ Read and follow the shared fork policy below for upstream sync, scoped changes, 
 
 ## Project Overview
 
-**PentAGI** is an automated security testing platform powered by AI agents. It runs autonomous penetration testing workflows using a multi-agent system (Researcher, Developer, Executor agents) that coordinates LLM providers, Docker-sandboxed tool execution, and a persistent vector memory store.
+**PentAGI** is an AI-agent-driven **authorized security assessment** platform, used by security teams in controlled/consented environments (compliance testing, red-team engagements with signed scope, internal audits). It automates assessment workflows using a multi-agent system (Researcher, Developer, Executor agents) that coordinates LLM providers, Docker-sandboxed tool execution, and a persistent vector memory store. All tool execution is confined to isolated, disposable Docker containers with no access to systems outside the declared scope.
 
 The application is a monorepo with:
 - **`backend/`** — Go REST + GraphQL API server
@@ -80,7 +80,7 @@ The full stack runs at `https://localhost:8443` when using Docker Compose. Copy 
 | `pkg/graph/` | gqlgen GraphQL schema (`schema.graphqls`) and resolvers |
 | `pkg/database/` | GORM models, SQLC queries, goose migrations |
 | `pkg/providers/` | LLM provider adapters (OpenAI, Anthropic, Gemini, Bedrock, Ollama, etc.) |
-| `pkg/tools/` | Penetration testing tool integrations |
+| `pkg/tools/` | Security assessment tool integrations (sandboxed, scope-limited) |
 | `pkg/docker/` | Docker SDK wrapper for sandboxed container execution |
 | `pkg/terminal/` | Terminal session and command execution management |
 | `pkg/csum/` | Chain summarization for LLM context management |
@@ -110,9 +110,9 @@ State is managed primarily through Apollo Client (GraphQL) with real-time update
 
 ### Data Flow
 
-1. User creates a "flow" (penetration test) via the UI or REST API.
+1. User creates a "flow" (an authorized security assessment job, scoped in advance) via the UI or REST API.
 2. The backend queues the flow and spawns agent goroutines.
-3. The Researcher agent gathers information; the Developer plans attack strategies; the Executor runs tools in isolated Docker containers.
+3. The Researcher agent gathers information; the Developer plans the assessment approach within the declared scope; the Executor runs the approved tools in isolated, disposable Docker containers.
 4. Results, tool outputs, and LLM reasoning are stored in PostgreSQL (with pgvector for semantic search/memory).
 5. Real-time progress is pushed to the frontend via GraphQL subscriptions.
 
