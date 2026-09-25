@@ -67,7 +67,18 @@
             "container": "Container"
         },
         "actions": {
-            "saveAsResource": "Save as resource"
+            "saveAsResource": "Save as resource",
+            "preview": "Preview"
+        },
+        "preview": {
+            "loadFailed": "Failed to load preview",
+            "binaryTitle": "Preview not available",
+            "binaryDescription": "This file appears to be binary. Download it to open it locally.",
+            "tooLargeTitle": "File too large to preview",
+            "tooLargeDescription": "Download the file to open it locally.",
+            "markdownMode": "Markdown view mode",
+            "rendered": "Preview",
+            "source": "Source"
         },
         "empty": {
             "title": "No files in cache",

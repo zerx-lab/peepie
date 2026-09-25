@@ -1,4 +1,4 @@
-import { ArrowDownToLine, FolderInput, FolderOutput, FolderUp, Search, Upload, X } from 'lucide-react';
+import { ArrowDownToLine, Eye, FolderInput, FolderOutput, FolderUp, Search, Upload, X } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -29,6 +29,7 @@ import { useFilesDragAndDrop } from '@/hooks/use-files-drag-and-drop';
 import { copyToClipboard } from '@/lib/report';
 import { useFlow } from '@/providers/flow-provider';
 
+import { FlowFilePreviewDialog } from './flow-file-preview-dialog';
 import { FlowFilesAttachResourcesDialog } from './flow-files-attach-resources-dialog';
 import { RESOURCES_TARGET_DIRECTORY, ROOT_GROUPS, UPLOADS_TARGET_DIRECTORY } from './flow-files-constants';
 import { FlowFilesPromoteDialog } from './flow-files-promote-dialog';
@@ -46,6 +47,7 @@ function FlowFiles() {
     const [isPullDialogOpen, setIsPullDialogOpen] = useState(false);
     const [isAttachResourcesDialogOpen, setIsAttachResourcesDialogOpen] = useState(false);
     const [filesToPromote, setFilesToPromote] = useState<FileNode[] | null>(null);
+    const [fileToPreview, setFileToPreview] = useState<FileNode | null>(null);
 
     const { fileNodes, isInitialLoading, isLoading } = useFlowFilesData({ flowId });
 
@@ -119,6 +121,17 @@ function FlowFiles() {
     }, []);
 
     const handleClosePromoteDialog = useCallback(() => setFilesToPromote(null), []);
+    const handleClosePreviewDialog = useCallback(() => setFileToPreview(null), []);
+
+    const previewAction = useMemo<FileManagerAction>(
+        () => ({
+            icon: Eye,
+            id: 'flow-files-preview',
+            label: t('flowFiles.actions.preview'),
+            onSelect: setFileToPreview,
+        }),
+        [t],
+    );
 
     const promoteAction = useMemo<FileManagerAction>(
         () => ({
@@ -133,6 +146,7 @@ function FlowFiles() {
 
     const fileManagerActions = useMemo<FileManagerAction[]>(
         () => [
+            previewAction,
             downloadAction(getRowDownloadHref),
             copyPathAction(handleCopyPath),
             promoteAction,
@@ -140,7 +154,7 @@ function FlowFiles() {
         ],
         // Built-in helper labels resolve via i18n at call time; `promoteAction` depends on `t`,
         // so this list is rebuilt on language change.
-        [getRowDownloadHref, handleCopyPath, promoteAction, deletion.requestDelete],
+        [previewAction, getRowDownloadHref, handleCopyPath, promoteAction, deletion.requestDelete],
     );
 
     const fileManagerBulkActions = useMemo<FileManagerBulkAction[]>(
@@ -377,6 +391,7 @@ function FlowFiles() {
                 emptyState={noFilesState}
                 files={fileNodes}
                 isLoading={isInitialLoading}
+                onOpen={setFileToPreview}
                 rootGroups={rootGroups}
                 search={{ emptyState: noMatchesState, query: search.debouncedQuery }}
             />
@@ -400,6 +415,15 @@ function FlowFiles() {
                 flowId={flowId}
                 onClose={handleClosePromoteDialog}
             />
+
+            {fileToPreview && flowId && (
+                <FlowFilePreviewDialog
+                    file={fileToPreview}
+                    flowId={flowId}
+                    key={fileToPreview.path}
+                    onClose={handleClosePreviewDialog}
+                />
+            )}
 
             <ConfirmationDialog
                 confirmText={t('common:actions.delete')}

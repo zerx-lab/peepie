@@ -59,7 +59,18 @@
             "container": "容器"
         },
         "actions": {
-            "saveAsResource": "保存为资源"
+            "saveAsResource": "保存为资源",
+            "preview": "预览"
+        },
+        "preview": {
+            "loadFailed": "预览加载失败",
+            "binaryTitle": "无法预览",
+            "binaryDescription": "该文件似乎是二进制文件，请下载后在本地打开。",
+            "tooLargeTitle": "文件过大，无法预览",
+            "tooLargeDescription": "请下载文件后在本地打开。",
+            "markdownMode": "Markdown 显示模式",
+            "rendered": "渲染",
+            "source": "源码"
         },
         "empty": {
             "title": "缓存中没有文件",
