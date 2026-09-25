@@ -208,10 +208,10 @@ type Settings {
 
 # ==================== Runtime System Settings (hot-reloadable) ====================
 # These mirror a subset of the installer TUI / .env configuration that is safe to
-# change without a process restart (pkg/config.Overrides). Secret fields never echo
-# their plaintext value back once set: `xxxSet` reports whether a value is stored,
-# and the corresponding value field is omitted (null) in that case unless the caller
-# is actively overwriting it.
+# change without a process restart (pkg/config.Overrides). Every change is written to
+# the system_settings table and to the settings .env file (SETTINGS_ENV_FILE), which is
+# re-read periodically so TUI edits are hot-reloaded too. Secret fields never echo
+# their plaintext value back once set: `xxxSet` reports whether a value is stored.
 
 type SearchEngineSettings {
   duckduckgoEnabled: Boolean!
@@ -285,6 +285,132 @@ input ExecutionSettingsInput {
   maxLimitedAgentToolCalls: Int!
   agentPlanningStepEnabled: Boolean!
   assistantUseAgents: Boolean!
+}
+
+# Built-in LLM provider credentials (the same OPEN_AI_KEY / ANTHROPIC_API_KEY / ...
+# variables the installer TUI manages). Changes are validated by building the affected
+# providers, mirrored into the settings .env file and applied without a restart;
+# running flows pick up the new credentials on their next LLM call.
+# `active` reports whether the provider is currently built and usable, `error` why the
+# last (re)build of a configured provider failed.
+
+type LLMProviderKeySettings {
+  active: Boolean!
+  error: String
+  apiKeySet: Boolean!
+  serverUrl: String!
+  # LiteLLM-style model prefix; null for providers without that option
+  providerName: String
+}
+
+input LLMProviderKeySettingsInput {
+  # null keeps the stored key, "" clears it
+  apiKey: String
+  serverUrl: String!
+  providerName: String
+}
+
+type BedrockProviderSettings {
+  active: Boolean!
+  error: String
+  region: String!
+  defaultAuth: Boolean!
+  bearerTokenSet: Boolean!
+  accessKeyIdSet: Boolean!
+  secretAccessKeySet: Boolean!
+  sessionTokenSet: Boolean!
+  serverUrl: String!
+}
+
+input BedrockProviderSettingsInput {
+  region: String!
+  defaultAuth: Boolean!
+  bearerToken: String
+  accessKeyId: String
+  secretAccessKey: String
+  sessionToken: String
+  serverUrl: String!
+}
+
+type OllamaProviderSettings {
+  active: Boolean!
+  error: String
+  serverUrl: String!
+  apiKeySet: Boolean!
+  model: String!
+  configPath: String!
+  pullModelsEnabled: Boolean!
+  pullModelsTimeout: Int!
+  loadModelsEnabled: Boolean!
+}
+
+input OllamaProviderSettingsInput {
+  serverUrl: String!
+  apiKey: String
+  model: String!
+  configPath: String!
+  pullModelsEnabled: Boolean!
+  pullModelsTimeout: Int!
+  loadModelsEnabled: Boolean!
+}
+
+type CustomProviderSettings {
+  active: Boolean!
+  error: String
+  serverUrl: String!
+  apiKeySet: Boolean!
+  model: String!
+  configPath: String!
+  providerName: String!
+  legacyReasoning: Boolean!
+  preserveReasoning: Boolean!
+}
+
+input CustomProviderSettingsInput {
+  serverUrl: String!
+  apiKey: String
+  model: String!
+  configPath: String!
+  providerName: String!
+  legacyReasoning: Boolean!
+  preserveReasoning: Boolean!
+}
+
+type LLMProviderSettings {
+  openai: LLMProviderKeySettings!
+  anthropic: LLMProviderKeySettings!
+  gemini: LLMProviderKeySettings!
+  bedrock: BedrockProviderSettings!
+  ollama: OllamaProviderSettings!
+  custom: CustomProviderSettings!
+  deepseek: LLMProviderKeySettings!
+  glm: LLMProviderKeySettings!
+  kimi: LLMProviderKeySettings!
+  qwen: LLMProviderKeySettings!
+  minimax: LLMProviderKeySettings!
+  # provider config files shipped in the container, suggested for configPath fields
+  configPaths: [String!]!
+}
+
+# Only the providers present in the input are changed.
+input LLMProviderSettingsInput {
+  openai: LLMProviderKeySettingsInput
+  anthropic: LLMProviderKeySettingsInput
+  gemini: LLMProviderKeySettingsInput
+  bedrock: BedrockProviderSettingsInput
+  ollama: OllamaProviderSettingsInput
+  custom: CustomProviderSettingsInput
+  deepseek: LLMProviderKeySettingsInput
+  glm: LLMProviderKeySettingsInput
+  kimi: LLMProviderKeySettingsInput
+  qwen: LLMProviderKeySettingsInput
+  minimax: LLMProviderKeySettingsInput
+}
+
+# Where Web UI runtime settings are mirrored (the .env file shared with the installer TUI).
+type SettingsEnvFile {
+  path: String!
+  writable: Boolean!
 }
 
 # ==================== User Preferences Types ====================
@@ -1120,6 +1246,8 @@ type Query {
   settingsUser: UserPreferences!
   settingsSearchEngines: SearchEngineSettings!
   settingsExecution: ExecutionSettings!
+  settingsLLMProviders: LLMProviderSettings!
+  settingsEnvFile: SettingsEnvFile!
 
   # API Tokens management
   apiToken(tokenId: String!): APIToken
@@ -1169,6 +1297,7 @@ type Mutation {
   # Runtime system settings (hot-reloadable, no restart required)
   updateSearchEngineSettings(input: SearchEngineSettingsInput!): SearchEngineSettings!
   updateExecutionSettings(input: ExecutionSettingsInput!): ExecutionSettings!
+  updateLLMProviderSettings(input: LLMProviderSettingsInput!): LLMProviderSettings!
 
   # API Tokens management
   createAPIToken(input: CreateAPITokenInput!): APITokenWithSecret!

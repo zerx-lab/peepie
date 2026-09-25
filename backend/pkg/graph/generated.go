@@ -183,6 +183,30 @@ type ComplexityRoot struct {
 		Type         func(childComplexity int) int
 	}
 
+	BedrockProviderSettings struct {
+		AccessKeyIDSet     func(childComplexity int) int
+		Active             func(childComplexity int) int
+		BearerTokenSet     func(childComplexity int) int
+		DefaultAuth        func(childComplexity int) int
+		Error              func(childComplexity int) int
+		Region             func(childComplexity int) int
+		SecretAccessKeySet func(childComplexity int) int
+		ServerURL          func(childComplexity int) int
+		SessionTokenSet    func(childComplexity int) int
+	}
+
+	CustomProviderSettings struct {
+		APIKeySet         func(childComplexity int) int
+		Active            func(childComplexity int) int
+		ConfigPath        func(childComplexity int) int
+		Error             func(childComplexity int) int
+		LegacyReasoning   func(childComplexity int) int
+		Model             func(childComplexity int) int
+		PreserveReasoning func(childComplexity int) int
+		ProviderName      func(childComplexity int) int
+		ServerURL         func(childComplexity int) int
+	}
+
 	DailyFlowsStats struct {
 		Date  func(childComplexity int) int
 		Stats func(childComplexity int) int
@@ -319,6 +343,29 @@ type ComplexityRoot struct {
 		Score    func(childComplexity int) int
 	}
 
+	LLMProviderKeySettings struct {
+		APIKeySet    func(childComplexity int) int
+		Active       func(childComplexity int) int
+		Error        func(childComplexity int) int
+		ProviderName func(childComplexity int) int
+		ServerURL    func(childComplexity int) int
+	}
+
+	LLMProviderSettings struct {
+		Anthropic   func(childComplexity int) int
+		Bedrock     func(childComplexity int) int
+		ConfigPaths func(childComplexity int) int
+		Custom      func(childComplexity int) int
+		Deepseek    func(childComplexity int) int
+		Gemini      func(childComplexity int) int
+		Glm         func(childComplexity int) int
+		Kimi        func(childComplexity int) int
+		Minimax     func(childComplexity int) int
+		Ollama      func(childComplexity int) int
+		Openai      func(childComplexity int) int
+		Qwen        func(childComplexity int) int
+	}
+
 	MessageLog struct {
 		CreatedAt    func(childComplexity int) int
 		FlowID       func(childComplexity int) int
@@ -400,10 +447,23 @@ type ComplexityRoot struct {
 		UpdateExecutionSettings    func(childComplexity int, input model.ExecutionSettingsInput) int
 		UpdateFlowTemplate         func(childComplexity int, templateID int64, input model.UpdateFlowTemplateInput) int
 		UpdateKnowledgeDocument    func(childComplexity int, id string, input model.UpdateKnowledgeDocumentInput) int
+		UpdateLLMProviderSettings  func(childComplexity int, input model.LLMProviderSettingsInput) int
 		UpdatePrompt               func(childComplexity int, promptID int64, template string) int
 		UpdateProvider             func(childComplexity int, providerID int64, name string, agents model.AgentsConfig) int
 		UpdateSearchEngineSettings func(childComplexity int, input model.SearchEngineSettingsInput) int
 		ValidatePrompt             func(childComplexity int, typeArg model.PromptType, template string) int
+	}
+
+	OllamaProviderSettings struct {
+		APIKeySet         func(childComplexity int) int
+		Active            func(childComplexity int) int
+		ConfigPath        func(childComplexity int) int
+		Error             func(childComplexity int) int
+		LoadModelsEnabled func(childComplexity int) int
+		Model             func(childComplexity int) int
+		PullModelsEnabled func(childComplexity int) int
+		PullModelsTimeout func(childComplexity int) int
+		ServerURL         func(childComplexity int) int
 	}
 
 	PromptValidationResult struct {
@@ -513,7 +573,9 @@ type ComplexityRoot struct {
 		SearchKnowledge                 func(childComplexity int, query string, filter *model.KnowledgeFilter, limit *int) int
 		SearchLogs                      func(childComplexity int, flowID int64) int
 		Settings                        func(childComplexity int) int
+		SettingsEnvFile                 func(childComplexity int) int
 		SettingsExecution               func(childComplexity int) int
+		SettingsLLMProviders            func(childComplexity int) int
 		SettingsPrompts                 func(childComplexity int) int
 		SettingsProviders               func(childComplexity int) int
 		SettingsSearchEngines           func(childComplexity int) int
@@ -600,6 +662,11 @@ type ComplexityRoot struct {
 		DockerInside       func(childComplexity int) int
 		IsDevelopMode      func(childComplexity int) int
 		Version            func(childComplexity int) int
+	}
+
+	SettingsEnvFile struct {
+		Path     func(childComplexity int) int
+		Writable func(childComplexity int) int
 	}
 
 	Subscription struct {
@@ -816,6 +883,7 @@ type MutationResolver interface {
 	DeletePrompt(ctx context.Context, promptID int64) (model.ResultType, error)
 	UpdateSearchEngineSettings(ctx context.Context, input model.SearchEngineSettingsInput) (*model.SearchEngineSettings, error)
 	UpdateExecutionSettings(ctx context.Context, input model.ExecutionSettingsInput) (*model.ExecutionSettings, error)
+	UpdateLLMProviderSettings(ctx context.Context, input model.LLMProviderSettingsInput) (*model.LLMProviderSettings, error)
 	CreateAPIToken(ctx context.Context, input model.CreateAPITokenInput) (*model.APITokenWithSecret, error)
 	UpdateAPIToken(ctx context.Context, tokenID string, input model.UpdateAPITokenInput) (*model.APIToken, error)
 	DeleteAPIToken(ctx context.Context, tokenID string) (bool, error)
@@ -868,6 +936,8 @@ type QueryResolver interface {
 	SettingsUser(ctx context.Context) (*model.UserPreferences, error)
 	SettingsSearchEngines(ctx context.Context) (*model.SearchEngineSettings, error)
 	SettingsExecution(ctx context.Context) (*model.ExecutionSettings, error)
+	SettingsLLMProviders(ctx context.Context) (*model.LLMProviderSettings, error)
+	SettingsEnvFile(ctx context.Context) (*model.SettingsEnvFile, error)
 	APIToken(ctx context.Context, tokenID string) (*model.APIToken, error)
 	APITokens(ctx context.Context) ([]*model.APIToken, error)
 	FlowTemplate(ctx context.Context, templateID int64) (*model.FlowTemplate, error)
@@ -1616,6 +1686,132 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AssistantLog.Type(childComplexity), true
 
+	case "BedrockProviderSettings.accessKeyIdSet":
+		if e.complexity.BedrockProviderSettings.AccessKeyIDSet == nil {
+			break
+		}
+
+		return e.complexity.BedrockProviderSettings.AccessKeyIDSet(childComplexity), true
+
+	case "BedrockProviderSettings.active":
+		if e.complexity.BedrockProviderSettings.Active == nil {
+			break
+		}
+
+		return e.complexity.BedrockProviderSettings.Active(childComplexity), true
+
+	case "BedrockProviderSettings.bearerTokenSet":
+		if e.complexity.BedrockProviderSettings.BearerTokenSet == nil {
+			break
+		}
+
+		return e.complexity.BedrockProviderSettings.BearerTokenSet(childComplexity), true
+
+	case "BedrockProviderSettings.defaultAuth":
+		if e.complexity.BedrockProviderSettings.DefaultAuth == nil {
+			break
+		}
+
+		return e.complexity.BedrockProviderSettings.DefaultAuth(childComplexity), true
+
+	case "BedrockProviderSettings.error":
+		if e.complexity.BedrockProviderSettings.Error == nil {
+			break
+		}
+
+		return e.complexity.BedrockProviderSettings.Error(childComplexity), true
+
+	case "BedrockProviderSettings.region":
+		if e.complexity.BedrockProviderSettings.Region == nil {
+			break
+		}
+
+		return e.complexity.BedrockProviderSettings.Region(childComplexity), true
+
+	case "BedrockProviderSettings.secretAccessKeySet":
+		if e.complexity.BedrockProviderSettings.SecretAccessKeySet == nil {
+			break
+		}
+
+		return e.complexity.BedrockProviderSettings.SecretAccessKeySet(childComplexity), true
+
+	case "BedrockProviderSettings.serverUrl":
+		if e.complexity.BedrockProviderSettings.ServerURL == nil {
+			break
+		}
+
+		return e.complexity.BedrockProviderSettings.ServerURL(childComplexity), true
+
+	case "BedrockProviderSettings.sessionTokenSet":
+		if e.complexity.BedrockProviderSettings.SessionTokenSet == nil {
+			break
+		}
+
+		return e.complexity.BedrockProviderSettings.SessionTokenSet(childComplexity), true
+
+	case "CustomProviderSettings.apiKeySet":
+		if e.complexity.CustomProviderSettings.APIKeySet == nil {
+			break
+		}
+
+		return e.complexity.CustomProviderSettings.APIKeySet(childComplexity), true
+
+	case "CustomProviderSettings.active":
+		if e.complexity.CustomProviderSettings.Active == nil {
+			break
+		}
+
+		return e.complexity.CustomProviderSettings.Active(childComplexity), true
+
+	case "CustomProviderSettings.configPath":
+		if e.complexity.CustomProviderSettings.ConfigPath == nil {
+			break
+		}
+
+		return e.complexity.CustomProviderSettings.ConfigPath(childComplexity), true
+
+	case "CustomProviderSettings.error":
+		if e.complexity.CustomProviderSettings.Error == nil {
+			break
+		}
+
+		return e.complexity.CustomProviderSettings.Error(childComplexity), true
+
+	case "CustomProviderSettings.legacyReasoning":
+		if e.complexity.CustomProviderSettings.LegacyReasoning == nil {
+			break
+		}
+
+		return e.complexity.CustomProviderSettings.LegacyReasoning(childComplexity), true
+
+	case "CustomProviderSettings.model":
+		if e.complexity.CustomProviderSettings.Model == nil {
+			break
+		}
+
+		return e.complexity.CustomProviderSettings.Model(childComplexity), true
+
+	case "CustomProviderSettings.preserveReasoning":
+		if e.complexity.CustomProviderSettings.PreserveReasoning == nil {
+			break
+		}
+
+		return e.complexity.CustomProviderSettings.PreserveReasoning(childComplexity), true
+
+	case "CustomProviderSettings.providerName":
+		if e.complexity.CustomProviderSettings.ProviderName == nil {
+			break
+		}
+
+		return e.complexity.CustomProviderSettings.ProviderName(childComplexity), true
+
+	case "CustomProviderSettings.serverUrl":
+		if e.complexity.CustomProviderSettings.ServerURL == nil {
+			break
+		}
+
+		return e.complexity.CustomProviderSettings.ServerURL(childComplexity), true
+
 	case "DailyFlowsStats.date":
 		if e.complexity.DailyFlowsStats.Date == nil {
 			break
@@ -2211,6 +2407,125 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.KnowledgeDocumentWithScore.Score(childComplexity), true
 
+	case "LLMProviderKeySettings.apiKeySet":
+		if e.complexity.LLMProviderKeySettings.APIKeySet == nil {
+			break
+		}
+
+		return e.complexity.LLMProviderKeySettings.APIKeySet(childComplexity), true
+
+	case "LLMProviderKeySettings.active":
+		if e.complexity.LLMProviderKeySettings.Active == nil {
+			break
+		}
+
+		return e.complexity.LLMProviderKeySettings.Active(childComplexity), true
+
+	case "LLMProviderKeySettings.error":
+		if e.complexity.LLMProviderKeySettings.Error == nil {
+			break
+		}
+
+		return e.complexity.LLMProviderKeySettings.Error(childComplexity), true
+
+	case "LLMProviderKeySettings.providerName":
+		if e.complexity.LLMProviderKeySettings.ProviderName == nil {
+			break
+		}
+
+		return e.complexity.LLMProviderKeySettings.ProviderName(childComplexity), true
+
+	case "LLMProviderKeySettings.serverUrl":
+		if e.complexity.LLMProviderKeySettings.ServerURL == nil {
+			break
+		}
+
+		return e.complexity.LLMProviderKeySettings.ServerURL(childComplexity), true
+
+	case "LLMProviderSettings.anthropic":
+		if e.complexity.LLMProviderSettings.Anthropic == nil {
+			break
+		}
+
+		return e.complexity.LLMProviderSettings.Anthropic(childComplexity), true
+
+	case "LLMProviderSettings.bedrock":
+		if e.complexity.LLMProviderSettings.Bedrock == nil {
+			break
+		}
+
+		return e.complexity.LLMProviderSettings.Bedrock(childComplexity), true
+
+	case "LLMProviderSettings.configPaths":
+		if e.complexity.LLMProviderSettings.ConfigPaths == nil {
+			break
+		}
+
+		return e.complexity.LLMProviderSettings.ConfigPaths(childComplexity), true
+
+	case "LLMProviderSettings.custom":
+		if e.complexity.LLMProviderSettings.Custom == nil {
+			break
+		}
+
+		return e.complexity.LLMProviderSettings.Custom(childComplexity), true
+
+	case "LLMProviderSettings.deepseek":
+		if e.complexity.LLMProviderSettings.Deepseek == nil {
+			break
+		}
+
+		return e.complexity.LLMProviderSettings.Deepseek(childComplexity), true
+
+	case "LLMProviderSettings.gemini":
+		if e.complexity.LLMProviderSettings.Gemini == nil {
+			break
+		}
+
+		return e.complexity.LLMProviderSettings.Gemini(childComplexity), true
+
+	case "LLMProviderSettings.glm":
+		if e.complexity.LLMProviderSettings.Glm == nil {
+			break
+		}
+
+		return e.complexity.LLMProviderSettings.Glm(childComplexity), true
+
+	case "LLMProviderSettings.kimi":
+		if e.complexity.LLMProviderSettings.Kimi == nil {
+			break
+		}
+
+		return e.complexity.LLMProviderSettings.Kimi(childComplexity), true
+
+	case "LLMProviderSettings.minimax":
+		if e.complexity.LLMProviderSettings.Minimax == nil {
+			break
+		}
+
+		return e.complexity.LLMProviderSettings.Minimax(childComplexity), true
+
+	case "LLMProviderSettings.ollama":
+		if e.complexity.LLMProviderSettings.Ollama == nil {
+			break
+		}
+
+		return e.complexity.LLMProviderSettings.Ollama(childComplexity), true
+
+	case "LLMProviderSettings.openai":
+		if e.complexity.LLMProviderSettings.Openai == nil {
+			break
+		}
+
+		return e.complexity.LLMProviderSettings.Openai(childComplexity), true
+
+	case "LLMProviderSettings.qwen":
+		if e.complexity.LLMProviderSettings.Qwen == nil {
+			break
+		}
+
+		return e.complexity.LLMProviderSettings.Qwen(childComplexity), true
+
 	case "MessageLog.createdAt":
 		if e.complexity.MessageLog.CreatedAt == nil {
 			break
@@ -2795,6 +3110,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateKnowledgeDocument(childComplexity, args["id"].(string), args["input"].(model.UpdateKnowledgeDocumentInput)), true
 
+	case "Mutation.updateLLMProviderSettings":
+		if e.complexity.Mutation.UpdateLLMProviderSettings == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateLLMProviderSettings_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateLLMProviderSettings(childComplexity, args["input"].(model.LLMProviderSettingsInput)), true
+
 	case "Mutation.updatePrompt":
 		if e.complexity.Mutation.UpdatePrompt == nil {
 			break
@@ -2842,6 +3169,69 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.ValidatePrompt(childComplexity, args["type"].(model.PromptType), args["template"].(string)), true
+
+	case "OllamaProviderSettings.apiKeySet":
+		if e.complexity.OllamaProviderSettings.APIKeySet == nil {
+			break
+		}
+
+		return e.complexity.OllamaProviderSettings.APIKeySet(childComplexity), true
+
+	case "OllamaProviderSettings.active":
+		if e.complexity.OllamaProviderSettings.Active == nil {
+			break
+		}
+
+		return e.complexity.OllamaProviderSettings.Active(childComplexity), true
+
+	case "OllamaProviderSettings.configPath":
+		if e.complexity.OllamaProviderSettings.ConfigPath == nil {
+			break
+		}
+
+		return e.complexity.OllamaProviderSettings.ConfigPath(childComplexity), true
+
+	case "OllamaProviderSettings.error":
+		if e.complexity.OllamaProviderSettings.Error == nil {
+			break
+		}
+
+		return e.complexity.OllamaProviderSettings.Error(childComplexity), true
+
+	case "OllamaProviderSettings.loadModelsEnabled":
+		if e.complexity.OllamaProviderSettings.LoadModelsEnabled == nil {
+			break
+		}
+
+		return e.complexity.OllamaProviderSettings.LoadModelsEnabled(childComplexity), true
+
+	case "OllamaProviderSettings.model":
+		if e.complexity.OllamaProviderSettings.Model == nil {
+			break
+		}
+
+		return e.complexity.OllamaProviderSettings.Model(childComplexity), true
+
+	case "OllamaProviderSettings.pullModelsEnabled":
+		if e.complexity.OllamaProviderSettings.PullModelsEnabled == nil {
+			break
+		}
+
+		return e.complexity.OllamaProviderSettings.PullModelsEnabled(childComplexity), true
+
+	case "OllamaProviderSettings.pullModelsTimeout":
+		if e.complexity.OllamaProviderSettings.PullModelsTimeout == nil {
+			break
+		}
+
+		return e.complexity.OllamaProviderSettings.PullModelsTimeout(childComplexity), true
+
+	case "OllamaProviderSettings.serverUrl":
+		if e.complexity.OllamaProviderSettings.ServerURL == nil {
+			break
+		}
+
+		return e.complexity.OllamaProviderSettings.ServerURL(childComplexity), true
 
 	case "PromptValidationResult.details":
 		if e.complexity.PromptValidationResult.Details == nil {
@@ -3481,12 +3871,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Settings(childComplexity), true
 
+	case "Query.settingsEnvFile":
+		if e.complexity.Query.SettingsEnvFile == nil {
+			break
+		}
+
+		return e.complexity.Query.SettingsEnvFile(childComplexity), true
+
 	case "Query.settingsExecution":
 		if e.complexity.Query.SettingsExecution == nil {
 			break
 		}
 
 		return e.complexity.Query.SettingsExecution(childComplexity), true
+
+	case "Query.settingsLLMProviders":
+		if e.complexity.Query.SettingsLLMProviders == nil {
+			break
+		}
+
+		return e.complexity.Query.SettingsLLMProviders(childComplexity), true
 
 	case "Query.settingsPrompts":
 		if e.complexity.Query.SettingsPrompts == nil {
@@ -4039,6 +4443,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Settings.Version(childComplexity), true
+
+	case "SettingsEnvFile.path":
+		if e.complexity.SettingsEnvFile.Path == nil {
+			break
+		}
+
+		return e.complexity.SettingsEnvFile.Path(childComplexity), true
+
+	case "SettingsEnvFile.writable":
+		if e.complexity.SettingsEnvFile.Writable == nil {
+			break
+		}
+
+		return e.complexity.SettingsEnvFile.Writable(childComplexity), true
 
 	case "Subscription.apiTokenCreated":
 		if e.complexity.Subscription.APITokenCreated == nil {
@@ -5146,12 +5564,17 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputAgentConfigInput,
 		ec.unmarshalInputAgentsConfigInput,
+		ec.unmarshalInputBedrockProviderSettingsInput,
 		ec.unmarshalInputCreateAPITokenInput,
 		ec.unmarshalInputCreateFlowTemplateInput,
 		ec.unmarshalInputCreateKnowledgeDocumentInput,
+		ec.unmarshalInputCustomProviderSettingsInput,
 		ec.unmarshalInputExecutionSettingsInput,
 		ec.unmarshalInputKnowledgeFilter,
+		ec.unmarshalInputLLMProviderKeySettingsInput,
+		ec.unmarshalInputLLMProviderSettingsInput,
 		ec.unmarshalInputModelPriceInput,
+		ec.unmarshalInputOllamaProviderSettingsInput,
 		ec.unmarshalInputReasoningConfigInput,
 		ec.unmarshalInputSearchEngineSettingsInput,
 		ec.unmarshalInputUpdateAPITokenInput,
@@ -6949,6 +7372,38 @@ func (ec *executionContext) field_Mutation_updateKnowledgeDocument_argsInput(
 	}
 
 	var zeroVal model.UpdateKnowledgeDocumentInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateLLMProviderSettings_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	arg0, err := ec.field_Mutation_updateLLMProviderSettings_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updateLLMProviderSettings_argsInput(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (model.LLMProviderSettingsInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["input"]
+	if !ok {
+		var zeroVal model.LLMProviderSettingsInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNLLMProviderSettingsInput2pentagiᚋpkgᚋgraphᚋmodelᚐLLMProviderSettingsInput(ctx, tmp)
+	}
+
+	var zeroVal model.LLMProviderSettingsInput
 	return zeroVal, nil
 }
 
@@ -13766,6 +14221,792 @@ func (ec *executionContext) fieldContext_AssistantLog_createdAt(_ context.Contex
 	return fc, nil
 }
 
+func (ec *executionContext) _BedrockProviderSettings_active(ctx context.Context, field graphql.CollectedField, obj *model.BedrockProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_BedrockProviderSettings_active(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Active, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_BedrockProviderSettings_active(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BedrockProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _BedrockProviderSettings_error(ctx context.Context, field graphql.CollectedField, obj *model.BedrockProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_BedrockProviderSettings_error(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Error, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_BedrockProviderSettings_error(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BedrockProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _BedrockProviderSettings_region(ctx context.Context, field graphql.CollectedField, obj *model.BedrockProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_BedrockProviderSettings_region(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Region, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_BedrockProviderSettings_region(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BedrockProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _BedrockProviderSettings_defaultAuth(ctx context.Context, field graphql.CollectedField, obj *model.BedrockProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_BedrockProviderSettings_defaultAuth(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DefaultAuth, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_BedrockProviderSettings_defaultAuth(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BedrockProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _BedrockProviderSettings_bearerTokenSet(ctx context.Context, field graphql.CollectedField, obj *model.BedrockProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_BedrockProviderSettings_bearerTokenSet(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.BearerTokenSet, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_BedrockProviderSettings_bearerTokenSet(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BedrockProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _BedrockProviderSettings_accessKeyIdSet(ctx context.Context, field graphql.CollectedField, obj *model.BedrockProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_BedrockProviderSettings_accessKeyIdSet(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AccessKeyIDSet, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_BedrockProviderSettings_accessKeyIdSet(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BedrockProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _BedrockProviderSettings_secretAccessKeySet(ctx context.Context, field graphql.CollectedField, obj *model.BedrockProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_BedrockProviderSettings_secretAccessKeySet(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SecretAccessKeySet, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_BedrockProviderSettings_secretAccessKeySet(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BedrockProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _BedrockProviderSettings_sessionTokenSet(ctx context.Context, field graphql.CollectedField, obj *model.BedrockProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_BedrockProviderSettings_sessionTokenSet(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SessionTokenSet, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_BedrockProviderSettings_sessionTokenSet(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BedrockProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _BedrockProviderSettings_serverUrl(ctx context.Context, field graphql.CollectedField, obj *model.BedrockProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_BedrockProviderSettings_serverUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ServerURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_BedrockProviderSettings_serverUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BedrockProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CustomProviderSettings_active(ctx context.Context, field graphql.CollectedField, obj *model.CustomProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CustomProviderSettings_active(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Active, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CustomProviderSettings_active(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CustomProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CustomProviderSettings_error(ctx context.Context, field graphql.CollectedField, obj *model.CustomProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CustomProviderSettings_error(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Error, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CustomProviderSettings_error(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CustomProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CustomProviderSettings_serverUrl(ctx context.Context, field graphql.CollectedField, obj *model.CustomProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CustomProviderSettings_serverUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ServerURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CustomProviderSettings_serverUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CustomProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CustomProviderSettings_apiKeySet(ctx context.Context, field graphql.CollectedField, obj *model.CustomProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CustomProviderSettings_apiKeySet(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.APIKeySet, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CustomProviderSettings_apiKeySet(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CustomProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CustomProviderSettings_model(ctx context.Context, field graphql.CollectedField, obj *model.CustomProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CustomProviderSettings_model(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Model, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CustomProviderSettings_model(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CustomProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CustomProviderSettings_configPath(ctx context.Context, field graphql.CollectedField, obj *model.CustomProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CustomProviderSettings_configPath(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ConfigPath, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CustomProviderSettings_configPath(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CustomProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CustomProviderSettings_providerName(ctx context.Context, field graphql.CollectedField, obj *model.CustomProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CustomProviderSettings_providerName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ProviderName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CustomProviderSettings_providerName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CustomProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CustomProviderSettings_legacyReasoning(ctx context.Context, field graphql.CollectedField, obj *model.CustomProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CustomProviderSettings_legacyReasoning(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LegacyReasoning, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CustomProviderSettings_legacyReasoning(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CustomProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CustomProviderSettings_preserveReasoning(ctx context.Context, field graphql.CollectedField, obj *model.CustomProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CustomProviderSettings_preserveReasoning(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PreserveReasoning, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CustomProviderSettings_preserveReasoning(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CustomProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _DailyFlowsStats_date(ctx context.Context, field graphql.CollectedField, obj *model.DailyFlowsStats) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_DailyFlowsStats_date(ctx, field)
 	if err != nil {
@@ -17795,6 +19036,904 @@ func (ec *executionContext) fieldContext_KnowledgeDocumentWithScore_document(_ c
 	return fc, nil
 }
 
+func (ec *executionContext) _LLMProviderKeySettings_active(ctx context.Context, field graphql.CollectedField, obj *model.LLMProviderKeySettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LLMProviderKeySettings_active(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Active, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LLMProviderKeySettings_active(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LLMProviderKeySettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LLMProviderKeySettings_error(ctx context.Context, field graphql.CollectedField, obj *model.LLMProviderKeySettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LLMProviderKeySettings_error(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Error, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LLMProviderKeySettings_error(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LLMProviderKeySettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LLMProviderKeySettings_apiKeySet(ctx context.Context, field graphql.CollectedField, obj *model.LLMProviderKeySettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LLMProviderKeySettings_apiKeySet(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.APIKeySet, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LLMProviderKeySettings_apiKeySet(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LLMProviderKeySettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LLMProviderKeySettings_serverUrl(ctx context.Context, field graphql.CollectedField, obj *model.LLMProviderKeySettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LLMProviderKeySettings_serverUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ServerURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LLMProviderKeySettings_serverUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LLMProviderKeySettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LLMProviderKeySettings_providerName(ctx context.Context, field graphql.CollectedField, obj *model.LLMProviderKeySettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LLMProviderKeySettings_providerName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ProviderName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LLMProviderKeySettings_providerName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LLMProviderKeySettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LLMProviderSettings_openai(ctx context.Context, field graphql.CollectedField, obj *model.LLMProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LLMProviderSettings_openai(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Openai, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.LLMProviderKeySettings)
+	fc.Result = res
+	return ec.marshalNLLMProviderKeySettings2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐLLMProviderKeySettings(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LLMProviderSettings_openai(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LLMProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "active":
+				return ec.fieldContext_LLMProviderKeySettings_active(ctx, field)
+			case "error":
+				return ec.fieldContext_LLMProviderKeySettings_error(ctx, field)
+			case "apiKeySet":
+				return ec.fieldContext_LLMProviderKeySettings_apiKeySet(ctx, field)
+			case "serverUrl":
+				return ec.fieldContext_LLMProviderKeySettings_serverUrl(ctx, field)
+			case "providerName":
+				return ec.fieldContext_LLMProviderKeySettings_providerName(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LLMProviderKeySettings", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LLMProviderSettings_anthropic(ctx context.Context, field graphql.CollectedField, obj *model.LLMProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LLMProviderSettings_anthropic(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Anthropic, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.LLMProviderKeySettings)
+	fc.Result = res
+	return ec.marshalNLLMProviderKeySettings2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐLLMProviderKeySettings(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LLMProviderSettings_anthropic(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LLMProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "active":
+				return ec.fieldContext_LLMProviderKeySettings_active(ctx, field)
+			case "error":
+				return ec.fieldContext_LLMProviderKeySettings_error(ctx, field)
+			case "apiKeySet":
+				return ec.fieldContext_LLMProviderKeySettings_apiKeySet(ctx, field)
+			case "serverUrl":
+				return ec.fieldContext_LLMProviderKeySettings_serverUrl(ctx, field)
+			case "providerName":
+				return ec.fieldContext_LLMProviderKeySettings_providerName(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LLMProviderKeySettings", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LLMProviderSettings_gemini(ctx context.Context, field graphql.CollectedField, obj *model.LLMProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LLMProviderSettings_gemini(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Gemini, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.LLMProviderKeySettings)
+	fc.Result = res
+	return ec.marshalNLLMProviderKeySettings2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐLLMProviderKeySettings(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LLMProviderSettings_gemini(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LLMProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "active":
+				return ec.fieldContext_LLMProviderKeySettings_active(ctx, field)
+			case "error":
+				return ec.fieldContext_LLMProviderKeySettings_error(ctx, field)
+			case "apiKeySet":
+				return ec.fieldContext_LLMProviderKeySettings_apiKeySet(ctx, field)
+			case "serverUrl":
+				return ec.fieldContext_LLMProviderKeySettings_serverUrl(ctx, field)
+			case "providerName":
+				return ec.fieldContext_LLMProviderKeySettings_providerName(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LLMProviderKeySettings", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LLMProviderSettings_bedrock(ctx context.Context, field graphql.CollectedField, obj *model.LLMProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LLMProviderSettings_bedrock(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Bedrock, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.BedrockProviderSettings)
+	fc.Result = res
+	return ec.marshalNBedrockProviderSettings2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐBedrockProviderSettings(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LLMProviderSettings_bedrock(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LLMProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "active":
+				return ec.fieldContext_BedrockProviderSettings_active(ctx, field)
+			case "error":
+				return ec.fieldContext_BedrockProviderSettings_error(ctx, field)
+			case "region":
+				return ec.fieldContext_BedrockProviderSettings_region(ctx, field)
+			case "defaultAuth":
+				return ec.fieldContext_BedrockProviderSettings_defaultAuth(ctx, field)
+			case "bearerTokenSet":
+				return ec.fieldContext_BedrockProviderSettings_bearerTokenSet(ctx, field)
+			case "accessKeyIdSet":
+				return ec.fieldContext_BedrockProviderSettings_accessKeyIdSet(ctx, field)
+			case "secretAccessKeySet":
+				return ec.fieldContext_BedrockProviderSettings_secretAccessKeySet(ctx, field)
+			case "sessionTokenSet":
+				return ec.fieldContext_BedrockProviderSettings_sessionTokenSet(ctx, field)
+			case "serverUrl":
+				return ec.fieldContext_BedrockProviderSettings_serverUrl(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type BedrockProviderSettings", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LLMProviderSettings_ollama(ctx context.Context, field graphql.CollectedField, obj *model.LLMProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LLMProviderSettings_ollama(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Ollama, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.OllamaProviderSettings)
+	fc.Result = res
+	return ec.marshalNOllamaProviderSettings2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐOllamaProviderSettings(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LLMProviderSettings_ollama(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LLMProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "active":
+				return ec.fieldContext_OllamaProviderSettings_active(ctx, field)
+			case "error":
+				return ec.fieldContext_OllamaProviderSettings_error(ctx, field)
+			case "serverUrl":
+				return ec.fieldContext_OllamaProviderSettings_serverUrl(ctx, field)
+			case "apiKeySet":
+				return ec.fieldContext_OllamaProviderSettings_apiKeySet(ctx, field)
+			case "model":
+				return ec.fieldContext_OllamaProviderSettings_model(ctx, field)
+			case "configPath":
+				return ec.fieldContext_OllamaProviderSettings_configPath(ctx, field)
+			case "pullModelsEnabled":
+				return ec.fieldContext_OllamaProviderSettings_pullModelsEnabled(ctx, field)
+			case "pullModelsTimeout":
+				return ec.fieldContext_OllamaProviderSettings_pullModelsTimeout(ctx, field)
+			case "loadModelsEnabled":
+				return ec.fieldContext_OllamaProviderSettings_loadModelsEnabled(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type OllamaProviderSettings", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LLMProviderSettings_custom(ctx context.Context, field graphql.CollectedField, obj *model.LLMProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LLMProviderSettings_custom(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Custom, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.CustomProviderSettings)
+	fc.Result = res
+	return ec.marshalNCustomProviderSettings2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐCustomProviderSettings(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LLMProviderSettings_custom(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LLMProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "active":
+				return ec.fieldContext_CustomProviderSettings_active(ctx, field)
+			case "error":
+				return ec.fieldContext_CustomProviderSettings_error(ctx, field)
+			case "serverUrl":
+				return ec.fieldContext_CustomProviderSettings_serverUrl(ctx, field)
+			case "apiKeySet":
+				return ec.fieldContext_CustomProviderSettings_apiKeySet(ctx, field)
+			case "model":
+				return ec.fieldContext_CustomProviderSettings_model(ctx, field)
+			case "configPath":
+				return ec.fieldContext_CustomProviderSettings_configPath(ctx, field)
+			case "providerName":
+				return ec.fieldContext_CustomProviderSettings_providerName(ctx, field)
+			case "legacyReasoning":
+				return ec.fieldContext_CustomProviderSettings_legacyReasoning(ctx, field)
+			case "preserveReasoning":
+				return ec.fieldContext_CustomProviderSettings_preserveReasoning(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CustomProviderSettings", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LLMProviderSettings_deepseek(ctx context.Context, field graphql.CollectedField, obj *model.LLMProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LLMProviderSettings_deepseek(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Deepseek, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.LLMProviderKeySettings)
+	fc.Result = res
+	return ec.marshalNLLMProviderKeySettings2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐLLMProviderKeySettings(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LLMProviderSettings_deepseek(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LLMProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "active":
+				return ec.fieldContext_LLMProviderKeySettings_active(ctx, field)
+			case "error":
+				return ec.fieldContext_LLMProviderKeySettings_error(ctx, field)
+			case "apiKeySet":
+				return ec.fieldContext_LLMProviderKeySettings_apiKeySet(ctx, field)
+			case "serverUrl":
+				return ec.fieldContext_LLMProviderKeySettings_serverUrl(ctx, field)
+			case "providerName":
+				return ec.fieldContext_LLMProviderKeySettings_providerName(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LLMProviderKeySettings", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LLMProviderSettings_glm(ctx context.Context, field graphql.CollectedField, obj *model.LLMProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LLMProviderSettings_glm(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Glm, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.LLMProviderKeySettings)
+	fc.Result = res
+	return ec.marshalNLLMProviderKeySettings2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐLLMProviderKeySettings(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LLMProviderSettings_glm(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LLMProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "active":
+				return ec.fieldContext_LLMProviderKeySettings_active(ctx, field)
+			case "error":
+				return ec.fieldContext_LLMProviderKeySettings_error(ctx, field)
+			case "apiKeySet":
+				return ec.fieldContext_LLMProviderKeySettings_apiKeySet(ctx, field)
+			case "serverUrl":
+				return ec.fieldContext_LLMProviderKeySettings_serverUrl(ctx, field)
+			case "providerName":
+				return ec.fieldContext_LLMProviderKeySettings_providerName(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LLMProviderKeySettings", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LLMProviderSettings_kimi(ctx context.Context, field graphql.CollectedField, obj *model.LLMProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LLMProviderSettings_kimi(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Kimi, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.LLMProviderKeySettings)
+	fc.Result = res
+	return ec.marshalNLLMProviderKeySettings2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐLLMProviderKeySettings(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LLMProviderSettings_kimi(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LLMProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "active":
+				return ec.fieldContext_LLMProviderKeySettings_active(ctx, field)
+			case "error":
+				return ec.fieldContext_LLMProviderKeySettings_error(ctx, field)
+			case "apiKeySet":
+				return ec.fieldContext_LLMProviderKeySettings_apiKeySet(ctx, field)
+			case "serverUrl":
+				return ec.fieldContext_LLMProviderKeySettings_serverUrl(ctx, field)
+			case "providerName":
+				return ec.fieldContext_LLMProviderKeySettings_providerName(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LLMProviderKeySettings", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LLMProviderSettings_qwen(ctx context.Context, field graphql.CollectedField, obj *model.LLMProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LLMProviderSettings_qwen(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Qwen, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.LLMProviderKeySettings)
+	fc.Result = res
+	return ec.marshalNLLMProviderKeySettings2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐLLMProviderKeySettings(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LLMProviderSettings_qwen(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LLMProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "active":
+				return ec.fieldContext_LLMProviderKeySettings_active(ctx, field)
+			case "error":
+				return ec.fieldContext_LLMProviderKeySettings_error(ctx, field)
+			case "apiKeySet":
+				return ec.fieldContext_LLMProviderKeySettings_apiKeySet(ctx, field)
+			case "serverUrl":
+				return ec.fieldContext_LLMProviderKeySettings_serverUrl(ctx, field)
+			case "providerName":
+				return ec.fieldContext_LLMProviderKeySettings_providerName(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LLMProviderKeySettings", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LLMProviderSettings_minimax(ctx context.Context, field graphql.CollectedField, obj *model.LLMProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LLMProviderSettings_minimax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Minimax, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.LLMProviderKeySettings)
+	fc.Result = res
+	return ec.marshalNLLMProviderKeySettings2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐLLMProviderKeySettings(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LLMProviderSettings_minimax(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LLMProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "active":
+				return ec.fieldContext_LLMProviderKeySettings_active(ctx, field)
+			case "error":
+				return ec.fieldContext_LLMProviderKeySettings_error(ctx, field)
+			case "apiKeySet":
+				return ec.fieldContext_LLMProviderKeySettings_apiKeySet(ctx, field)
+			case "serverUrl":
+				return ec.fieldContext_LLMProviderKeySettings_serverUrl(ctx, field)
+			case "providerName":
+				return ec.fieldContext_LLMProviderKeySettings_providerName(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LLMProviderKeySettings", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LLMProviderSettings_configPaths(ctx context.Context, field graphql.CollectedField, obj *model.LLMProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LLMProviderSettings_configPaths(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ConfigPaths, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LLMProviderSettings_configPaths(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LLMProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _MessageLog_id(ctx context.Context, field graphql.CollectedField, obj *model.MessageLog) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_MessageLog_id(ctx, field)
 	if err != nil {
@@ -20571,6 +22710,87 @@ func (ec *executionContext) fieldContext_Mutation_updateExecutionSettings(ctx co
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_updateLLMProviderSettings(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateLLMProviderSettings(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateLLMProviderSettings(rctx, fc.Args["input"].(model.LLMProviderSettingsInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.LLMProviderSettings)
+	fc.Result = res
+	return ec.marshalNLLMProviderSettings2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐLLMProviderSettings(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateLLMProviderSettings(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "openai":
+				return ec.fieldContext_LLMProviderSettings_openai(ctx, field)
+			case "anthropic":
+				return ec.fieldContext_LLMProviderSettings_anthropic(ctx, field)
+			case "gemini":
+				return ec.fieldContext_LLMProviderSettings_gemini(ctx, field)
+			case "bedrock":
+				return ec.fieldContext_LLMProviderSettings_bedrock(ctx, field)
+			case "ollama":
+				return ec.fieldContext_LLMProviderSettings_ollama(ctx, field)
+			case "custom":
+				return ec.fieldContext_LLMProviderSettings_custom(ctx, field)
+			case "deepseek":
+				return ec.fieldContext_LLMProviderSettings_deepseek(ctx, field)
+			case "glm":
+				return ec.fieldContext_LLMProviderSettings_glm(ctx, field)
+			case "kimi":
+				return ec.fieldContext_LLMProviderSettings_kimi(ctx, field)
+			case "qwen":
+				return ec.fieldContext_LLMProviderSettings_qwen(ctx, field)
+			case "minimax":
+				return ec.fieldContext_LLMProviderSettings_minimax(ctx, field)
+			case "configPaths":
+				return ec.fieldContext_LLMProviderSettings_configPaths(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LLMProviderSettings", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateLLMProviderSettings_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createAPIToken(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createAPIToken(ctx, field)
 	if err != nil {
@@ -21448,6 +23668,399 @@ func (ec *executionContext) fieldContext_Mutation_anonymizeText(ctx context.Cont
 	if fc.Args, err = ec.field_Mutation_anonymizeText_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _OllamaProviderSettings_active(ctx context.Context, field graphql.CollectedField, obj *model.OllamaProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_OllamaProviderSettings_active(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Active, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_OllamaProviderSettings_active(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OllamaProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _OllamaProviderSettings_error(ctx context.Context, field graphql.CollectedField, obj *model.OllamaProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_OllamaProviderSettings_error(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Error, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_OllamaProviderSettings_error(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OllamaProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _OllamaProviderSettings_serverUrl(ctx context.Context, field graphql.CollectedField, obj *model.OllamaProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_OllamaProviderSettings_serverUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ServerURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_OllamaProviderSettings_serverUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OllamaProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _OllamaProviderSettings_apiKeySet(ctx context.Context, field graphql.CollectedField, obj *model.OllamaProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_OllamaProviderSettings_apiKeySet(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.APIKeySet, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_OllamaProviderSettings_apiKeySet(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OllamaProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _OllamaProviderSettings_model(ctx context.Context, field graphql.CollectedField, obj *model.OllamaProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_OllamaProviderSettings_model(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Model, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_OllamaProviderSettings_model(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OllamaProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _OllamaProviderSettings_configPath(ctx context.Context, field graphql.CollectedField, obj *model.OllamaProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_OllamaProviderSettings_configPath(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ConfigPath, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_OllamaProviderSettings_configPath(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OllamaProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _OllamaProviderSettings_pullModelsEnabled(ctx context.Context, field graphql.CollectedField, obj *model.OllamaProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_OllamaProviderSettings_pullModelsEnabled(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PullModelsEnabled, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_OllamaProviderSettings_pullModelsEnabled(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OllamaProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _OllamaProviderSettings_pullModelsTimeout(ctx context.Context, field graphql.CollectedField, obj *model.OllamaProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_OllamaProviderSettings_pullModelsTimeout(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PullModelsTimeout, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_OllamaProviderSettings_pullModelsTimeout(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OllamaProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _OllamaProviderSettings_loadModelsEnabled(ctx context.Context, field graphql.CollectedField, obj *model.OllamaProviderSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_OllamaProviderSettings_loadModelsEnabled(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LoadModelsEnabled, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_OllamaProviderSettings_loadModelsEnabled(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OllamaProviderSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
 	}
 	return fc, nil
 }
@@ -26575,6 +29188,126 @@ func (ec *executionContext) fieldContext_Query_settingsExecution(_ context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_settingsLLMProviders(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_settingsLLMProviders(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().SettingsLLMProviders(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.LLMProviderSettings)
+	fc.Result = res
+	return ec.marshalNLLMProviderSettings2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐLLMProviderSettings(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_settingsLLMProviders(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "openai":
+				return ec.fieldContext_LLMProviderSettings_openai(ctx, field)
+			case "anthropic":
+				return ec.fieldContext_LLMProviderSettings_anthropic(ctx, field)
+			case "gemini":
+				return ec.fieldContext_LLMProviderSettings_gemini(ctx, field)
+			case "bedrock":
+				return ec.fieldContext_LLMProviderSettings_bedrock(ctx, field)
+			case "ollama":
+				return ec.fieldContext_LLMProviderSettings_ollama(ctx, field)
+			case "custom":
+				return ec.fieldContext_LLMProviderSettings_custom(ctx, field)
+			case "deepseek":
+				return ec.fieldContext_LLMProviderSettings_deepseek(ctx, field)
+			case "glm":
+				return ec.fieldContext_LLMProviderSettings_glm(ctx, field)
+			case "kimi":
+				return ec.fieldContext_LLMProviderSettings_kimi(ctx, field)
+			case "qwen":
+				return ec.fieldContext_LLMProviderSettings_qwen(ctx, field)
+			case "minimax":
+				return ec.fieldContext_LLMProviderSettings_minimax(ctx, field)
+			case "configPaths":
+				return ec.fieldContext_LLMProviderSettings_configPaths(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LLMProviderSettings", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_settingsEnvFile(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_settingsEnvFile(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().SettingsEnvFile(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.SettingsEnvFile)
+	fc.Result = res
+	return ec.marshalNSettingsEnvFile2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐSettingsEnvFile(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_settingsEnvFile(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "path":
+				return ec.fieldContext_SettingsEnvFile_path(ctx, field)
+			case "writable":
+				return ec.fieldContext_SettingsEnvFile_writable(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type SettingsEnvFile", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_apiToken(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_apiToken(ctx, field)
 	if err != nil {
@@ -29441,6 +32174,94 @@ func (ec *executionContext) _Settings_assistantUseAgents(ctx context.Context, fi
 func (ec *executionContext) fieldContext_Settings_assistantUseAgents(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Settings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SettingsEnvFile_path(ctx context.Context, field graphql.CollectedField, obj *model.SettingsEnvFile) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SettingsEnvFile_path(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Path, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SettingsEnvFile_path(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SettingsEnvFile",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SettingsEnvFile_writable(ctx context.Context, field graphql.CollectedField, obj *model.SettingsEnvFile) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SettingsEnvFile_writable(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Writable, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SettingsEnvFile_writable(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SettingsEnvFile",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -39328,6 +42149,75 @@ func (ec *executionContext) unmarshalInputAgentsConfigInput(ctx context.Context,
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputBedrockProviderSettingsInput(ctx context.Context, obj interface{}) (model.BedrockProviderSettingsInput, error) {
+	var it model.BedrockProviderSettingsInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"region", "defaultAuth", "bearerToken", "accessKeyId", "secretAccessKey", "sessionToken", "serverUrl"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "region":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("region"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Region = data
+		case "defaultAuth":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("defaultAuth"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DefaultAuth = data
+		case "bearerToken":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("bearerToken"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.BearerToken = data
+		case "accessKeyId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("accessKeyId"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AccessKeyID = data
+		case "secretAccessKey":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("secretAccessKey"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SecretAccessKey = data
+		case "sessionToken":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sessionToken"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SessionToken = data
+		case "serverUrl":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("serverUrl"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ServerURL = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateAPITokenInput(ctx context.Context, obj interface{}) (model.CreateAPITokenInput, error) {
 	var it model.CreateAPITokenInput
 	asMap := map[string]interface{}{}
@@ -39465,6 +42355,75 @@ func (ec *executionContext) unmarshalInputCreateKnowledgeDocumentInput(ctx conte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCustomProviderSettingsInput(ctx context.Context, obj interface{}) (model.CustomProviderSettingsInput, error) {
+	var it model.CustomProviderSettingsInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"serverUrl", "apiKey", "model", "configPath", "providerName", "legacyReasoning", "preserveReasoning"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "serverUrl":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("serverUrl"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ServerURL = data
+		case "apiKey":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("apiKey"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.APIKey = data
+		case "model":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("model"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Model = data
+		case "configPath":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("configPath"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ConfigPath = data
+		case "providerName":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("providerName"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ProviderName = data
+		case "legacyReasoning":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("legacyReasoning"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.LegacyReasoning = data
+		case "preserveReasoning":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("preserveReasoning"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PreserveReasoning = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputExecutionSettingsInput(ctx context.Context, obj interface{}) (model.ExecutionSettingsInput, error) {
 	var it model.ExecutionSettingsInput
 	asMap := map[string]interface{}{}
@@ -39596,6 +42555,144 @@ func (ec *executionContext) unmarshalInputKnowledgeFilter(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputLLMProviderKeySettingsInput(ctx context.Context, obj interface{}) (model.LLMProviderKeySettingsInput, error) {
+	var it model.LLMProviderKeySettingsInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"apiKey", "serverUrl", "providerName"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "apiKey":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("apiKey"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.APIKey = data
+		case "serverUrl":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("serverUrl"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ServerURL = data
+		case "providerName":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("providerName"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ProviderName = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputLLMProviderSettingsInput(ctx context.Context, obj interface{}) (model.LLMProviderSettingsInput, error) {
+	var it model.LLMProviderSettingsInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"openai", "anthropic", "gemini", "bedrock", "ollama", "custom", "deepseek", "glm", "kimi", "qwen", "minimax"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "openai":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("openai"))
+			data, err := ec.unmarshalOLLMProviderKeySettingsInput2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐLLMProviderKeySettingsInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Openai = data
+		case "anthropic":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("anthropic"))
+			data, err := ec.unmarshalOLLMProviderKeySettingsInput2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐLLMProviderKeySettingsInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Anthropic = data
+		case "gemini":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("gemini"))
+			data, err := ec.unmarshalOLLMProviderKeySettingsInput2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐLLMProviderKeySettingsInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Gemini = data
+		case "bedrock":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("bedrock"))
+			data, err := ec.unmarshalOBedrockProviderSettingsInput2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐBedrockProviderSettingsInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Bedrock = data
+		case "ollama":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ollama"))
+			data, err := ec.unmarshalOOllamaProviderSettingsInput2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐOllamaProviderSettingsInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Ollama = data
+		case "custom":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("custom"))
+			data, err := ec.unmarshalOCustomProviderSettingsInput2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐCustomProviderSettingsInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Custom = data
+		case "deepseek":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deepseek"))
+			data, err := ec.unmarshalOLLMProviderKeySettingsInput2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐLLMProviderKeySettingsInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Deepseek = data
+		case "glm":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("glm"))
+			data, err := ec.unmarshalOLLMProviderKeySettingsInput2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐLLMProviderKeySettingsInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Glm = data
+		case "kimi":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("kimi"))
+			data, err := ec.unmarshalOLLMProviderKeySettingsInput2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐLLMProviderKeySettingsInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Kimi = data
+		case "qwen":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("qwen"))
+			data, err := ec.unmarshalOLLMProviderKeySettingsInput2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐLLMProviderKeySettingsInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Qwen = data
+		case "minimax":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("minimax"))
+			data, err := ec.unmarshalOLLMProviderKeySettingsInput2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐLLMProviderKeySettingsInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Minimax = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputModelPriceInput(ctx context.Context, obj interface{}) (model.ModelPrice, error) {
 	var it model.ModelPrice
 	asMap := map[string]interface{}{}
@@ -39638,6 +42735,75 @@ func (ec *executionContext) unmarshalInputModelPriceInput(ctx context.Context, o
 				return it, err
 			}
 			it.CacheWrite = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputOllamaProviderSettingsInput(ctx context.Context, obj interface{}) (model.OllamaProviderSettingsInput, error) {
+	var it model.OllamaProviderSettingsInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"serverUrl", "apiKey", "model", "configPath", "pullModelsEnabled", "pullModelsTimeout", "loadModelsEnabled"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "serverUrl":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("serverUrl"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ServerURL = data
+		case "apiKey":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("apiKey"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.APIKey = data
+		case "model":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("model"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Model = data
+		case "configPath":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("configPath"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ConfigPath = data
+		case "pullModelsEnabled":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pullModelsEnabled"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PullModelsEnabled = data
+		case "pullModelsTimeout":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pullModelsTimeout"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PullModelsTimeout = data
+		case "loadModelsEnabled":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("loadModelsEnabled"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.LoadModelsEnabled = data
 		}
 	}
 
@@ -40848,6 +44014,158 @@ func (ec *executionContext) _AssistantLog(ctx context.Context, sel ast.Selection
 	return out
 }
 
+var bedrockProviderSettingsImplementors = []string{"BedrockProviderSettings"}
+
+func (ec *executionContext) _BedrockProviderSettings(ctx context.Context, sel ast.SelectionSet, obj *model.BedrockProviderSettings) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, bedrockProviderSettingsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("BedrockProviderSettings")
+		case "active":
+			out.Values[i] = ec._BedrockProviderSettings_active(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "error":
+			out.Values[i] = ec._BedrockProviderSettings_error(ctx, field, obj)
+		case "region":
+			out.Values[i] = ec._BedrockProviderSettings_region(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "defaultAuth":
+			out.Values[i] = ec._BedrockProviderSettings_defaultAuth(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "bearerTokenSet":
+			out.Values[i] = ec._BedrockProviderSettings_bearerTokenSet(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "accessKeyIdSet":
+			out.Values[i] = ec._BedrockProviderSettings_accessKeyIdSet(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "secretAccessKeySet":
+			out.Values[i] = ec._BedrockProviderSettings_secretAccessKeySet(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "sessionTokenSet":
+			out.Values[i] = ec._BedrockProviderSettings_sessionTokenSet(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "serverUrl":
+			out.Values[i] = ec._BedrockProviderSettings_serverUrl(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var customProviderSettingsImplementors = []string{"CustomProviderSettings"}
+
+func (ec *executionContext) _CustomProviderSettings(ctx context.Context, sel ast.SelectionSet, obj *model.CustomProviderSettings) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, customProviderSettingsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CustomProviderSettings")
+		case "active":
+			out.Values[i] = ec._CustomProviderSettings_active(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "error":
+			out.Values[i] = ec._CustomProviderSettings_error(ctx, field, obj)
+		case "serverUrl":
+			out.Values[i] = ec._CustomProviderSettings_serverUrl(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "apiKeySet":
+			out.Values[i] = ec._CustomProviderSettings_apiKeySet(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "model":
+			out.Values[i] = ec._CustomProviderSettings_model(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "configPath":
+			out.Values[i] = ec._CustomProviderSettings_configPath(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "providerName":
+			out.Values[i] = ec._CustomProviderSettings_providerName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "legacyReasoning":
+			out.Values[i] = ec._CustomProviderSettings_legacyReasoning(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "preserveReasoning":
+			out.Values[i] = ec._CustomProviderSettings_preserveReasoning(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var dailyFlowsStatsImplementors = []string{"DailyFlowsStats"}
 
 func (ec *executionContext) _DailyFlowsStats(ctx context.Context, sel ast.SelectionSet, obj *model.DailyFlowsStats) graphql.Marshaler {
@@ -41800,6 +45118,153 @@ func (ec *executionContext) _KnowledgeDocumentWithScore(ctx context.Context, sel
 	return out
 }
 
+var lLMProviderKeySettingsImplementors = []string{"LLMProviderKeySettings"}
+
+func (ec *executionContext) _LLMProviderKeySettings(ctx context.Context, sel ast.SelectionSet, obj *model.LLMProviderKeySettings) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, lLMProviderKeySettingsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("LLMProviderKeySettings")
+		case "active":
+			out.Values[i] = ec._LLMProviderKeySettings_active(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "error":
+			out.Values[i] = ec._LLMProviderKeySettings_error(ctx, field, obj)
+		case "apiKeySet":
+			out.Values[i] = ec._LLMProviderKeySettings_apiKeySet(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "serverUrl":
+			out.Values[i] = ec._LLMProviderKeySettings_serverUrl(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "providerName":
+			out.Values[i] = ec._LLMProviderKeySettings_providerName(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var lLMProviderSettingsImplementors = []string{"LLMProviderSettings"}
+
+func (ec *executionContext) _LLMProviderSettings(ctx context.Context, sel ast.SelectionSet, obj *model.LLMProviderSettings) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, lLMProviderSettingsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("LLMProviderSettings")
+		case "openai":
+			out.Values[i] = ec._LLMProviderSettings_openai(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "anthropic":
+			out.Values[i] = ec._LLMProviderSettings_anthropic(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "gemini":
+			out.Values[i] = ec._LLMProviderSettings_gemini(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "bedrock":
+			out.Values[i] = ec._LLMProviderSettings_bedrock(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "ollama":
+			out.Values[i] = ec._LLMProviderSettings_ollama(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "custom":
+			out.Values[i] = ec._LLMProviderSettings_custom(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deepseek":
+			out.Values[i] = ec._LLMProviderSettings_deepseek(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "glm":
+			out.Values[i] = ec._LLMProviderSettings_glm(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "kimi":
+			out.Values[i] = ec._LLMProviderSettings_kimi(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "qwen":
+			out.Values[i] = ec._LLMProviderSettings_qwen(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "minimax":
+			out.Values[i] = ec._LLMProviderSettings_minimax(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "configPaths":
+			out.Values[i] = ec._LLMProviderSettings_configPaths(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var messageLogImplementors = []string{"MessageLog"}
 
 func (ec *executionContext) _MessageLog(ctx context.Context, sel ast.SelectionSet, obj *model.MessageLog) graphql.Marshaler {
@@ -42291,6 +45756,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "updateLLMProviderSettings":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateLLMProviderSettings(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "createAPIToken":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createAPIToken(ctx, field)
@@ -42379,6 +45851,82 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_anonymizeText(ctx, field)
 			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var ollamaProviderSettingsImplementors = []string{"OllamaProviderSettings"}
+
+func (ec *executionContext) _OllamaProviderSettings(ctx context.Context, sel ast.SelectionSet, obj *model.OllamaProviderSettings) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, ollamaProviderSettingsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("OllamaProviderSettings")
+		case "active":
+			out.Values[i] = ec._OllamaProviderSettings_active(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "error":
+			out.Values[i] = ec._OllamaProviderSettings_error(ctx, field, obj)
+		case "serverUrl":
+			out.Values[i] = ec._OllamaProviderSettings_serverUrl(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "apiKeySet":
+			out.Values[i] = ec._OllamaProviderSettings_apiKeySet(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "model":
+			out.Values[i] = ec._OllamaProviderSettings_model(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "configPath":
+			out.Values[i] = ec._OllamaProviderSettings_configPath(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "pullModelsEnabled":
+			out.Values[i] = ec._OllamaProviderSettings_pullModelsEnabled(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "pullModelsTimeout":
+			out.Values[i] = ec._OllamaProviderSettings_pullModelsTimeout(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "loadModelsEnabled":
+			out.Values[i] = ec._OllamaProviderSettings_loadModelsEnabled(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -43749,6 +47297,50 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "settingsLLMProviders":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_settingsLLMProviders(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "settingsEnvFile":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_settingsEnvFile(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "apiToken":
 			field := field
 
@@ -44323,6 +47915,50 @@ func (ec *executionContext) _Settings(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "assistantUseAgents":
 			out.Values[i] = ec._Settings_assistantUseAgents(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var settingsEnvFileImplementors = []string{"SettingsEnvFile"}
+
+func (ec *executionContext) _SettingsEnvFile(ctx context.Context, sel ast.SelectionSet, obj *model.SettingsEnvFile) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, settingsEnvFileImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SettingsEnvFile")
+		case "path":
+			out.Values[i] = ec._SettingsEnvFile_path(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "writable":
+			out.Values[i] = ec._SettingsEnvFile_writable(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -46105,6 +49741,16 @@ func (ec *executionContext) marshalNAssistantLog2ᚖpentagiᚋpkgᚋgraphᚋmode
 	return ec._AssistantLog(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNBedrockProviderSettings2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐBedrockProviderSettings(ctx context.Context, sel ast.SelectionSet, v *model.BedrockProviderSettings) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._BedrockProviderSettings(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -46133,6 +49779,16 @@ func (ec *executionContext) unmarshalNCreateFlowTemplateInput2pentagiᚋpkgᚋgr
 func (ec *executionContext) unmarshalNCreateKnowledgeDocumentInput2pentagiᚋpkgᚋgraphᚋmodelᚐCreateKnowledgeDocumentInput(ctx context.Context, v interface{}) (model.CreateKnowledgeDocumentInput, error) {
 	res, err := ec.unmarshalInputCreateKnowledgeDocumentInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCustomProviderSettings2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐCustomProviderSettings(ctx context.Context, sel ast.SelectionSet, v *model.CustomProviderSettings) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CustomProviderSettings(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNDailyFlowsStats2ᚕᚖpentagiᚋpkgᚋgraphᚋmodelᚐDailyFlowsStatsᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.DailyFlowsStats) graphql.Marshaler {
@@ -46845,6 +50501,35 @@ func (ec *executionContext) marshalNKnowledgeGuideType2pentagiᚋpkgᚋgraphᚋm
 	return v
 }
 
+func (ec *executionContext) marshalNLLMProviderKeySettings2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐLLMProviderKeySettings(ctx context.Context, sel ast.SelectionSet, v *model.LLMProviderKeySettings) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._LLMProviderKeySettings(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNLLMProviderSettings2pentagiᚋpkgᚋgraphᚋmodelᚐLLMProviderSettings(ctx context.Context, sel ast.SelectionSet, v model.LLMProviderSettings) graphql.Marshaler {
+	return ec._LLMProviderSettings(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNLLMProviderSettings2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐLLMProviderSettings(ctx context.Context, sel ast.SelectionSet, v *model.LLMProviderSettings) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._LLMProviderSettings(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNLLMProviderSettingsInput2pentagiᚋpkgᚋgraphᚋmodelᚐLLMProviderSettingsInput(ctx context.Context, v interface{}) (model.LLMProviderSettingsInput, error) {
+	res, err := ec.unmarshalInputLLMProviderSettingsInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalNMessageLog2pentagiᚋpkgᚋgraphᚋmodelᚐMessageLog(ctx context.Context, sel ast.SelectionSet, v model.MessageLog) graphql.Marshaler {
 	return ec._MessageLog(ctx, sel, &v)
 }
@@ -47029,6 +50714,16 @@ func (ec *executionContext) marshalNModelUsageStats2ᚖpentagiᚋpkgᚋgraphᚋm
 		return graphql.Null
 	}
 	return ec._ModelUsageStats(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNOllamaProviderSettings2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐOllamaProviderSettings(ctx context.Context, sel ast.SelectionSet, v *model.OllamaProviderSettings) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._OllamaProviderSettings(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNPromptType2pentagiᚋpkgᚋgraphᚋmodelᚐPromptType(ctx context.Context, v interface{}) (model.PromptType, error) {
@@ -47338,6 +51033,20 @@ func (ec *executionContext) marshalNSettings2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐ
 		return graphql.Null
 	}
 	return ec._Settings(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNSettingsEnvFile2pentagiᚋpkgᚋgraphᚋmodelᚐSettingsEnvFile(ctx context.Context, sel ast.SelectionSet, v model.SettingsEnvFile) graphql.Marshaler {
+	return ec._SettingsEnvFile(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNSettingsEnvFile2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐSettingsEnvFile(ctx context.Context, sel ast.SelectionSet, v *model.SettingsEnvFile) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._SettingsEnvFile(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNStatusType2pentagiᚋpkgᚋgraphᚋmodelᚐStatusType(ctx context.Context, v interface{}) (model.StatusType, error) {
@@ -48250,6 +51959,14 @@ func (ec *executionContext) marshalOAssistantLog2ᚕᚖpentagiᚋpkgᚋgraphᚋm
 	return ret
 }
 
+func (ec *executionContext) unmarshalOBedrockProviderSettingsInput2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐBedrockProviderSettingsInput(ctx context.Context, v interface{}) (*model.BedrockProviderSettingsInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputBedrockProviderSettingsInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -48274,6 +51991,14 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	}
 	res := graphql.MarshalBoolean(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOCustomProviderSettingsInput2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐCustomProviderSettingsInput(ctx context.Context, v interface{}) (*model.CustomProviderSettingsInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputCustomProviderSettingsInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v interface{}) (*float64, error) {
@@ -48673,6 +52398,14 @@ func (ec *executionContext) marshalOKnowledgeGuideType2ᚖpentagiᚋpkgᚋgraph�
 	return v
 }
 
+func (ec *executionContext) unmarshalOLLMProviderKeySettingsInput2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐLLMProviderKeySettingsInput(ctx context.Context, v interface{}) (*model.LLMProviderKeySettingsInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputLLMProviderKeySettingsInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOMap2map(ctx context.Context, v interface{}) (map[string]interface{}, error) {
 	if v == nil {
 		return nil, nil
@@ -48819,6 +52552,14 @@ func (ec *executionContext) marshalOModelReasoningMode2ᚖpentagiᚋpkgᚋgraph�
 		return graphql.Null
 	}
 	return v
+}
+
+func (ec *executionContext) unmarshalOOllamaProviderSettingsInput2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐOllamaProviderSettingsInput(ctx context.Context, v interface{}) (*model.OllamaProviderSettingsInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputOllamaProviderSettingsInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOPromptValidationErrorType2ᚖpentagiᚋpkgᚋgraphᚋmodelᚐPromptValidationErrorType(ctx context.Context, v interface{}) (*model.PromptValidationErrorType, error) {

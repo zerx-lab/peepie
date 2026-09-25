@@ -22,6 +22,13 @@ type Config struct {
 	DataDir string `env:"DATA_DIR" envDefault:"./data"`
 	AskUser bool   `env:"ASK_USER" envDefault:"false"`
 
+	// SettingsEnvFile is the .env file that runtime settings changed in the Web
+	// UI (Settings -> System) are mirrored into, and re-read from periodically so
+	// edits made by the installer TUI or by hand are hot-reloaded. The file wins
+	// over values stored in the system_settings table. Missing file: settings
+	// are only persisted in the database. See pkg/config/envfile.go.
+	SettingsEnvFile string `env:"SETTINGS_ENV_FILE" envDefault:".env"`
+
 	// TenantID namespaces every externally-visible artifact this instance creates
 	// (PostgreSQL schema, docker object names, Graphiti group ids, telemetry identity)
 	TenantID string `env:"TENANT_ID" envDefault:""`
@@ -287,11 +294,11 @@ type Config struct {
 	PgxPool *pgxpool.Pool `env:"-"`
 
 	// Overrides holds runtime configuration values applied through the Web UI
-	// (Settings) and persisted in the system_settings table. It is populated by
-	// main after the database queries are available, and mutated in place by
-	// GraphQL settings resolvers, so every holder of this *Config pointer sees
-	// hot-reloaded values without a restart. See pkg/config/overrides.go and
-	// pkg/config/registry.go for the field catalogue that reads through it.
+	// (Settings), persisted in the system_settings table and mirrored into the
+	// SettingsEnvFile. It is populated by main after the database queries are
+	// available (see ReloadOverrides), and mutated in place by GraphQL settings
+	// resolvers, so every holder of this *Config pointer sees hot-reloaded values
+	// without a restart. See pkg/config/settings.go for the field catalogue.
 	Overrides *Overrides `env:"-"`
 }
 

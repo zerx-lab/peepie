@@ -123,6 +123,11 @@ type ProviderController interface {
 
 	SeedDefaultProviders(ctx context.Context, userID int64) error
 
+	// ApplyLLMProviderSettings validates and publishes a new llm_providers
+	// settings snapshot; see state.go.
+	ApplyLLMProviderSettings(settings map[string]string, persist func() error) error
+	DefaultProviderStatus(prvtype provider.ProviderType) (bool, error)
+
 	TestAgent(
 		ctx context.Context,
 		prvtype provider.ProviderType,
@@ -148,38 +153,10 @@ type providerController struct {
 	summarizerAgent     csum.Summarizer
 	summarizerAssistant csum.Summarizer
 
-	defaultConfigs provider.ProvidersConfig
-
-	// defaultConfigErrors records, per provider type, why buildDefaultConfigs
-	// tolerated a load failure (type disabled + unreadable custom config path).
-	// patchProviderConfig surfaces this instead of a bare "not found" so a later
-	// CreateProvider/UpdateProvider attempt on that type reports the real root
-	// cause (e.g. a bad BEDROCK_CONFIG_PATH) rather than an ambiguous message
-	// that reads the same as "this provider type does not exist at all".
-	defaultConfigErrors map[provider.ProviderType]error
-
-	provider.Providers
-}
-
-func buildDefaultConfigs(
-	cfg *config.Config,
-) (provider.ProvidersConfig, map[provider.ProviderType]error, error) {
-	defaultConfigs := make(provider.ProvidersConfig)
-	skipReasons := make(map[provider.ProviderType]error)
-	for _, e := range providerRegistry {
-		config, err := e.NewConfig(cfg)
-		if err != nil {
-			// A returned error here aborts startup; tolerate it for disabled providers.
-			if !e.Enabled(cfg) {
-				logrus.WithError(err).Warnf("skipping config for disabled %s provider", e.Type)
-				skipReasons[e.Type] = err
-				continue
-			}
-			return nil, nil, fmt.Errorf("failed to create %s provider config: %w", e.Type, err)
-		}
-		defaultConfigs[e.Type] = config
-	}
-	return defaultConfigs, skipReasons, nil
+	// state holds the built-in providers built from the live llm_providers
+	// settings; reloadMu serializes its rebuilds (see state.go).
+	state    atomic.Pointer[providerState]
+	reloadMu sync.Mutex
 }
 
 func NewProviderController(
@@ -189,31 +166,6 @@ func NewProviderController(
 ) (ProviderController, error) {
 	if cfg == nil {
 		return nil, fmt.Errorf("config is required")
-	}
-
-	embedder, err := embeddings.New(cfg)
-	if err != nil {
-		logrus.WithError(err).Errorf("failed to create embedder '%s'", cfg.EmbeddingProvider)
-	}
-
-	providers := make(provider.Providers)
-
-	defaultConfigs, defaultConfigErrors, err := buildDefaultConfigs(cfg)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, e := range providerRegistry {
-		if !e.Enabled(cfg) {
-			continue
-		}
-
-		p, err := e.New(cfg, e.Name, defaultConfigs[e.Type])
-		if err != nil {
-			return nil, fmt.Errorf("failed to create %s provider: %w", e.Type, err)
-		}
-
-		providers[e.Name] = p
 	}
 
 	summarizerAgent := csum.NewSummarizer(csum.SummarizerConfig{
@@ -252,19 +204,18 @@ func NewProviderController(
 		db:             db,
 		cfg:            cfg,
 		docker:         docker,
-		embedder:       embedder,
 		graphitiClient: graphitiClient,
 
 		startCallNumber: newAtomicInt64(0), // 0 means to make it random
 
 		summarizerAgent:     summarizerAgent,
 		summarizerAssistant: summarizerAssistant,
-
-		defaultConfigs:      defaultConfigs,
-		defaultConfigErrors: defaultConfigErrors,
-
-		Providers: providers,
 	}
+	pc.embedder = liveEmbedder{pc: pc}
+	// Build eagerly so configuration problems are logged at startup; a
+	// configured provider that fails to build is reported through
+	// DefaultProviderStatus instead of aborting the process.
+	pc.current()
 
 	// Seed configured system providers into the DB for all existing users so
 	// they are immediately available without any UI interaction. This runs on
@@ -592,11 +543,11 @@ func (pc *providerController) LoadAssistantProvider(
 }
 
 func (pc *providerController) DefaultProviders() provider.Providers {
-	return pc.Providers
+	return pc.current().providers
 }
 
 func (pc *providerController) DefaultProvidersConfig() provider.ProvidersConfig {
-	return pc.defaultConfigs
+	return pc.current().configs
 }
 
 func (pc *providerController) GetProvider(
@@ -617,18 +568,23 @@ func (pc *providerController) GetProvider(
 	}
 
 	// Fall back to built-in default providers
-	return pc.Providers.Get(prvname)
+	return pc.defaultProvider(pc.current(), prvname)
 }
 
 func (pc *providerController) GetProviders(
 	ctx context.Context,
 	userID int64,
 ) (provider.Providers, error) {
-	providersMap := make(provider.Providers, len(pc.Providers))
+	st := pc.current()
+	providersMap := make(provider.Providers, len(st.providers))
 
 	// Copy default providers
-	for prvname, prv := range pc.Providers {
-		providersMap[prvname] = prv
+	for prvname := range st.providers {
+		p, err := pc.defaultProvider(st, prvname)
+		if err != nil {
+			return nil, err
+		}
+		providersMap[prvname] = p
 	}
 
 	// Copy user providers
@@ -638,7 +594,7 @@ func (pc *providerController) GetProviders(
 	}
 
 	for _, prv := range providers {
-		p, err := pc.NewProvider(prv)
+		p, err := pc.newUserProvider(st, prv)
 		if err != nil {
 			// Any unbuildable saved provider (its type is disabled, or its stored
 			// config is stale/invalid) is skipped, not propagated — one bad row must
@@ -656,40 +612,76 @@ func (pc *providerController) GetProviders(
 }
 
 func (pc *providerController) NewProvider(prv database.Provider) (provider.Provider, error) {
-	if len(prv.Config) == 0 {
-		prv.Config = []byte(pconfig.EmptyProviderConfigRaw)
+	return pc.newUserProvider(pc.current(), prv)
+}
+
+// defaultProvider wraps the built-in provider prvname of st in a liveProvider.
+func (pc *providerController) defaultProvider(
+	st *providerState,
+	prvname provider.ProviderName,
+) (provider.Provider, error) {
+	prv, err := st.providers.Get(prvname)
+	if err != nil {
+		return nil, err
 	}
 
-	// Check if the provider type is available via check default one
+	return pc.newLiveProvider(st, prvname, prv.Type(), func(st *providerState) (provider.Provider, error) {
+		return st.providers.Get(prvname)
+	})
+}
+
+// newUserProvider wraps a user-defined provider row in a liveProvider, so it
+// is rebuilt with new credentials when the settings of its type change.
+func (pc *providerController) newUserProvider(st *providerState, prv database.Provider) (provider.Provider, error) {
+	rawConfig := prv.Config
+	if len(rawConfig) == 0 {
+		rawConfig = []byte(pconfig.EmptyProviderConfigRaw)
+	}
 	providerName := provider.ProviderName(prv.Name)
 	providerType := provider.ProviderType(prv.Type)
-	if !pc.ListTypes().Contains(providerType) {
-		return nil, fmt.Errorf("provider type '%s' is not available", prv.Type)
+
+	return pc.newLiveProvider(st, providerName, providerType, func(st *providerState) (provider.Provider, error) {
+		return buildUserProvider(st, providerName, providerType, rawConfig)
+	})
+}
+
+// buildUserProvider builds a user-defined provider from its stored agent
+// config and the credentials/endpoints of st.
+func buildUserProvider(
+	st *providerState,
+	prvname provider.ProviderName,
+	prvtype provider.ProviderType,
+	rawConfig []byte,
+) (provider.Provider, error) {
+	// Check if the provider type is available via check default one
+	if !st.providers.ListTypes().Contains(prvtype) {
+		return nil, fmt.Errorf("provider type '%s' is not available", prvtype)
 	}
 
-	e, ok := entryForType(providerType)
+	e, ok := entryForType(prvtype)
 	if !ok {
-		return nil, fmt.Errorf("unknown provider type: %s", prv.Type)
+		return nil, fmt.Errorf("unknown provider type: %s", prvtype)
 	}
 
-	config, err := e.BuildConfig(pc.cfg, prv.Config)
+	config, err := e.BuildConfig(st.cfg, rawConfig)
 	if err != nil {
-		return nil, fmt.Errorf("failed to build %s provider config: %w", providerType, err)
+		return nil, fmt.Errorf("failed to build %s provider config: %w", prvtype, err)
 	}
 
-	return e.New(pc.cfg, providerName, config)
+	return e.New(st.cfg, prvname, config)
 }
 
 func (pc *providerController) SeedDefaultProviders(ctx context.Context, userID int64) error {
-	if pc.cfg.BedrockConfig == "" {
+	st := pc.current()
+	if st.cfg.BedrockConfig == "" {
 		return nil
 	}
-	if !pc.cfg.BedrockDefaultAuth && pc.cfg.BedrockBearerToken == "" &&
-		(pc.cfg.BedrockAccessKey == "" || pc.cfg.BedrockSecretKey == "") {
+	if !st.cfg.BedrockDefaultAuth && st.cfg.BedrockBearerToken == "" &&
+		(st.cfg.BedrockAccessKey == "" || st.cfg.BedrockSecretKey == "") {
 		return nil
 	}
 
-	bedrockCfg, ok := pc.defaultConfigs[provider.ProviderBedrock]
+	bedrockCfg, ok := st.configs[provider.ProviderBedrock]
 	if !ok {
 		return nil
 	}
@@ -986,15 +978,12 @@ func (pc *providerController) patchProviderConfig(
 	prvtype provider.ProviderType,
 	config *pconfig.ProviderConfig,
 ) (*pconfig.ProviderConfig, error) {
-	var (
-		defaultCfg *pconfig.ProviderConfig
-		ok         bool
-	)
-
-	if defaultCfg, ok = pc.defaultConfigs[prvtype]; !ok {
-		if reason, hasReason := pc.defaultConfigErrors[prvtype]; hasReason {
+	st := pc.current()
+	defaultCfg, ok := st.configs[prvtype]
+	if !ok {
+		if reason, hasReason := st.configErrors[prvtype]; hasReason {
 			return nil, fmt.Errorf(
-				"provider type '%s' has no default config because it failed to load at startup: %w",
+				"provider type '%s' has no default config because it failed to load: %w",
 				prvtype.String(), reason,
 			)
 		}
@@ -1060,7 +1049,7 @@ func (pc *providerController) buildProviderFromConfig(
 		return nil, fmt.Errorf("unknown provider type: %s", prvtype)
 	}
 
-	return e.New(pc.cfg, prvname, config)
+	return e.New(pc.current().cfg, prvname, config)
 }
 
 func newAtomicInt64(seed int64) *atomic.Int64 {

@@ -121,7 +121,12 @@ func (o *Overrides) GetInt(category, key string, fallback int) int {
 
 // Snapshot returns a copy of every key/value currently overridden for a
 // category, e.g. for building a GraphQL response that must show live values.
+// Like Get, it is safe to call on a nil *Overrides.
 func (o *Overrides) Snapshot(category string) map[string]string {
+	if o == nil {
+		return map[string]string{}
+	}
+
 	o.mu.RLock()
 	defer o.mu.RUnlock()
 

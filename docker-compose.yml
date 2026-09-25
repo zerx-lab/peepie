@@ -38,6 +38,9 @@ services:
       - DEBUG=${DEBUG:-false}
       - DATA_DIR=${DATA_DIR:-}
       - DOCKER_GID=998
+      # Web UI (Settings -> System) mirrors runtime settings into the host .env
+      # mounted below and hot-reloads edits made to it (installer TUI / by hand).
+      - SETTINGS_ENV_FILE=/opt/pentagi/conf/.env
       - CORS_ORIGINS=${CORS_ORIGINS:-}
       - COOKIE_SIGNING_SALT=${COOKIE_SIGNING_SALT:-}
       - INSTALLATION_ID=${INSTALLATION_ID:-}
@@ -207,6 +210,7 @@ services:
       - ${PENTAGI_LLM_SERVER_CONFIG_PATH:-./example.custom.provider.yml}:/opt/pentagi/conf/custom.provider.yml
       - ${PENTAGI_OLLAMA_SERVER_CONFIG_PATH:-./example.ollama.provider.yml}:/opt/pentagi/conf/ollama.provider.yml
       - ${PENTAGI_BEDROCK_CONFIG_PATH:-./example.bedrock.provider.yml}:/opt/pentagi/conf/bedrock.provider.yml
+      - ./.env:/opt/pentagi/conf/.env
       - ${PENTAGI_DOCKER_CERT_PATH:-./docker-ssl}:/opt/pentagi/docker/ssl
     user: root:root # while using docker.sock
     networks:

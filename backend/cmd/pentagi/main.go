@@ -165,29 +165,39 @@ func main() {
 
 	logrus.Info("Database schema updated successfully")
 
-	if overrides, err := database.LoadSystemSettingsOverrides(ctx, queries); err != nil {
-		logrus.WithError(err).Warn("Runtime settings load failed, falling back to environment defaults")
-	} else {
-		cfg.Overrides.Load(overrides)
+	// Runtime settings: system_settings rows layered under the settings .env
+	// file (see config.ReloadOverrides). A database failure at boot degrades
+	// to file + environment values rather than aborting startup.
+	var bootSettings map[string]map[string]string
+	if err := cfg.ReloadOverrides(func() (map[string]map[string]string, error) {
+		rows, err := database.LoadSystemSettingsOverrides(ctx, queries)
+		if err != nil {
+			logrus.WithError(err).Warn("Runtime settings load failed, falling back to environment defaults")
+			return nil, nil
+		}
+		bootSettings = rows
+		return rows, nil
+	}); err != nil {
+		logrus.WithError(err).Warn("Settings file unreadable, using database runtime settings only")
+		cfg.Overrides.Load(bootSettings)
 	}
 
-	// Refresh periodically so that in a multi-replica deployment every
-	// instance converges on settings changes made through another instance's
-	// Web UI within one interval, without requiring a restart.
+	// Refresh periodically so that settings edited in the settings .env file
+	// (installer TUI or by hand) and, in a multi-replica deployment, changes
+	// made through another instance's Web UI are picked up without a restart.
 	go func() {
-		ticker := time.NewTicker(15 * time.Second)
+		ticker := time.NewTicker(5 * time.Second)
 		defer ticker.Stop()
 		for {
 			select {
 			case <-ctx.Done():
 				return
 			case <-ticker.C:
-				overrides, err := database.LoadSystemSettingsOverrides(ctx, queries)
-				if err != nil {
+				if err := cfg.ReloadOverrides(func() (map[string]map[string]string, error) {
+					return database.LoadSystemSettingsOverrides(ctx, queries)
+				}); err != nil {
 					logrus.WithError(err).Debug("Runtime settings refresh failed")
-					continue
 				}
-				cfg.Overrides.Load(overrides)
 			}
 		}
 	}()

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/fs"
 	"path/filepath"
 	"testing"
 	"time"
@@ -44,16 +45,27 @@ func (s stubProvidersQuerier) GetUserProviders(context.Context, int64) ([]databa
 	return s.rows, nil
 }
 
+// newTestController returns a controller whose built-in providers are the
+// given stubs, without building anything from cfg.
+func newTestController(cfg *config.Config, db database.Querier, defaults provider.Providers) *providerController {
+	pc := &providerController{cfg: cfg, db: db}
+	pc.state.Store(&providerState{
+		cfg:          cfg,
+		configs:      provider.ProvidersConfig{},
+		configErrors: map[provider.ProviderType]error{},
+		buildErrors:  map[provider.ProviderType]error{},
+		providers:    defaults,
+		versions:     map[provider.ProviderType]uint64{},
+	})
+	return pc
+}
+
 func TestGetProviders_SkipsUserProviderOfDisabledType(t *testing.T) {
-	pc := &providerController{
-		cfg: &config.Config{},
-		db: stubProvidersQuerier{rows: []database.Provider{
-			{Name: "stale-minimax", Type: "minimax"}, // not in ListTypes() below
-		}},
-		Providers: provider.Providers{
-			"openai-default": stubTypedProvider{ptype: provider.ProviderOpenAI},
-		},
-	}
+	pc := newTestController(&config.Config{}, stubProvidersQuerier{rows: []database.Provider{
+		{Name: "stale-minimax", Type: "minimax"}, // not in ListTypes() below
+	}}, provider.Providers{
+		"openai-default": stubTypedProvider{ptype: provider.ProviderOpenAI},
+	})
 
 	got, err := pc.GetProviders(context.Background(), 1)
 
@@ -63,18 +75,14 @@ func TestGetProviders_SkipsUserProviderOfDisabledType(t *testing.T) {
 }
 
 func TestGetProviders_StaleUserRowSpansValidSibling(t *testing.T) {
-	pc := &providerController{
-		cfg: &config.Config{},
-		db: stubProvidersQuerier{rows: []database.Provider{
-			// ollama.New builds with no API key and makes no network call (pull/load
-			// off under the empty config), so this row clears the real NewProvider.
-			{Name: "ollama-user", Type: "ollama"},
-			{Name: "stale-minimax", Type: "minimax"}, // type absent from ListTypes()
-		}},
-		Providers: provider.Providers{
-			"ollama-default": stubTypedProvider{ptype: provider.ProviderOllama},
-		},
-	}
+	pc := newTestController(&config.Config{}, stubProvidersQuerier{rows: []database.Provider{
+		// ollama.New builds with no API key and makes no network call (pull/load
+		// off under the empty config), so this row clears the real NewProvider.
+		{Name: "ollama-user", Type: "ollama"},
+		{Name: "stale-minimax", Type: "minimax"}, // type absent from ListTypes()
+	}}, provider.Providers{
+		"ollama-default": stubTypedProvider{ptype: provider.ProviderOllama},
+	})
 
 	got, err := pc.GetProviders(context.Background(), 1)
 
@@ -83,52 +91,52 @@ func TestGetProviders_StaleUserRowSpansValidSibling(t *testing.T) {
 	assert.NotContains(t, got, provider.ProviderName("stale-minimax"), "the unbuildable sibling is skipped")
 }
 
-func TestBuildDefaultConfigs_DisabledProviderBadPathIsNotFatal(t *testing.T) {
+func TestBuildProviderState_DisabledProviderBadPathIsNotFatal(t *testing.T) {
 	cfg := &config.Config{
 		BedrockConfig: filepath.Join(t.TempDir(), "missing.yml"),
 	}
 
-	configs, skipReasons, err := buildDefaultConfigs(cfg)
+	st := buildProviderState(cfg, nil, nil)
 
-	require.NoError(t, err)
-	_, hasBedrock := configs[provider.ProviderBedrock]
+	_, hasBedrock := st.configs[provider.ProviderBedrock]
 	assert.False(t, hasBedrock, "disabled provider with an unreadable config path is skipped")
-	assert.Error(t, skipReasons[provider.ProviderBedrock], "the skip reason must be recorded, not just swallowed")
-	_, hasOpenAI := configs[provider.ProviderOpenAI]
+	assert.Error(t, st.configErrors[provider.ProviderBedrock], "the skip reason must be recorded, not just swallowed")
+	assert.NoError(t, st.buildErrors[provider.ProviderBedrock], "a disabled provider is not a build failure")
+	_, hasOpenAI := st.configs[provider.ProviderOpenAI]
 	assert.True(t, hasOpenAI, "providers with a readable (embedded) default config still load")
 }
 
-func TestBuildDefaultConfigs_EnabledProviderBadPathIsFatal(t *testing.T) {
+// A configured provider that cannot be built must not abort startup (the Web
+// UI that fixes it has to stay reachable); it is left out and reported, while
+// every other configured provider is still built.
+func TestBuildProviderState_EnabledProviderBadPathIsReportedNotFatal(t *testing.T) {
 	cfg := &config.Config{
 		BedrockConfig:      filepath.Join(t.TempDir(), "missing.yml"),
 		BedrockBearerToken: "token",
+		OpenAIKey:          "sk-test",
+		OpenAIServerURL:    "http://127.0.0.1:1/v1",
 	}
 
-	_, _, err := buildDefaultConfigs(cfg)
+	st := buildProviderState(cfg, nil, nil)
 
-	require.Error(t, err)
+	require.Error(t, st.buildErrors[provider.ProviderBedrock])
+	assert.NotContains(t, st.providers, provider.DefaultProviderNameBedrock)
+	assert.Contains(t, st.providers, provider.DefaultProviderNameOpenAI)
 }
 
-// A provider type whose default config failed to load at startup (e.g. an
-// unreadable BEDROCK_CONFIG_PATH while Bedrock is otherwise disabled) must
-// report that specific cause from patchProviderConfig, not the generic "not
-// found" message that reads identically to "this type does not exist".
+// A provider type whose default config failed to load (e.g. an unreadable
+// BEDROCK_CONFIG_PATH while Bedrock is otherwise disabled) must report that
+// specific cause from patchProviderConfig, not the generic "not found".
 func TestPatchProviderConfig_SurfacesSkipReasonInsteadOfAmbiguousNotFound(t *testing.T) {
 	cfg := &config.Config{
 		BedrockConfig: filepath.Join(t.TempDir(), "missing.yml"),
 	}
-	configs, skipReasons, err := buildDefaultConfigs(cfg)
-	require.NoError(t, err)
+	pc := &providerController{cfg: cfg}
+	pc.state.Store(buildProviderState(cfg, nil, nil))
 
-	pc := &providerController{
-		cfg:                 cfg,
-		defaultConfigs:      configs,
-		defaultConfigErrors: skipReasons,
-	}
-
-	_, err = pc.patchProviderConfig(provider.ProviderBedrock, nil)
+	_, err := pc.patchProviderConfig(provider.ProviderBedrock, nil)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "failed to load at startup", "must surface the real cause, not just 'not found'")
+	assert.ErrorIs(t, err, fs.ErrNotExist, "must surface the real cause, not just 'not found'")
 }
 
 func TestOpenAICompatProvidersDoNotUseAdaptiveThinking(t *testing.T) {

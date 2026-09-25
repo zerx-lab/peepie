@@ -348,6 +348,50 @@ VAR2=value2`
 	os.RemoveAll(backupDir)
 }
 
+// The backend mirrors Web UI settings into the same .env while the installer
+// may have it loaded: saving must neither revert those edits nor replace the
+// file (a Docker single-file bind mount would keep the old inode).
+func TestEnvFileSaveKeepsExternalEditsAndInode(t *testing.T) {
+	tmpFile := createTempFile(t, "OPEN_AI_KEY=old\nVAR2=value2\n")
+	defer os.Remove(tmpFile)
+	defer os.RemoveAll(filepath.Join(filepath.Dir(tmpFile), ".bak"))
+
+	envFile, err := LoadEnvFile(tmpFile)
+	if err != nil {
+		t.Fatalf("Failed to load env file: %v", err)
+	}
+	before, err := os.Stat(tmpFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Web UI edit made after the installer loaded the file.
+	if err := os.WriteFile(tmpFile, []byte("OPEN_AI_KEY=from-web-ui\nVAR2=value2\nANTHROPIC_API_KEY=added\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	envFile.Set("VAR2", "from-tui")
+	if err := envFile.Save(tmpFile); err != nil {
+		t.Fatalf("Failed to save env file: %v", err)
+	}
+
+	saved, err := os.ReadFile(tmpFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want := "OPEN_AI_KEY=from-web-ui\nVAR2=from-tui\nANTHROPIC_API_KEY=added\n"; string(saved) != want {
+		t.Errorf("saved content = %q, want %q", string(saved), want)
+	}
+
+	after, err := os.Stat(tmpFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !os.SameFile(before, after) {
+		t.Error("Save must rewrite the file in place, not replace it")
+	}
+}
+
 func TestEnvFileSaveNewFile(t *testing.T) {
 	envFile := &envFile{
 		vars: map[string]*EnvVar{

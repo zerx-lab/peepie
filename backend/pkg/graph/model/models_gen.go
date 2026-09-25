@@ -142,6 +142,28 @@ type AssistantLog struct {
 	CreatedAt    time.Time      `json:"createdAt"`
 }
 
+type BedrockProviderSettings struct {
+	Active             bool    `json:"active"`
+	Error              *string `json:"error,omitempty"`
+	Region             string  `json:"region"`
+	DefaultAuth        bool    `json:"defaultAuth"`
+	BearerTokenSet     bool    `json:"bearerTokenSet"`
+	AccessKeyIDSet     bool    `json:"accessKeyIdSet"`
+	SecretAccessKeySet bool    `json:"secretAccessKeySet"`
+	SessionTokenSet    bool    `json:"sessionTokenSet"`
+	ServerURL          string  `json:"serverUrl"`
+}
+
+type BedrockProviderSettingsInput struct {
+	Region          string  `json:"region"`
+	DefaultAuth     bool    `json:"defaultAuth"`
+	BearerToken     *string `json:"bearerToken,omitempty"`
+	AccessKeyID     *string `json:"accessKeyId,omitempty"`
+	SecretAccessKey *string `json:"secretAccessKey,omitempty"`
+	SessionToken    *string `json:"sessionToken,omitempty"`
+	ServerURL       string  `json:"serverUrl"`
+}
+
 type CreateAPITokenInput struct {
 	Name *string `json:"name,omitempty"`
 	TTL  int     `json:"ttl"`
@@ -160,6 +182,28 @@ type CreateKnowledgeDocumentInput struct {
 	GuideType   *KnowledgeGuideType  `json:"guideType,omitempty"`
 	AnswerType  *KnowledgeAnswerType `json:"answerType,omitempty"`
 	CodeLang    *string              `json:"codeLang,omitempty"`
+}
+
+type CustomProviderSettings struct {
+	Active            bool    `json:"active"`
+	Error             *string `json:"error,omitempty"`
+	ServerURL         string  `json:"serverUrl"`
+	APIKeySet         bool    `json:"apiKeySet"`
+	Model             string  `json:"model"`
+	ConfigPath        string  `json:"configPath"`
+	ProviderName      string  `json:"providerName"`
+	LegacyReasoning   bool    `json:"legacyReasoning"`
+	PreserveReasoning bool    `json:"preserveReasoning"`
+}
+
+type CustomProviderSettingsInput struct {
+	ServerURL         string  `json:"serverUrl"`
+	APIKey            *string `json:"apiKey,omitempty"`
+	Model             string  `json:"model"`
+	ConfigPath        string  `json:"configPath"`
+	ProviderName      string  `json:"providerName"`
+	LegacyReasoning   bool    `json:"legacyReasoning"`
+	PreserveReasoning bool    `json:"preserveReasoning"`
 }
 
 type DailyFlowsStats struct {
@@ -317,6 +361,49 @@ type KnowledgeFilter struct {
 	Manual      *bool                 `json:"manual,omitempty"`
 }
 
+type LLMProviderKeySettings struct {
+	Active       bool    `json:"active"`
+	Error        *string `json:"error,omitempty"`
+	APIKeySet    bool    `json:"apiKeySet"`
+	ServerURL    string  `json:"serverUrl"`
+	ProviderName *string `json:"providerName,omitempty"`
+}
+
+type LLMProviderKeySettingsInput struct {
+	APIKey       *string `json:"apiKey,omitempty"`
+	ServerURL    string  `json:"serverUrl"`
+	ProviderName *string `json:"providerName,omitempty"`
+}
+
+type LLMProviderSettings struct {
+	Openai      *LLMProviderKeySettings  `json:"openai"`
+	Anthropic   *LLMProviderKeySettings  `json:"anthropic"`
+	Gemini      *LLMProviderKeySettings  `json:"gemini"`
+	Bedrock     *BedrockProviderSettings `json:"bedrock"`
+	Ollama      *OllamaProviderSettings  `json:"ollama"`
+	Custom      *CustomProviderSettings  `json:"custom"`
+	Deepseek    *LLMProviderKeySettings  `json:"deepseek"`
+	Glm         *LLMProviderKeySettings  `json:"glm"`
+	Kimi        *LLMProviderKeySettings  `json:"kimi"`
+	Qwen        *LLMProviderKeySettings  `json:"qwen"`
+	Minimax     *LLMProviderKeySettings  `json:"minimax"`
+	ConfigPaths []string                 `json:"configPaths"`
+}
+
+type LLMProviderSettingsInput struct {
+	Openai    *LLMProviderKeySettingsInput  `json:"openai,omitempty"`
+	Anthropic *LLMProviderKeySettingsInput  `json:"anthropic,omitempty"`
+	Gemini    *LLMProviderKeySettingsInput  `json:"gemini,omitempty"`
+	Bedrock   *BedrockProviderSettingsInput `json:"bedrock,omitempty"`
+	Ollama    *OllamaProviderSettingsInput  `json:"ollama,omitempty"`
+	Custom    *CustomProviderSettingsInput  `json:"custom,omitempty"`
+	Deepseek  *LLMProviderKeySettingsInput  `json:"deepseek,omitempty"`
+	Glm       *LLMProviderKeySettingsInput  `json:"glm,omitempty"`
+	Kimi      *LLMProviderKeySettingsInput  `json:"kimi,omitempty"`
+	Qwen      *LLMProviderKeySettingsInput  `json:"qwen,omitempty"`
+	Minimax   *LLMProviderKeySettingsInput  `json:"minimax,omitempty"`
+}
+
 type MessageLog struct {
 	ID           int64          `json:"id"`
 	Type         MessageLogType `json:"type"`
@@ -368,6 +455,28 @@ type ModelUsageStats struct {
 }
 
 type Mutation struct {
+}
+
+type OllamaProviderSettings struct {
+	Active            bool    `json:"active"`
+	Error             *string `json:"error,omitempty"`
+	ServerURL         string  `json:"serverUrl"`
+	APIKeySet         bool    `json:"apiKeySet"`
+	Model             string  `json:"model"`
+	ConfigPath        string  `json:"configPath"`
+	PullModelsEnabled bool    `json:"pullModelsEnabled"`
+	PullModelsTimeout int     `json:"pullModelsTimeout"`
+	LoadModelsEnabled bool    `json:"loadModelsEnabled"`
+}
+
+type OllamaProviderSettingsInput struct {
+	ServerURL         string  `json:"serverUrl"`
+	APIKey            *string `json:"apiKey,omitempty"`
+	Model             string  `json:"model"`
+	ConfigPath        string  `json:"configPath"`
+	PullModelsEnabled bool    `json:"pullModelsEnabled"`
+	PullModelsTimeout int     `json:"pullModelsTimeout"`
+	LoadModelsEnabled bool    `json:"loadModelsEnabled"`
 }
 
 type PromptValidationResult struct {
@@ -546,6 +655,11 @@ type Settings struct {
 	DockerInside       bool   `json:"dockerInside"`
 	IsDevelopMode      bool   `json:"isDevelopMode"`
 	AssistantUseAgents bool   `json:"assistantUseAgents"`
+}
+
+type SettingsEnvFile struct {
+	Path     string `json:"path"`
+	Writable bool   `json:"writable"`
 }
 
 type Subscription struct {

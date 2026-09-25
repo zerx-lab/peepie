@@ -111,6 +111,13 @@ func (e *envFile) Save(path string) error {
 	e.mx.Lock()
 	defer e.mx.Unlock()
 
+	// The backend (Web UI -> Settings -> System) writes runtime settings into
+	// this same file while the installer may be open; rebase onto the current
+	// disk content so saving here never reverts those edits.
+	if disk, err := os.ReadFile(path); err == nil && string(disk) != e.raw {
+		e.rebase(string(disk))
+	}
+
 	// check if there are any changes to the file to avoid unnecessary writes
 	curRaw := e.raw
 	e.patchRaw()
@@ -134,9 +141,16 @@ func (e *envFile) Save(path string) error {
 	if err == nil && info.IsDir() {
 		return fmt.Errorf("'%s' is a directory", path)
 	} else if err == nil {
+		// Copy rather than rename: the file is rewritten in place below so a
+		// Docker single-file bind mount of it (the pentagi container mounts
+		// .env to mirror Web UI settings) keeps pointing at the live file.
+		current, err := os.ReadFile(path)
+		if err != nil {
+			return fmt.Errorf("failed to read current file state: %w", err)
+		}
 		curTimeStr := time.Unix(time.Now().Unix(), 0).Format("20060102150405")
 		backupPath := filepath.Join(backupDir, fmt.Sprintf("%s.%s", filepath.Base(path), curTimeStr))
-		if err := os.Rename(path, backupPath); err != nil {
+		if err := os.WriteFile(backupPath, current, info.Mode().Perm()); err != nil {
 			return fmt.Errorf("failed to create backup file: %w", err)
 		}
 	}
@@ -150,6 +164,34 @@ func (e *envFile) Save(path string) error {
 	}
 
 	return nil
+}
+
+// rebase adopts disk as the new base content: variables with pending changes
+// keep their new value (re-anchored to their line on disk), every other
+// variable takes its value from disk, and variables only present on disk are
+// kept instead of being dropped as deleted.
+func (e *envFile) rebase(disk string) {
+	fresh := loadVars(disk)
+	for name, envVar := range e.vars {
+		diskVar, onDisk := fresh[name]
+		switch {
+		case envVar.IsChanged && onDisk:
+			envVar.Line = diskVar.Line
+		case envVar.IsChanged:
+			envVar.Line = -1
+		case onDisk:
+			envVar.Value, envVar.Line, envVar.IsComment = diskVar.Value, diskVar.Line, diskVar.IsComment
+			envVar.IsChanged = diskVar.IsChanged
+		default:
+			envVar.Value, envVar.Line = "", -1
+		}
+	}
+	for name, diskVar := range fresh {
+		if _, ok := e.vars[name]; !ok {
+			e.vars[name] = diskVar
+		}
+	}
+	e.raw = disk
 }
 
 func (e *envFile) Clone() EnvFile {

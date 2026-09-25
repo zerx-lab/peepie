@@ -1,9 +1,11 @@
 package config
 
 // Category names for runtime (hot-reloadable) settings stored in
-// system_settings and cached in Config.Overrides. Keep in sync with
-// frontend/src/pages/settings/settings-system.tsx and
-// backend/pkg/graph/schema.graphqls (SystemSettingsCategory-shaped types).
+// system_settings, mirrored into the settings .env file and cached in
+// Config.Overrides. Every (category, key) exposed through the Web UI must also
+// be listed in settingDefs (settings.go) so it maps to its environment
+// variable. Keep in sync with backend/pkg/graph/schema.graphqls and
+// frontend/src/pages/settings/settings-system.tsx.
 const (
 	CategorySearchEngines = "search_engines"
 	CategoryExecution     = "execution"
@@ -100,28 +102,35 @@ const (
 
 	KeyDeepSeekAPIKey    = "deepseek_api_key"
 	KeyDeepSeekServerURL = "deepseek_server_url"
+	KeyDeepSeekProvider  = "deepseek_provider"
 
 	KeyGLMAPIKey    = "glm_api_key"
 	KeyGLMServerURL = "glm_server_url"
+	KeyGLMProvider  = "glm_provider"
 
 	KeyKimiAPIKey    = "kimi_api_key"
 	KeyKimiServerURL = "kimi_server_url"
+	KeyKimiProvider  = "kimi_provider"
 
 	KeyQwenAPIKey    = "qwen_api_key"
 	KeyQwenServerURL = "qwen_server_url"
+	KeyQwenProvider  = "qwen_provider"
 
 	KeyMiniMaxAPIKey    = "minimax_api_key"
 	KeyMiniMaxServerURL = "minimax_server_url"
+	KeyMiniMaxProvider  = "minimax_provider"
 
 	KeyOllamaServerURL       = "ollama_server_url"
 	KeyOllamaServerAPIKey    = "ollama_server_api_key"
 	KeyOllamaServerModel     = "ollama_server_model"
+	KeyOllamaServerConfig    = "ollama_server_config_path"
 	KeyOllamaPullEnabled     = "ollama_server_pull_models_enabled"
 	KeyOllamaLoadEnabled     = "ollama_server_load_models_enabled"
 	KeyOllamaPullTimeout     = "ollama_server_pull_models_timeout"
 	KeyLLMServerURL          = "llm_server_url"
 	KeyLLMServerKey          = "llm_server_key"
 	KeyLLMServerModel        = "llm_server_model"
+	KeyLLMServerConfig       = "llm_server_config_path"
 	KeyLLMServerProvider     = "llm_server_provider"
 	KeyLLMServerLegacyReason = "llm_server_legacy_reasoning"
 	KeyLLMServerPreserveReas = "llm_server_preserve_reasoning"
@@ -130,24 +139,24 @@ const (
 // SecretKeys lists every key across all categories that must be masked when
 // echoed back to the frontend (never returned in plaintext once set).
 var SecretKeys = map[string]bool{
-	KeyGoogleAPIKey:         true,
-	KeyTraversaalAPIKey:     true,
-	KeyTavilyAPIKey:         true,
-	KeyFirecrawlAPIKey:      true,
-	KeyPerplexityAPIKey:     true,
-	KeyEmbeddingKey:         true,
-	KeyOpenAIKey:            true,
-	KeyAnthropicAPIKey:      true,
-	KeyGeminiAPIKey:         true,
-	KeyBedrockBearerToken:   true,
-	KeyBedrockAccessKey:     true,
-	KeyBedrockSecretKey:     true,
-	KeyBedrockSessionToken:  true,
-	KeyDeepSeekAPIKey:       true,
-	KeyGLMAPIKey:            true,
-	KeyKimiAPIKey:           true,
-	KeyQwenAPIKey:           true,
-	KeyMiniMaxAPIKey:        true,
-	KeyOllamaServerAPIKey:   true,
-	KeyLLMServerKey:         true,
+	KeyGoogleAPIKey:        true,
+	KeyTraversaalAPIKey:    true,
+	KeyTavilyAPIKey:        true,
+	KeyFirecrawlAPIKey:     true,
+	KeyPerplexityAPIKey:    true,
+	KeyEmbeddingKey:        true,
+	KeyOpenAIKey:           true,
+	KeyAnthropicAPIKey:     true,
+	KeyGeminiAPIKey:        true,
+	KeyBedrockBearerToken:  true,
+	KeyBedrockAccessKey:    true,
+	KeyBedrockSecretKey:    true,
+	KeyBedrockSessionToken: true,
+	KeyDeepSeekAPIKey:      true,
+	KeyGLMAPIKey:           true,
+	KeyKimiAPIKey:          true,
+	KeyQwenAPIKey:          true,
+	KeyMiniMaxAPIKey:       true,
+	KeyOllamaServerAPIKey:  true,
+	KeyLLMServerKey:        true,
 }

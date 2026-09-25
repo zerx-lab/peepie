@@ -128,24 +128,31 @@ The running PentAGI instance already exposes several settings areas in the web U
 - **Settings -> System**: Hot-reloadable runtime configuration — see below.
 - **Other UI-managed preferences**: Favorite flows are stored as user preferences, and theme selection is handled client-side from the main sidebar/profile controls.
 
-These web-console features do not replace the environment variables in this guide for provider credentials, endpoints, or external integrations that are still installer/env-managed (see below).
+These web-console features do not replace the environment variables in this guide for endpoints or external integrations that are still installer/env-managed (see below).
 
 #### Settings -> System (hot-reloadable, no restart)
 
-`Settings -> System` edits a subset of the fields below directly from the browser. A save persists a row per changed key to the `system_settings` table and immediately applies it in-process via `pkg/config.Config.Overrides` (`backend/pkg/config/overrides.go`); other replicas pick it up within 15s (`cmd/pentagi/main.go` periodic refresh). Nothing here requires `docker compose up` or a process restart, and the installer TUI is unaffected — it keeps writing `.env` unconditionally, which remains the fallback whenever no override row exists for a given key.
+`Settings -> System` edits a subset of the fields below directly from the browser, grouped into a category menu (LLM Providers, Search Engines, Execution) that also shows which providers/engines are configured. A save:
 
+1. writes the changed variables into the settings `.env` file (`SETTINGS_ENV_FILE`, default `.env` in the working directory; the Docker Compose stack mounts the host `./.env` at `/opt/pentagi/conf/.env`) — the same file the installer TUI edits, so both always show the same values;
+2. persists a row per changed key to the `system_settings` table;
+3. applies it in-process via `pkg/config.Config.Overrides` (`backend/pkg/config/overrides.go`).
+
+The backend re-reads the table and the file every 5s (`cmd/pentagi/main.go`), so edits made in the installer TUI or by hand, and changes made through another replica, are hot-reloaded as well. Precedence: settings file > `system_settings` > process environment. An empty assignment means the variable's default, exactly as at boot. If the file does not exist (e.g. an older compose file without the mount), changes are stored in the database only; the Web UI shows which case applies. The file is rewritten in place (never replaced), so a single-file bind mount keeps working — editors that save by renaming (e.g. some `vim` setups) break such a mount until the container is recreated.
+
+- **LLM Providers**: `OPEN_AI_*`, `ANTHROPIC_*`, `GEMINI_*`, `BEDROCK_*` (except `BEDROCK_CONFIG_PATH`), `OLLAMA_SERVER_*`, `LLM_SERVER_*`, `DEEPSEEK_*`, `GLM_*`, `KIMI_*`, `QWEN_*`, `MINIMAX_*`. A save first builds every provider it affects and is rejected (nothing written) if a configured provider cannot be built. Only providers whose settings changed are rebuilt; flows and assistants that are already running switch to the new credentials on their next LLM call, and the embedder is rebuilt when the OpenAI key/URL it falls back to changes. A configured provider that fails to build at startup no longer aborts the process: it is left out, logged, and its error is shown in the Web UI. `PENTAGI_OLLAMA_SERVER_CONFIG_PATH` / `PENTAGI_LLM_SERVER_CONFIG_PATH` (host files mounted by Docker Compose) still need the installer and a container recreate; in the Web UI pick a config file that already exists inside the container.
 - **Search Engines**: `DUCKDUCKGO_*`, `SPLOITUS_ENABLED`, `GOOGLE_*`, `TRAVERSAAL_API_KEY`, `TAVILY_API_KEY`, `FIRECRAWL_*`, `PERPLEXITY_*`, `SEARXNG_*`, `WEB_SEARCH_INTERNAL_*`.
 - **Execution**: `EXECUTION_MONITOR_*`, `MAX_GENERAL_AGENT_TOOL_CALLS`, `MAX_LIMITED_AGENT_TOOL_CALLS`, `AGENT_PLANNING_STEP_ENABLED`, `ASSISTANT_USE_AGENTS`.
 
-Read access requires the `settings.system.view` privilege and edits require `settings.system.edit` (Admin role by default; see the `20260924_120000_system_settings.sql` migration). Field-level key names and the DB-backed store live in `backend/pkg/config/keys.go` and `backend/pkg/config/overrides.go`.
+Read access requires the `settings.system.view` privilege and edits require `settings.system.edit` (Admin role by default; see the `20260924_120000_system_settings.sql` migration). The key catalogue (setting key ↔ environment variable) lives in `backend/pkg/config/settings.go`, the file sync in `backend/pkg/config/envfile.go`, and provider hot reload in `backend/pkg/providers/state.go`.
 
-Categories intentionally **not** included in this pass — LLM provider credentials, Embedder, OAuth, Observability (Langfuse/Graphiti/OTel), Docker sandbox runtime, and Server network settings — remain installer/env-managed. Some (LLM provider keys, Embedder) are architecturally hot-reloadable in principle but require rebuilding long-lived objects (the provider registry, summarizer, embedder client) that `pkg/providers.ProviderController` currently only constructs once at boot; others (OAuth, Server network, Observability container topology) genuinely cannot be changed without rebuilding the HTTP router or the docker-compose stack, matching the "Still Server-Managed" list below.
+Categories intentionally **not** included — Embedder, OAuth, Observability (Langfuse/Graphiti/OTel), Docker sandbox runtime, and Server network settings — remain installer/env-managed; some genuinely cannot be changed without rebuilding the HTTP router or the docker-compose stack, matching the "Still Server-Managed" list below.
 
 ### Still Server-Managed
 
 The environment variables documented below remain the source of truth for configuration that is not currently editable from the web console:
 
-- **LLM credentials and connection settings**: API keys, base URLs, auth modes, and provider-specific connection settings for OpenAI, Anthropic, Bedrock, Ollama, custom providers, and similar backends; config-path settings apply only where supported, such as `OLLAMA_SERVER_CONFIG_PATH`, `LLM_SERVER_CONFIG_PATH`, and `BEDROCK_CONFIG_PATH`.
+- **Provider config file mounts**: `BEDROCK_CONFIG_PATH` and the host-side `PENTAGI_*_CONFIG_PATH` volume sources.
 - **Embedding settings**: `EMBEDDING_*`.
 - **OAuth and server network settings**: OAuth client credentials, listen address/port, TLS, CORS, `PUBLIC_URL`.
 - **Third-party integrations**: Langfuse, Graphiti, and other external observability or knowledge services (these also gate docker-compose service topology via the installer TUI).
@@ -166,6 +173,7 @@ These settings control basic application behavior and are foundational for the s
 | Debug            | `DEBUG`                     | `false`                                                                      | Enables debug mode with additional logging                               |
 | DataDir          | `DATA_DIR`                  | `./data`                                                                     | Directory for storing persistent data                                    |
 | AskUser          | `ASK_USER`                  | `false`                                                                      | When enabled, requires explicit user confirmation for certain operations |
+| SettingsEnvFile  | `SETTINGS_ENV_FILE`         | `.env` (compose: `/opt/pentagi/conf/.env`)                                   | `.env` file that `Settings -> System` changes are written to and hot-reloaded from; missing file = database only. See [Settings -> System](#settings---system-hot-reloadable-no-restart) |
 | TenantID         | `TENANT_ID`                 | *(empty)*                                                                    | Namespaces every externally-visible artifact this instance creates so several PentAGI instances can share one host and one set of backing services. Empty = single-instance behavior, unchanged. See [Multi-Instance Deployment](#multi-instance-deployment-tenant_id). |
 | DockerPortsBase  | `DOCKER_PORTS_BASE`         | `0` (means `28000`)                                                          | First host port for per-flow sandbox port publishing; each instance owns `[base, base+2000)` |
 | InstallationID   | `INSTALLATION_ID`           | *(none)*                                                                     | Unique installation identifier for PentAGI Cloud API communication       |

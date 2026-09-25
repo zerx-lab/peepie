@@ -27,6 +27,9 @@ type registryEntry struct {
 	NewConfig   func(*config.Config) (*pconfig.ProviderConfig, error)
 	New         func(*config.Config, provider.ProviderName, *pconfig.ProviderConfig) (provider.Provider, error)
 	BuildConfig func(*config.Config, []byte) (*pconfig.ProviderConfig, error)
+	// Keys lists the llm_providers runtime settings (config.CategoryLLMProviders)
+	// the provider is built from; a change to any of them rebuilds it.
+	Keys []string
 }
 
 // ignoreConfig adapts a no-argument default-config loader to the registry signature.
@@ -51,6 +54,7 @@ var providerRegistry = []registryEntry{
 		NewConfig:   ignoreConfig(openai.DefaultProviderConfig),
 		New:         openai.New,
 		BuildConfig: fromData(openai.BuildProviderConfig),
+		Keys:        []string{config.KeyOpenAIKey, config.KeyOpenAIServerURL},
 	},
 	{
 		Type:        provider.ProviderAnthropic,
@@ -59,6 +63,7 @@ var providerRegistry = []registryEntry{
 		NewConfig:   ignoreConfig(anthropic.DefaultProviderConfig),
 		New:         anthropic.New,
 		BuildConfig: fromData(anthropic.BuildProviderConfig),
+		Keys:        []string{config.KeyAnthropicAPIKey, config.KeyAnthropicServerURL},
 	},
 	{
 		Type:        provider.ProviderGemini,
@@ -67,6 +72,7 @@ var providerRegistry = []registryEntry{
 		NewConfig:   ignoreConfig(gemini.DefaultProviderConfig),
 		New:         gemini.New,
 		BuildConfig: fromData(gemini.BuildProviderConfig),
+		Keys:        []string{config.KeyGeminiAPIKey, config.KeyGeminiServerURL},
 	},
 	{
 		Type: provider.ProviderBedrock,
@@ -79,6 +85,11 @@ var providerRegistry = []registryEntry{
 		NewConfig:   bedrock.DefaultProviderConfig,
 		New:         bedrock.New,
 		BuildConfig: fromData(bedrock.BuildProviderConfig),
+		Keys: []string{
+			config.KeyBedrockRegion, config.KeyBedrockDefaultAuth, config.KeyBedrockBearerToken,
+			config.KeyBedrockAccessKey, config.KeyBedrockSecretKey, config.KeyBedrockSessionToken,
+			config.KeyBedrockServerURL,
+		},
 	},
 	{
 		Type:        provider.ProviderOllama,
@@ -87,6 +98,11 @@ var providerRegistry = []registryEntry{
 		NewConfig:   ollama.DefaultProviderConfig,
 		New:         ollama.New,
 		BuildConfig: ollama.BuildProviderConfig,
+		Keys: []string{
+			config.KeyOllamaServerURL, config.KeyOllamaServerAPIKey, config.KeyOllamaServerModel,
+			config.KeyOllamaServerConfig, config.KeyOllamaPullEnabled, config.KeyOllamaLoadEnabled,
+			config.KeyOllamaPullTimeout,
+		},
 	},
 	{
 		Type: provider.ProviderCustom,
@@ -97,6 +113,10 @@ var providerRegistry = []registryEntry{
 		NewConfig:   custom.DefaultProviderConfig,
 		New:         custom.New,
 		BuildConfig: custom.BuildProviderConfig,
+		Keys: []string{
+			config.KeyLLMServerURL, config.KeyLLMServerKey, config.KeyLLMServerModel, config.KeyLLMServerConfig,
+			config.KeyLLMServerProvider, config.KeyLLMServerLegacyReason, config.KeyLLMServerPreserveReas,
+		},
 	},
 	{
 		Type:        provider.ProviderDeepSeek,
@@ -105,6 +125,7 @@ var providerRegistry = []registryEntry{
 		NewConfig:   ignoreConfig(deepseek.DefaultProviderConfig),
 		New:         deepseek.New,
 		BuildConfig: fromData(deepseek.BuildProviderConfig),
+		Keys:        []string{config.KeyDeepSeekAPIKey, config.KeyDeepSeekServerURL, config.KeyDeepSeekProvider},
 	},
 	{
 		Type:        provider.ProviderGLM,
@@ -113,6 +134,7 @@ var providerRegistry = []registryEntry{
 		NewConfig:   ignoreConfig(glm.DefaultProviderConfig),
 		New:         glm.New,
 		BuildConfig: fromData(glm.BuildProviderConfig),
+		Keys:        []string{config.KeyGLMAPIKey, config.KeyGLMServerURL, config.KeyGLMProvider},
 	},
 	{
 		Type:        provider.ProviderKimi,
@@ -121,6 +143,7 @@ var providerRegistry = []registryEntry{
 		NewConfig:   ignoreConfig(kimi.DefaultProviderConfig),
 		New:         kimi.New,
 		BuildConfig: fromData(kimi.BuildProviderConfig),
+		Keys:        []string{config.KeyKimiAPIKey, config.KeyKimiServerURL, config.KeyKimiProvider},
 	},
 	{
 		Type:        provider.ProviderQwen,
@@ -129,6 +152,7 @@ var providerRegistry = []registryEntry{
 		NewConfig:   ignoreConfig(qwen.DefaultProviderConfig),
 		New:         qwen.New,
 		BuildConfig: fromData(qwen.BuildProviderConfig),
+		Keys:        []string{config.KeyQwenAPIKey, config.KeyQwenServerURL, config.KeyQwenProvider},
 	},
 	{
 		Type:        provider.ProviderMiniMax,
@@ -137,6 +161,7 @@ var providerRegistry = []registryEntry{
 		NewConfig:   ignoreConfig(minimax.DefaultProviderConfig),
 		New:         minimax.New,
 		BuildConfig: fromData(minimax.BuildProviderConfig),
+		Keys:        []string{config.KeyMiniMaxAPIKey, config.KeyMiniMaxServerURL, config.KeyMiniMaxProvider},
 	},
 }
 

@@ -781,51 +781,35 @@ func (r *mutationResolver) UpdateSearchEngineSettings(ctx context.Context, input
 		return nil, err
 	}
 
-	cat := config.CategorySearchEngines
-	sets := []struct {
-		key   string
-		value string
-	}{
-		{config.KeyDuckDuckGoEnabled, strconv.FormatBool(input.DuckduckgoEnabled)},
-		{config.KeyDuckDuckGoRegion, input.DuckduckgoRegion},
-		{config.KeyDuckDuckGoSafeSearch, input.DuckduckgoSafesearch},
-		{config.KeyDuckDuckGoTimeRange, input.DuckduckgoTimeRange},
-		{config.KeySploitusEnabled, strconv.FormatBool(input.SploitusEnabled)},
-		{config.KeyGoogleCXKey, input.GoogleCxKey},
-		{config.KeyGoogleLRKey, input.GoogleLrKey},
-		{config.KeyFirecrawlAPIURL, input.FirecrawlAPIURL},
-		{config.KeyPerplexityModel, input.PerplexityModel},
-		{config.KeyPerplexityContext, input.PerplexityContextSize},
-		{config.KeySearxngURL, input.SearxngURL},
-		{config.KeySearxngCategories, input.SearxngCategories},
-		{config.KeySearxngLanguage, input.SearxngLanguage},
-		{config.KeySearxngSafeSearch, input.SearxngSafesearch},
-		{config.KeySearxngTimeRange, input.SearxngTimeRange},
-		{config.KeySearxngTimeout, strconv.Itoa(input.SearxngTimeout)},
-		{config.KeyWebSearchIntEnabled, strconv.FormatBool(input.WebSearchInternalEnabled)},
-		{config.KeyWebSearchIntMaxSites, strconv.Itoa(input.WebSearchInternalMaxSites)},
-		{config.KeyWebSearchIntMaxBytes, strconv.Itoa(input.WebSearchInternalMaxSiteBytes)},
+	values := map[string]string{
+		config.KeyDuckDuckGoEnabled:    strconv.FormatBool(input.DuckduckgoEnabled),
+		config.KeyDuckDuckGoRegion:     input.DuckduckgoRegion,
+		config.KeyDuckDuckGoSafeSearch: input.DuckduckgoSafesearch,
+		config.KeyDuckDuckGoTimeRange:  input.DuckduckgoTimeRange,
+		config.KeySploitusEnabled:      strconv.FormatBool(input.SploitusEnabled),
+		config.KeyGoogleCXKey:          input.GoogleCxKey,
+		config.KeyGoogleLRKey:          input.GoogleLrKey,
+		config.KeyFirecrawlAPIURL:      input.FirecrawlAPIURL,
+		config.KeyPerplexityModel:      input.PerplexityModel,
+		config.KeyPerplexityContext:    input.PerplexityContextSize,
+		config.KeySearxngURL:           input.SearxngURL,
+		config.KeySearxngCategories:    input.SearxngCategories,
+		config.KeySearxngLanguage:      input.SearxngLanguage,
+		config.KeySearxngSafeSearch:    input.SearxngSafesearch,
+		config.KeySearxngTimeRange:     input.SearxngTimeRange,
+		config.KeySearxngTimeout:       strconv.Itoa(input.SearxngTimeout),
+		config.KeyWebSearchIntEnabled:  strconv.FormatBool(input.WebSearchInternalEnabled),
+		config.KeyWebSearchIntMaxSites: strconv.Itoa(input.WebSearchInternalMaxSites),
+		config.KeyWebSearchIntMaxBytes: strconv.Itoa(input.WebSearchInternalMaxSiteBytes),
 	}
-	for _, s := range sets {
-		if err := applySetting(ctx, r.DB, r.Config, uid, cat, s.key, s.value, false); err != nil {
-			return nil, err
-		}
-	}
+	putSecret(values, config.KeyGoogleAPIKey, input.GoogleAPIKey)
+	putSecret(values, config.KeyTraversaalAPIKey, input.TraversaalAPIKey)
+	putSecret(values, config.KeyTavilyAPIKey, input.TavilyAPIKey)
+	putSecret(values, config.KeyFirecrawlAPIKey, input.FirecrawlAPIKey)
+	putSecret(values, config.KeyPerplexityAPIKey, input.PerplexityAPIKey)
 
-	secrets := []struct {
-		key   string
-		value *string
-	}{
-		{config.KeyGoogleAPIKey, input.GoogleAPIKey},
-		{config.KeyTraversaalAPIKey, input.TraversaalAPIKey},
-		{config.KeyTavilyAPIKey, input.TavilyAPIKey},
-		{config.KeyFirecrawlAPIKey, input.FirecrawlAPIKey},
-		{config.KeyPerplexityAPIKey, input.PerplexityAPIKey},
-	}
-	for _, s := range secrets {
-		if err := applySecretSetting(ctx, r.DB, r.Config, uid, cat, s.key, s.value); err != nil {
-			return nil, err
-		}
+	if err := applySettings(ctx, r.DB, r.Config, uid, config.CategorySearchEngines, values); err != nil {
+		return nil, err
 	}
 
 	return r.Query().SettingsSearchEngines(ctx)
@@ -838,26 +822,54 @@ func (r *mutationResolver) UpdateExecutionSettings(ctx context.Context, input mo
 		return nil, err
 	}
 
-	cat := config.CategoryExecution
-	sets := []struct {
-		key   string
-		value string
-	}{
-		{config.KeyExecutionMonitorEnabled, strconv.FormatBool(input.ExecutionMonitorEnabled)},
-		{config.KeyExecutionSameToolLimit, strconv.Itoa(input.ExecutionMonitorSameToolLimit)},
-		{config.KeyExecutionTotalToolLimit, strconv.Itoa(input.ExecutionMonitorTotalToolLimit)},
-		{config.KeyMaxGeneralAgentToolCalls, strconv.Itoa(input.MaxGeneralAgentToolCalls)},
-		{config.KeyMaxLimitedAgentToolCalls, strconv.Itoa(input.MaxLimitedAgentToolCalls)},
-		{config.KeyAgentPlanningStepEnabled, strconv.FormatBool(input.AgentPlanningStepEnabled)},
-		{config.KeyAssistantUseAgents, strconv.FormatBool(input.AssistantUseAgents)},
+	values := map[string]string{
+		config.KeyExecutionMonitorEnabled:  strconv.FormatBool(input.ExecutionMonitorEnabled),
+		config.KeyExecutionSameToolLimit:   strconv.Itoa(input.ExecutionMonitorSameToolLimit),
+		config.KeyExecutionTotalToolLimit:  strconv.Itoa(input.ExecutionMonitorTotalToolLimit),
+		config.KeyMaxGeneralAgentToolCalls: strconv.Itoa(input.MaxGeneralAgentToolCalls),
+		config.KeyMaxLimitedAgentToolCalls: strconv.Itoa(input.MaxLimitedAgentToolCalls),
+		config.KeyAgentPlanningStepEnabled: strconv.FormatBool(input.AgentPlanningStepEnabled),
+		config.KeyAssistantUseAgents:       strconv.FormatBool(input.AssistantUseAgents),
 	}
-	for _, s := range sets {
-		if err := applySetting(ctx, r.DB, r.Config, uid, cat, s.key, s.value, false); err != nil {
+	if err := applySettings(ctx, r.DB, r.Config, uid, config.CategoryExecution, values); err != nil {
+		return nil, err
+	}
+
+	return r.Query().SettingsExecution(ctx)
+}
+
+// UpdateLLMProviderSettings is the resolver for the updateLLMProviderSettings field.
+func (r *mutationResolver) UpdateLLMProviderSettings(ctx context.Context, input model.LLMProviderSettingsInput) (*model.LLMProviderSettings, error) {
+	uid, _, err := validatePermission(ctx, "settings.system.edit")
+	if err != nil {
+		return nil, err
+	}
+
+	values, err := llmProviderSettingValues(input)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(values) != 0 {
+		// The provider controller builds every provider these values affect
+		// before anything is persisted, so a setting that cannot produce a
+		// working provider is rejected instead of saved.
+		cat := config.CategoryLLMProviders
+		candidate := r.Config.Overrides.Snapshot(cat)
+		for key, value := range values {
+			values[key] = config.NormalizeSetting(cat, key, value)
+			candidate[key] = values[key]
+		}
+
+		if err := r.ProvidersCtrl.ApplyLLMProviderSettings(candidate, func() error {
+			return applySettings(ctx, r.DB, r.Config, uid, cat, values)
+		}); err != nil {
+			r.Logger.WithError(err).Warn("rejected llm provider settings change")
 			return nil, err
 		}
 	}
 
-	return r.Query().SettingsExecution(ctx)
+	return r.Query().SettingsLLMProviders(ctx)
 }
 
 // CreateAPIToken is the resolver for the createAPIToken field.
@@ -2444,6 +2456,25 @@ func (r *queryResolver) SettingsExecution(ctx context.Context) (*model.Execution
 		AssistantUseAgents: o.GetBool(
 			config.CategoryExecution, config.KeyAssistantUseAgents, c.AssistantUseAgents),
 	}, nil
+}
+
+// SettingsLLMProviders is the resolver for the settingsLLMProviders field.
+func (r *queryResolver) SettingsLLMProviders(ctx context.Context) (*model.LLMProviderSettings, error) {
+	if _, _, err := validatePermission(ctx, "settings.system.view"); err != nil {
+		return nil, err
+	}
+
+	return llmProviderSettings(r.Config, r.ProvidersCtrl), nil
+}
+
+// SettingsEnvFile is the resolver for the settingsEnvFile field.
+func (r *queryResolver) SettingsEnvFile(ctx context.Context) (*model.SettingsEnvFile, error) {
+	if _, _, err := validatePermission(ctx, "settings.system.view"); err != nil {
+		return nil, err
+	}
+
+	path, writable := r.Config.SettingsEnvFileStatus()
+	return &model.SettingsEnvFile{Path: path, Writable: writable}, nil
 }
 
 // APIToken is the resolver for the apiToken field.
