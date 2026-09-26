@@ -151,6 +151,8 @@ fragment taskFragment on Task {
     subtasks {
         ...subtaskFragment
     }
+    retryCount
+    lastError
     createdAt
     updatedAt
 }
@@ -162,6 +164,8 @@ fragment subtaskFragment on Subtask {
     description
     result
     taskId
+    retryCount
+    lastError
     createdAt
     updatedAt
 }
@@ -1499,6 +1503,8 @@ subscription taskUpdated($flowId: ID!) {
         subtasks {
             ...subtaskFragment
         }
+        retryCount
+        lastError
         updatedAt
     }
 }

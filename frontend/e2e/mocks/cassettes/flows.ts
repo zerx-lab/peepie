@@ -239,14 +239,18 @@ const TABS_TASK = entity('Task', {
     flowId: '5',
     id: '11',
     input: 'Enumerate the target',
+    lastError: '',
     result: 'Enumeration complete',
+    retryCount: 0,
     status: StatusType.Finished,
     subtasks: [
         entity('Subtask', {
             createdAt: T,
             description: 'Run an nmap sweep',
             id: '21',
+            lastError: '',
             result: 'Ports 22, 80 open',
+            retryCount: 0,
             status: StatusType.Finished,
             taskId: '11',
             title: 'E2E Subtask Scan',

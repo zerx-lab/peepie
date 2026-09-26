@@ -41,6 +41,27 @@ function FlowAutomationMessages({ className }: FlowAutomationMessagesProps) {
 
     const logs = useMemo(() => flowData?.messageLogs ?? [], [flowData?.messageLogs]);
 
+    // Real failure/retry info persisted by the backend for the task/subtask that
+    // produced each message, keyed by id so the timeline can show *why* a step
+    // stalled instead of the previous heuristic-only "repeated N times" badge.
+    const retryInfoById = useMemo(() => {
+        const info: Record<string, { lastError: string; retryCount: number }> = {};
+
+        for (const task of flowData?.tasks ?? []) {
+            if (task.retryCount > 0) {
+                info[task.id] = { lastError: task.lastError, retryCount: task.retryCount };
+            }
+
+            for (const subtask of task.subtasks ?? []) {
+                if (subtask.retryCount > 0) {
+                    info[subtask.id] = { lastError: subtask.lastError, retryCount: subtask.retryCount };
+                }
+            }
+        }
+
+        return info;
+    }, [flowData?.tasks]);
+
     // The most recently created agent log tells us which agent role is currently
     // handling the flow; shown next to the input so the user isn't guessing what
     // is happening while waiting (agent logs carry no live "in progress" flag,
@@ -307,6 +328,12 @@ function FlowAutomationMessages({ className }: FlowAutomationMessagesProps) {
                                 key={group.representative.id}
                                 log={group.representative}
                                 occurrenceTimestamps={group.occurrences}
+                                retryInfo={
+                                    (group.representative.subtaskId &&
+                                        retryInfoById[group.representative.subtaskId]) ||
+                                    (group.representative.taskId && retryInfoById[group.representative.taskId]) ||
+                                    undefined
+                                }
                                 searchValue={debouncedSearchValue}
                             />
                         ))}

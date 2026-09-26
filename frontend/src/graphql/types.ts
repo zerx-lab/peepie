@@ -522,6 +522,8 @@ export type TaskFragmentFragment = {
     input: string;
     result: string;
     flowId: string;
+    retryCount: number;
+    lastError: string;
     createdAt: string;
     updatedAt: string;
     subtasks: Array<SubtaskFragmentFragment> | null;
@@ -534,6 +536,8 @@ export type SubtaskFragmentFragment = {
     description: string;
     result: string;
     taskId: string;
+    retryCount: number;
+    lastError: string;
     createdAt: string;
     updatedAt: string;
 };
@@ -1561,6 +1565,8 @@ export type TaskUpdatedSubscription = {
         id: string;
         status: StatusType;
         result: string;
+        retryCount: number;
+        lastError: string;
         updatedAt: string;
         subtasks: Array<SubtaskFragmentFragment> | null;
     };
@@ -2042,6 +2048,8 @@ export const SubtaskFragmentFragmentDoc = {
                     { kind: 'Field', name: { kind: 'Name', value: 'description' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'result' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'taskId' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'retryCount' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'lastError' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
                 ],
@@ -2073,6 +2081,8 @@ export const TaskFragmentFragmentDoc = {
                             selections: [{ kind: 'FragmentSpread', name: { kind: 'Name', value: 'subtaskFragment' } }],
                         },
                     },
+                    { kind: 'Field', name: { kind: 'Name', value: 'retryCount' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'lastError' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
                 ],
@@ -2091,6 +2101,8 @@ export const TaskFragmentFragmentDoc = {
                     { kind: 'Field', name: { kind: 'Name', value: 'description' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'result' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'taskId' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'retryCount' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'lastError' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
                 ],
@@ -6020,6 +6032,8 @@ export const FlowDocument = {
                     { kind: 'Field', name: { kind: 'Name', value: 'description' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'result' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'taskId' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'retryCount' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'lastError' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
                 ],
@@ -6077,6 +6091,8 @@ export const FlowDocument = {
                             selections: [{ kind: 'FragmentSpread', name: { kind: 'Name', value: 'subtaskFragment' } }],
                         },
                     },
+                    { kind: 'Field', name: { kind: 'Name', value: 'retryCount' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'lastError' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
                 ],
@@ -6247,6 +6263,8 @@ export const TasksDocument = {
                     { kind: 'Field', name: { kind: 'Name', value: 'description' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'result' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'taskId' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'retryCount' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'lastError' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
                 ],
@@ -6273,6 +6291,8 @@ export const TasksDocument = {
                             selections: [{ kind: 'FragmentSpread', name: { kind: 'Name', value: 'subtaskFragment' } }],
                         },
                     },
+                    { kind: 'Field', name: { kind: 'Name', value: 'retryCount' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'lastError' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
                 ],
@@ -6636,6 +6656,8 @@ export const FlowReportDocument = {
                     { kind: 'Field', name: { kind: 'Name', value: 'description' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'result' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'taskId' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'retryCount' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'lastError' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
                 ],
@@ -6693,6 +6715,8 @@ export const FlowReportDocument = {
                             selections: [{ kind: 'FragmentSpread', name: { kind: 'Name', value: 'subtaskFragment' } }],
                         },
                     },
+                    { kind: 'Field', name: { kind: 'Name', value: 'retryCount' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'lastError' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
                 ],
@@ -12382,6 +12406,8 @@ export const TaskCreatedDocument = {
                     { kind: 'Field', name: { kind: 'Name', value: 'description' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'result' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'taskId' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'retryCount' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'lastError' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
                 ],
@@ -12408,6 +12434,8 @@ export const TaskCreatedDocument = {
                             selections: [{ kind: 'FragmentSpread', name: { kind: 'Name', value: 'subtaskFragment' } }],
                         },
                     },
+                    { kind: 'Field', name: { kind: 'Name', value: 'retryCount' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'lastError' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
                 ],
@@ -12461,6 +12489,8 @@ export const TaskUpdatedDocument = {
                                         ],
                                     },
                                 },
+                                { kind: 'Field', name: { kind: 'Name', value: 'retryCount' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'lastError' } },
                                 { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
                             ],
                         },
@@ -12481,6 +12511,8 @@ export const TaskUpdatedDocument = {
                     { kind: 'Field', name: { kind: 'Name', value: 'description' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'result' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'taskId' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'retryCount' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'lastError' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
                     { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
                 ],

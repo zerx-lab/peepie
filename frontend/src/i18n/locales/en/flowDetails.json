@@ -77,6 +77,7 @@
         "notFound": "No messages found",
         "retryBadge": "Retried {{count}}×",
         "retryTooltip": "This step repeated without producing a result, possibly stuck on a failing tool call. Attempts:\n{{times}}",
+        "failureBadge": "Failed after {{count}} retries",
         "currentAgent": "Currently handling:",
         "automationEmpty": {
             "title": "No active tasks",

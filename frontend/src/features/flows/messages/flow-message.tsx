@@ -17,6 +17,7 @@ import FlowMessageTypeIcon from './flow-message-type-icon';
 interface FlowMessageProps {
     log: AssistantLogFragmentFragment | MessageLogFragmentFragment;
     occurrenceTimestamps?: string[];
+    retryInfo?: { lastError: string; retryCount: number };
     searchValue?: string;
 }
 
@@ -28,7 +29,7 @@ const containsSearchValue = (text: null | string | undefined, searchValue: strin
     return text.toLowerCase().includes(searchValue.toLowerCase().trim());
 };
 
-function FlowMessage({ log, occurrenceTimestamps, searchValue = '' }: FlowMessageProps) {
+function FlowMessage({ log, occurrenceTimestamps, retryInfo, searchValue = '' }: FlowMessageProps) {
     const { t } = useTranslation(['flowDetails', 'common']);
     const { createdAt, message, result, resultFormat = ResultFormat.Plain, thinking, type } = log;
     const isReportMessage = type === MessageLogType.Report;
@@ -214,6 +215,17 @@ function FlowMessage({ log, occurrenceTimestamps, searchValue = '' }: FlowMessag
                                 times: occurrenceTimestamps.map((ts) => formatDate(new Date(ts))).join('\n'),
                             })}
                         </TooltipContent>
+                    </Tooltip>
+                )}
+                {retryInfo && retryInfo.retryCount > 0 && (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <span className="border-destructive/40 bg-destructive/10 text-destructive mx-0.5 inline-flex items-center gap-0.5 rounded-full border px-1.5 py-0.5 text-[10px] font-medium leading-none">
+                                <RefreshCw className="size-2.5" />
+                                {t('messages.failureBadge', { count: retryInfo.retryCount })}
+                            </span>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-80 whitespace-pre-line">{retryInfo.lastError}</TooltipContent>
                     </Tooltip>
                 )}
                 <Tooltip>

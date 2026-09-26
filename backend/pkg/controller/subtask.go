@@ -305,6 +305,10 @@ func (stw *subtaskWorker) Run(ctx context.Context) error {
 		return err
 	}
 
+	if _, err := stw.subtaskCtx.DB.ResetSubtaskRetryError(ctx, stw.subtaskCtx.SubtaskID); err != nil {
+		logrus.WithContext(ctx).WithError(err).Warn("failed to reset subtask retry error")
+	}
+
 	var (
 		taskID     = stw.subtaskCtx.TaskID
 		subtaskID  = stw.subtaskCtx.SubtaskID

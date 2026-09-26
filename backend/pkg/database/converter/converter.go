@@ -90,15 +90,17 @@ func ConvertSubtasks(subtasks []database.Subtask) []*model.Subtask {
 
 func ConvertTask(task database.Task, subtasks []database.Subtask) *model.Task {
 	return &model.Task{
-		ID:        task.ID,
-		Title:     task.Title,
-		Status:    model.StatusType(task.Status),
-		Input:     task.Input,
-		Result:    task.Result,
-		FlowID:    task.FlowID,
-		Subtasks:  ConvertSubtasks(subtasks),
-		CreatedAt: task.CreatedAt.Time,
-		UpdatedAt: task.UpdatedAt.Time,
+		ID:         task.ID,
+		Title:      task.Title,
+		Status:     model.StatusType(task.Status),
+		Input:      task.Input,
+		Result:     task.Result,
+		FlowID:     task.FlowID,
+		Subtasks:   ConvertSubtasks(subtasks),
+		RetryCount: int(task.RetryCount),
+		LastError:  task.LastError,
+		CreatedAt:  task.CreatedAt.Time,
+		UpdatedAt:  task.UpdatedAt.Time,
 	}
 }
 
@@ -110,6 +112,8 @@ func ConvertSubtask(subtask database.Subtask) *model.Subtask {
 		Description: subtask.Description,
 		Result:      subtask.Result,
 		TaskID:      subtask.TaskID,
+		RetryCount:  int(subtask.RetryCount),
+		LastError:   subtask.LastError,
 		CreatedAt:   subtask.CreatedAt.Time,
 		UpdatedAt:   subtask.UpdatedAt.Time,
 	}

@@ -118,6 +118,18 @@ SET context = $1
 WHERE id = $2
 RETURNING *;
 
+-- name: UpdateSubtaskRetryError :one
+UPDATE subtasks
+SET retry_count = retry_count + 1, last_error = $1
+WHERE id = $2
+RETURNING *;
+
+-- name: ResetSubtaskRetryError :one
+UPDATE subtasks
+SET retry_count = 0, last_error = ''
+WHERE id = $1
+RETURNING *;
+
 -- name: DeleteSubtask :exec
 DELETE FROM subtasks
 WHERE id = $1;

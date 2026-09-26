@@ -86,6 +86,102 @@ func markReflectorRetry(ctx context.Context) context.Context {
 	return context.WithValue(ctx, reflectorRetryContextKey{}, true)
 }
 
+// transientProviderErrorMarkers are substrings that indicate a temporary,
+// infrastructure-level failure of the LLM provider/gateway call (rate limit,
+// upstream overload, network hiccup, timeout) as opposed to a genuine
+// behavioral/response problem the model itself needs guidance about.
+// Matching is done on err.Error() because provider SDKs (Anthropic, OpenAI,
+// Bifrost gateway, etc.) surface raw HTTP status codes and transport errors
+// as plain strings, not typed errors.
+var transientProviderErrorMarkers = []string{
+	"429",
+	"500",
+	"502",
+	"503",
+	"504",
+	"timeout",
+	"timed out",
+	"deadline exceeded",
+	"connection reset",
+	"connection refused",
+	"eof",
+	"i/o timeout",
+	"temporarily unavailable",
+	"overloaded",
+	"too many requests",
+	"rate limit",
+	"bad gateway",
+	"gateway timeout",
+	"service unavailable",
+}
+
+// isTransientProviderError reports whether err looks like a temporary
+// infrastructure failure that is worth patiently retrying with backoff
+// instead of immediately burning the model-behavior retry/reflector budget.
+func isTransientProviderError(err error) bool {
+	if err == nil {
+		return false
+	}
+	msg := strings.ToLower(err.Error())
+	for _, marker := range transientProviderErrorMarkers {
+		if strings.Contains(msg, marker) {
+			return true
+		}
+	}
+	return false
+}
+
+// recordRetryError persists the latest failure for the current task/subtask
+// so it is visible to the user via the API instead of only living in
+// process logs. It is best-effort: a failure to persist must never abort
+// the agent chain it is merely observing.
+func (fp *flowProvider) recordRetryError(ctx context.Context, taskID, subtaskID *int64, callErr error) {
+	if callErr == nil {
+		return
+	}
+
+	msg := callErr.Error()
+	if len(msg) > 2000 {
+		msg = msg[:2000]
+	}
+
+	if subtaskID != nil {
+		if _, err := fp.db.UpdateSubtaskRetryError(ctx, database.UpdateSubtaskRetryErrorParams{
+			LastError: msg,
+			ID:        *subtaskID,
+		}); err != nil {
+			logrus.WithContext(ctx).WithError(err).Warn("failed to persist subtask retry error")
+		}
+		return
+	}
+
+	if taskID != nil {
+		if _, err := fp.db.UpdateTaskRetryError(ctx, database.UpdateTaskRetryErrorParams{
+			LastError: msg,
+			ID:        *taskID,
+		}); err != nil {
+			logrus.WithContext(ctx).WithError(err).Warn("failed to persist task retry error")
+		}
+	}
+}
+
+// resetRetryError clears retry_count/last_error at the start of a fresh run
+// so the UI does not show stale failure info from a previous attempt.
+func (fp *flowProvider) resetRetryError(ctx context.Context, taskID, subtaskID *int64) {
+	if subtaskID != nil {
+		if _, err := fp.db.ResetSubtaskRetryError(ctx, *subtaskID); err != nil {
+			logrus.WithContext(ctx).WithError(err).Warn("failed to reset subtask retry error")
+		}
+		return
+	}
+
+	if taskID != nil {
+		if _, err := fp.db.ResetTaskRetryError(ctx, *taskID); err != nil {
+			logrus.WithContext(ctx).WithError(err).Warn("failed to reset task retry error")
+		}
+	}
+}
+
 type repeatingDetector struct {
 	funcCalls []llms.FunctionCall
 }

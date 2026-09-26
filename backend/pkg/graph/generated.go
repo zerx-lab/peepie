@@ -717,7 +717,9 @@ type ComplexityRoot struct {
 		CreatedAt   func(childComplexity int) int
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
+		LastError   func(childComplexity int) int
 		Result      func(childComplexity int) int
+		RetryCount  func(childComplexity int) int
 		Status      func(childComplexity int) int
 		TaskID      func(childComplexity int) int
 		Title       func(childComplexity int) int
@@ -732,15 +734,17 @@ type ComplexityRoot struct {
 	}
 
 	Task struct {
-		CreatedAt func(childComplexity int) int
-		FlowID    func(childComplexity int) int
-		ID        func(childComplexity int) int
-		Input     func(childComplexity int) int
-		Result    func(childComplexity int) int
-		Status    func(childComplexity int) int
-		Subtasks  func(childComplexity int) int
-		Title     func(childComplexity int) int
-		UpdatedAt func(childComplexity int) int
+		CreatedAt  func(childComplexity int) int
+		FlowID     func(childComplexity int) int
+		ID         func(childComplexity int) int
+		Input      func(childComplexity int) int
+		LastError  func(childComplexity int) int
+		Result     func(childComplexity int) int
+		RetryCount func(childComplexity int) int
+		Status     func(childComplexity int) int
+		Subtasks   func(childComplexity int) int
+		Title      func(childComplexity int) int
+		UpdatedAt  func(childComplexity int) int
 	}
 
 	TaskExecutionStats struct {
@@ -4864,12 +4868,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Subtask.ID(childComplexity), true
 
+	case "Subtask.lastError":
+		if e.complexity.Subtask.LastError == nil {
+			break
+		}
+
+		return e.complexity.Subtask.LastError(childComplexity), true
+
 	case "Subtask.result":
 		if e.complexity.Subtask.Result == nil {
 			break
 		}
 
 		return e.complexity.Subtask.Result(childComplexity), true
+
+	case "Subtask.retryCount":
+		if e.complexity.Subtask.RetryCount == nil {
+			break
+		}
+
+		return e.complexity.Subtask.RetryCount(childComplexity), true
 
 	case "Subtask.status":
 		if e.complexity.Subtask.Status == nil {
@@ -4955,12 +4973,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Task.Input(childComplexity), true
 
+	case "Task.lastError":
+		if e.complexity.Task.LastError == nil {
+			break
+		}
+
+		return e.complexity.Task.LastError(childComplexity), true
+
 	case "Task.result":
 		if e.complexity.Task.Result == nil {
 			break
 		}
 
 		return e.complexity.Task.Result(childComplexity), true
+
+	case "Task.retryCount":
+		if e.complexity.Task.RetryCount == nil {
+			break
+		}
+
+		return e.complexity.Task.RetryCount(childComplexity), true
 
 	case "Task.status":
 		if e.complexity.Task.Status == nil {
@@ -27255,6 +27287,10 @@ func (ec *executionContext) fieldContext_Query_tasks(ctx context.Context, field 
 				return ec.fieldContext_Task_flowId(ctx, field)
 			case "subtasks":
 				return ec.fieldContext_Task_subtasks(ctx, field)
+			case "retryCount":
+				return ec.fieldContext_Task_retryCount(ctx, field)
+			case "lastError":
+				return ec.fieldContext_Task_lastError(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Task_createdAt(ctx, field)
 			case "updatedAt":
@@ -32729,6 +32765,10 @@ func (ec *executionContext) fieldContext_Subscription_taskCreated(ctx context.Co
 				return ec.fieldContext_Task_flowId(ctx, field)
 			case "subtasks":
 				return ec.fieldContext_Task_subtasks(ctx, field)
+			case "retryCount":
+				return ec.fieldContext_Task_retryCount(ctx, field)
+			case "lastError":
+				return ec.fieldContext_Task_lastError(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Task_createdAt(ctx, field)
 			case "updatedAt":
@@ -32818,6 +32858,10 @@ func (ec *executionContext) fieldContext_Subscription_taskUpdated(ctx context.Co
 				return ec.fieldContext_Task_flowId(ctx, field)
 			case "subtasks":
 				return ec.fieldContext_Task_subtasks(ctx, field)
+			case "retryCount":
+				return ec.fieldContext_Task_retryCount(ctx, field)
+			case "lastError":
+				return ec.fieldContext_Task_lastError(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Task_createdAt(ctx, field)
 			case "updatedAt":
@@ -35841,6 +35885,94 @@ func (ec *executionContext) fieldContext_Subtask_taskId(_ context.Context, field
 	return fc, nil
 }
 
+func (ec *executionContext) _Subtask_retryCount(ctx context.Context, field graphql.CollectedField, obj *model.Subtask) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Subtask_retryCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RetryCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Subtask_retryCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Subtask",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Subtask_lastError(ctx context.Context, field graphql.CollectedField, obj *model.Subtask) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Subtask_lastError(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LastError, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Subtask_lastError(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Subtask",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Subtask_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Subtask) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Subtask_createdAt(ctx, field)
 	if err != nil {
@@ -36417,12 +36549,104 @@ func (ec *executionContext) fieldContext_Task_subtasks(_ context.Context, field 
 				return ec.fieldContext_Subtask_result(ctx, field)
 			case "taskId":
 				return ec.fieldContext_Subtask_taskId(ctx, field)
+			case "retryCount":
+				return ec.fieldContext_Subtask_retryCount(ctx, field)
+			case "lastError":
+				return ec.fieldContext_Subtask_lastError(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Subtask_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Subtask_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Subtask", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Task_retryCount(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_retryCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RetryCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Task_retryCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Task",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Task_lastError(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_lastError(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LastError, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Task_lastError(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Task",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -48324,6 +48548,16 @@ func (ec *executionContext) _Subtask(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "retryCount":
+			out.Values[i] = ec._Subtask_retryCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "lastError":
+			out.Values[i] = ec._Subtask_lastError(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "createdAt":
 			out.Values[i] = ec._Subtask_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -48454,6 +48688,16 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "subtasks":
 			out.Values[i] = ec._Task_subtasks(ctx, field, obj)
+		case "retryCount":
+			out.Values[i] = ec._Task_retryCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "lastError":
+			out.Values[i] = ec._Task_lastError(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "createdAt":
 			out.Values[i] = ec._Task_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

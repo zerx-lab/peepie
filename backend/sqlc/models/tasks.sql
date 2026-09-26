@@ -70,3 +70,15 @@ UPDATE tasks
 SET status = 'failed', result = $1
 WHERE id = $2
 RETURNING *;
+
+-- name: UpdateTaskRetryError :one
+UPDATE tasks
+SET retry_count = retry_count + 1, last_error = $1
+WHERE id = $2
+RETURNING *;
+
+-- name: ResetTaskRetryError :one
+UPDATE tasks
+SET retry_count = 0, last_error = ''
+WHERE id = $1
+RETURNING *;

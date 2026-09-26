@@ -493,6 +493,8 @@ type Task {
   result: String!
   flowId: ID!
   subtasks: [Subtask!]
+  retryCount: Int!
+  lastError: String!
   createdAt: Time!
   updatedAt: Time!
 }
@@ -504,6 +506,8 @@ type Subtask {
   description: String!
   result: String!
   taskId: ID!
+  retryCount: Int!
+  lastError: String!
   createdAt: Time!
   updatedAt: Time!
 }

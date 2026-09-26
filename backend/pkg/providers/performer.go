@@ -35,6 +35,14 @@ const (
 	maxAgentShutdownIterations     = 3
 	maxSoftDetectionsBeforeAbort   = 4
 	delayBetweenRetries            = 5 * time.Second
+
+	// Transient provider/gateway errors (429/5xx/timeouts) are infrastructure
+	// hiccups, not agent-behavior problems: they get their own, much more
+	// patient retry budget with exponential backoff instead of immediately
+	// burning the reflector-guidance budget, which is meant for genuine
+	// model-response issues and cannot fix an upstream outage anyway.
+	maxTransientRetriesToCallAgentChain = 8
+	transientRetryMaxDelay              = 60 * time.Second
 )
 
 type callResult struct {
@@ -326,15 +334,15 @@ func (fp *flowProvider) execToolCall(
 	}
 
 	var (
-		err      error
-		response string
+		err            error
+		response       string
+		degradedReason string
 	)
 
 	for idx := 0; idx <= maxRetriesToCallFunction; idx++ {
 		if idx == maxRetriesToCallFunction {
-			err = fmt.Errorf("reached max retries to call function: %w", err)
-			obs.LogErrorOrCancel(logger, err, "failed to exec function")
-			return "", fmt.Errorf("failed to exec function '%s': %w", funcName, err)
+			degradedReason = fmt.Errorf("reached max retries to call function: %w", err).Error()
+			break
 		}
 
 		response, err = executor.Execute(ctx, streamID, toolCall.ID, funcName, funcName, thinking, funcArgs)
@@ -355,20 +363,33 @@ func (fp *flowProvider) execToolCall(
 			logger.WithError(err).Warn("failed to exec function")
 
 			funcExecErr := err
-			funcSchema, err := executor.GetToolSchema(funcName)
-			if err != nil {
-				logger.WithError(err).Error("failed to get tool schema")
-				return "", fmt.Errorf("failed to get tool schema: %w", err)
+			funcSchema, schemaErr := executor.GetToolSchema(funcName)
+			if schemaErr != nil {
+				logger.WithError(schemaErr).Error("failed to get tool schema")
+				degradedReason = fmt.Errorf("failed to get tool schema: %w", schemaErr).Error()
+				break
 			}
 
 			funcArgs, err = fp.fixToolCallArgs(ctx, funcName, funcArgs, funcSchema, funcExecErr)
 			if err != nil {
 				obs.LogErrorOrCancel(logger, err, "failed to fix tool call args")
-				return "", fmt.Errorf("failed to fix tool call args: %w", err)
+				degradedReason = fmt.Errorf("failed to fix tool call args: %w", err).Error()
+				break
 			}
 		} else {
 			break
 		}
+	}
+
+	if degradedReason != "" {
+		// A tool call failing (transient error, arguments the agent keeps getting
+		// wrong, provider hiccup, ...) must not kill the whole agent chain: report
+		// the failure back to the agent as a normal tool result so it can pick
+		// another approach, and keep a record of it for observability.
+		fp.recordRetryError(ctx, taskID, subtaskID, errors.New(degradedReason))
+		return fmt.Sprintf(
+			"tool '%s' failed: %s. Choose a different approach or arguments.", funcName, degradedReason,
+		), nil
 	}
 
 	if monitor.shouldInvokeMentor(toolCall) && executor.IsFunctionExists(tools.AdviceToolName) {
@@ -474,13 +495,18 @@ func (fp *flowProvider) callWithRetries(
 		return nil
 	}
 
-	for idx := 0; idx <= maxRetriesToCallAgentChain; idx++ {
-		if idx == maxRetriesToCallAgentChain {
+	var (
+		attempt              int
+		nonTransientFailures int
+	)
+
+	for {
+		if nonTransientFailures >= maxRetriesToCallAgentChain || attempt >= maxTransientRetriesToCallAgentChain {
 			reflectorResult, err := fp.performCallerReflector(
 				ctx, optAgentType, chainID, taskID, subtaskID, chain, executor, executionContext, errs,
 			)
 			if err != nil {
-				msg := fmt.Sprintf("failed to call agent chain: max retries reached, %d", idx)
+				msg := fmt.Sprintf("failed to call agent chain: max retries reached, %d", attempt)
 				return nil, fmt.Errorf(msg+": %w", errors.Join(append(errs, err)...))
 			}
 
@@ -528,15 +554,34 @@ func (fp *flowProvider) callWithRetries(
 		}
 		if err == nil {
 			break
-		} else {
-			errs = append(errs, err)
-			logger.WithFields(logrus.Fields{
-				"retry_iteration": idx,
-				"error":           err.Error()[:min(200, len(err.Error()))],
-			}).Warn("agent chain call failed, will retry")
 		}
 
-		ticker.Reset(delayBetweenRetries)
+		errs = append(errs, err)
+		transient := isTransientProviderError(err)
+		if !transient {
+			nonTransientFailures++
+		}
+		attempt++
+
+		fp.recordRetryError(ctx, taskID, subtaskID, err)
+		logger.WithFields(logrus.Fields{
+			"retry_iteration": attempt,
+			"transient":       transient,
+			"error":           err.Error()[:min(200, len(err.Error()))],
+		}).Warn("agent chain call failed, will retry")
+
+		delay := delayBetweenRetries
+		if transient {
+			// exponential backoff for infrastructure hiccups (rate limits, gateway
+			// timeouts, ...), capped so a genuinely stuck provider still surfaces
+			// as a visible failure instead of stalling the flow indefinitely
+			delay = delayBetweenRetries * time.Duration(1<<min(attempt, 4))
+			if delay > transientRetryMaxDelay {
+				delay = transientRetryMaxDelay
+			}
+		}
+
+		ticker.Reset(delay)
 		select {
 		case <-ticker.C:
 		case <-ctx.Done():

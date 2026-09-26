@@ -678,6 +678,8 @@ type Subtask struct {
 	Description string     `json:"description"`
 	Result      string     `json:"result"`
 	TaskID      int64      `json:"taskId"`
+	RetryCount  int        `json:"retryCount"`
+	LastError   string     `json:"lastError"`
 	CreatedAt   time.Time  `json:"createdAt"`
 	UpdatedAt   time.Time  `json:"updatedAt"`
 }
@@ -690,15 +692,17 @@ type SubtaskExecutionStats struct {
 }
 
 type Task struct {
-	ID        int64      `json:"id"`
-	Title     string     `json:"title"`
-	Status    StatusType `json:"status"`
-	Input     string     `json:"input"`
-	Result    string     `json:"result"`
-	FlowID    int64      `json:"flowId"`
-	Subtasks  []*Subtask `json:"subtasks,omitempty"`
-	CreatedAt time.Time  `json:"createdAt"`
-	UpdatedAt time.Time  `json:"updatedAt"`
+	ID         int64      `json:"id"`
+	Title      string     `json:"title"`
+	Status     StatusType `json:"status"`
+	Input      string     `json:"input"`
+	Result     string     `json:"result"`
+	FlowID     int64      `json:"flowId"`
+	Subtasks   []*Subtask `json:"subtasks,omitempty"`
+	RetryCount int        `json:"retryCount"`
+	LastError  string     `json:"lastError"`
+	CreatedAt  time.Time  `json:"createdAt"`
+	UpdatedAt  time.Time  `json:"updatedAt"`
 }
 
 type TaskExecutionStats struct {
